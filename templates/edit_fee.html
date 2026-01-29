@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Fee - {{ member.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .edit-fee-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .edit-fee-back-wrap {
+        margin-bottom: 2rem;
+    }
+
+    .edit-fee-back-link {
+        color: var(--text-muted);
+        text-decoration: none;
+    }
+
+    .edit-fee-title {
+        margin-bottom: 1.5rem;
+    }
+
+    .edit-fee-form {
+        margin-top: 1.5rem;
+    }
+
+    .edit-fee-submit {
+        width: 100%;
+    }
+</style>
+
+<div class="edit-fee-container">
+    <div class="edit-fee-back-wrap">
+        <a href="{{ url_for('member_details', member_id=member.id) }}" class="edit-fee-back-link">&larr; Back to
+            Member</a>
+    </div>
+
+    <div class="card">
+        <h2 class="edit-fee-title">✏️ Edit Payment</h2>
+        <p><strong>Member:</strong> {{ member.name }}</p>
+        <p><strong>Month:</strong> {{ month }}</p>
+
+        <form method="POST" class="edit-fee-form">
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" value="{{ fee.amount }}" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Payment Date (YYYY-MM-DD HH:MM:SS)</label>
+                <input type="text" id="date" name="date" value="{{ fee.paid_date }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-success edit-fee-submit">💾 Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

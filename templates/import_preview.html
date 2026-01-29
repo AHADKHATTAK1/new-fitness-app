@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}Import Preview - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .import-preview-wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .import-preview-back-wrap {
+        margin-bottom: 2rem;
+    }
+
+    .import-preview-back-link {
+        color: var(--text-muted);
+        text-decoration: none;
+    }
+
+    .import-preview-title {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .import-preview-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+
+    .import-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .import-summary-card {
+        text-align: center;
+    }
+
+    .import-summary-total {
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    .import-summary-valid {
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .import-summary-warn {
+        background: rgba(234, 179, 8, 0.1);
+    }
+
+    .import-summary-error {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .import-summary-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .import-summary-value {
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .import-summary-value-total {
+        color: var(--primary);
+    }
+
+    .import-summary-value-valid {
+        color: #10b981;
+    }
+
+    .import-summary-value-warn {
+        color: #eab308;
+    }
+
+    .import-summary-value-error {
+        color: #ef4444;
+    }
+
+    .import-summary-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .import-duplicate-card {
+        margin-bottom: 2rem;
+        background: linear-gradient(145deg, rgba(234, 179, 8, 0.1), rgba(234, 179, 8, 0.05));
+    }
+
+    .import-duplicate-title {
+        margin-bottom: 1rem;
+        color: #eab308;
+    }
+
+    .import-duplicate-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .import-duplicate-options {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .duplicate-option {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .duplicate-option-radio {
+        margin-right: 0.75rem;
+    }
+
+    .duplicate-option-help {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-left: 1.75rem;
+    }
+
+    .import-table-card {
+        overflow-x: auto;
+    }
+
+    .import-table-title {
+        margin-bottom: 1.5rem;
+    }
+
+    .import-preview-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .import-preview-head-row {
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    .import-preview-th,
+    .import-preview-td {
+        padding: 0.75rem;
+        text-align: left;
+    }
+
+    .import-preview-row {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .import-preview-row-error {
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .import-preview-row-warning {
+        background: rgba(234, 179, 8, 0.05);
+    }
+
+    .import-status-icon {
+        font-size: 1.2rem;
+    }
+
+    .import-status-valid {
+        color: #10b981;
+    }
+
+    .import-status-warning {
+        color: #eab308;
+    }
+
+    .import-status-error {
+        color: #ef4444;
+    }
+
+    .import-name-cell {
+        font-weight: 600;
+    }
+
+    .import-email-cell {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .import-joined-cell {
+        font-size: 0.9rem;
+    }
+
+    .import-payment-chip {
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .import-payment-paid {
+        background: #10b981;
+    }
+
+    .import-payment-unpaid {
+        background: #ef4444;
+    }
+
+    .import-payment-empty {
+        color: var(--text-muted);
+    }
+
+    .import-issues-cell {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .import-issue-item {
+        margin-bottom: 0.25rem;
+    }
+
+    .import-issue-ok {
+        color: #10b981;
+    }
+
+    .import-table-footer {
+        text-align: center;
+        padding: 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .import-actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .import-btn-cancel {
+        background: transparent;
+        border: 1px solid var(--border);
+    }
+
+    .import-btn-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .import-btn-confirm {
+        font-size: 1.1rem;
+    }
+
+    .duplicate-option:has(input[type="radio"]:checked) {
+        border-color: var(--primary);
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    .duplicate-option:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+</style>
+
+<div class="import-preview-wrap">
+    <div class="import-preview-back-wrap">
+        <a href="{{ url_for('bulk_import') }}" class="import-preview-back-link">
+            ← Back to Upload
+        </a>
+    </div>
+
+    <h1 class="import-preview-title">
+        📊 Import Preview
+    </h1>
+    <p class="import-preview-subtitle">Review data before importing: {{ filename }}</p>
+
+    <!-- Summary Cards -->
+    <div class="import-summary-grid">
+        <!-- Total -->
+        <div class="card import-summary-card import-summary-total">
+            <div class="import-summary-icon">📋</div>
+            <div class="import-summary-value import-summary-value-total">{{ validation.total }}</div>
+            <div class="import-summary-label">Total Rows</div>
+        </div>
+
+        <!-- Valid -->
+        <div class="card import-summary-card import-summary-valid">
+            <div class="import-summary-icon">✅</div>
+            <div class="import-summary-value import-summary-value-valid">{{ validation.valid }}</div>
+            <div class="import-summary-label">Valid</div>
+        </div>
+
+        <!-- Warnings -->
+        <div class="card import-summary-card import-summary-warn">
+            <div class="import-summary-icon">⚠️</div>
+            <div class="import-summary-value import-summary-value-warn">{{ validation.warnings }}</div>
+            <div class="import-summary-label">Warnings</div>
+        </div>
+
+        <!-- Errors -->
+        <div class="card import-summary-card import-summary-error">
+            <div class="import-summary-icon">❌</div>
+            <div class="import-summary-value import-summary-value-error">{{ validation.errors }}</div>
+            <div class="import-summary-label">Errors</div>
+        </div>
+    </div>
+
+    <!-- Duplicate Handling (if duplicates found) -->
+    {% if duplicate_count > 0 %}
+    <div class="card import-duplicate-card">
+        <h2 class="import-duplicate-title">⚠️ Duplicates Found: {{ duplicate_count }}</h2>
+        <p class="import-duplicate-subtitle">
+            These members already exist in your database. Choose how to handle them:
+        </p>
+
+        <form id="importForm" method="POST" action="{{ url_for('bulk_import') }}">
+            <input type="hidden" name="action" value="confirm">
+
+            <div class="import-duplicate-options">
+                <label class="duplicate-option">
+                    <input type="radio" name="duplicate_strategy" value="skip" checked class="duplicate-option-radio">
+                    <strong>Skip Duplicates</strong><br>
+                    <span class="duplicate-option-help">
+                        Keep existing members unchanged, only add new members
+                    </span>
+                </label>
+
+                <label class="duplicate-option">
+                    <input type="radio" name="duplicate_strategy" value="update" class="duplicate-option-radio">
+                    <strong>Update All Fields</strong><br>
+                    <span class="duplicate-option-help">
+                        Replace all member information with data from Excel
+                    </span>
+                </label>
+
+                <label class="duplicate-option">
+                    <input type="radio" name="duplicate_strategy" value="merge" class="duplicate-option-radio">
+                    <strong>Smart Merge</strong><br>
+                    <span class="duplicate-option-help">
+                        Update only non-empty fields, add new payments, keep existing data
+                    </span>
+                </label>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Preview Table -->
+    <div class="card import-table-card">
+        <h2 class="import-table-title">📋 Preview (First 20 Rows)</h2>
+
+        <table class="import-preview-table">
+            <thead>
+                <tr class="import-preview-head-row">
+                    <th class="import-preview-th">#</th>
+                    <th class="import-preview-th">Status</th>
+                    <th class="import-preview-th">Name</th>
+                    <th class="import-preview-th">Phone</th>
+                    <th class="import-preview-th">Email</th>
+                    <th class="import-preview-th">Joined</th>
+                    <th class="import-preview-th">Payment</th>
+                    <th class="import-preview-th">Issues</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in validation.rows[:20] %}
+                <tr
+                    class="import-preview-row {% if row.status == 'error' %}import-preview-row-error{% elif row.status == 'warning' %}import-preview-row-warning{% endif %}">
+                    <td class="import-preview-td">{{ row.row_num }}</td>
+                    <td class="import-preview-td">
+                        {% if row.status == 'valid' %}
+                        <span class="import-status-icon import-status-valid">✅</span>
+                        {% elif row.status == 'warning' %}
+                        <span class="import-status-icon import-status-warning">⚠️</span>
+                        {% else %}
+                        <span class="import-status-icon import-status-error">❌</span>
+                        {% endif %}
+                    </td>
+                    <td class="import-preview-td import-name-cell">{{ row.data.name or '-' }}</td>
+                    <td class="import-preview-td">{{ row.data.phone or '-' }}</td>
+                    <td class="import-preview-td import-email-cell">{{ row.data.email or '-'
+                        }}</td>
+                    <td class="import-preview-td import-joined-cell">{{ row.data.joined_date }}</td>
+                    <td class="import-preview-td">
+                        {% if row.data.status == 'paid' %}
+                        <span class="import-payment-chip import-payment-paid">PAID</span>
+                        {% elif row.data.status == 'unpaid' %}
+                        <span class="import-payment-chip import-payment-unpaid">UNPAID</span>
+                        {% else %}
+                        <span class="import-payment-empty">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="import-preview-td import-issues-cell">
+                        {% if row.messages %}
+                        {% for msg in row.messages %}
+                        <div class="import-issue-item">• {{ msg }}</div>
+                        {% endfor %}
+                        {% else %}
+                        <span class="import-issue-ok">OK</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if validation.total > 20 %}
+        <div class="import-table-footer">
+            Showing first 20 of {{ validation.total }} rows
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="import-actions">
+        <a href="{{ url_for('bulk_import') }}" class="btn import-btn-cancel">
+            ❌ Cancel
+        </a>
+
+        {% if validation.errors > 0 %}
+        <button disabled class="btn import-btn-disabled" title="Fix errors before importing">
+            ⚠️ Cannot Import ({{ validation.errors }} errors)
+        </button>
+        {% else %}
+        <button type="submit" form="importForm" class="btn btn-success import-btn-confirm">
+            ✅ Proceed with Import ({{ validation.valid + validation.warnings }} rows)
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

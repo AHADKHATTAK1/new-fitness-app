@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Operations - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .bulk-card {
+        background: rgba(15, 23, 42, 0.6);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+
+    .quick-select-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-select-all {
+        background: var(--secondary);
+    }
+
+    .btn-select-none {
+        background: var(--text-muted);
+    }
+
+    .btn-select-unpaid {
+        background: var(--error);
+    }
+
+    .btn-select-paid {
+        background: var(--success);
+    }
+
+    .selected-count {
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .member-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .member-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(139, 92, 246, 0.05);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+    }
+
+    .member-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .member-info {
+        flex: 1;
+    }
+
+    .member-name {
+        font-weight: 700;
+    }
+
+    .member-phone {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .status-pill {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .action-box {
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid;
+    }
+
+    .action-box-payment {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: var(--success);
+    }
+
+    .action-box-message {
+        background: rgba(6, 182, 212, 0.1);
+        border-color: var(--secondary);
+    }
+
+    .action-title-payment {
+        color: var(--success);
+        margin-bottom: 1rem;
+    }
+
+    .action-title-message {
+        color: var(--secondary);
+        margin-bottom: 1rem;
+    }
+
+    .action-description {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .field-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .field-control {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .field-control-textarea {
+        resize: vertical;
+    }
+
+    .btn-full {
+        width: 100%;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header-row">
+        <h1 class="page-title">⚡ Bulk Operations</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back</a>
+    </div>
+
+    <div class="bulk-card">
+        <h2 class="section-title">🎯 Quick Select</h2>
+        <div class="quick-select-actions">
+            <button onclick="selectAll()" class="btn btn-select-all">✅ Select All</button>
+            <button onclick="selectNone()" class="btn btn-select-none">❌ Deselect All</button>
+            <button onclick="selectUnpaid()" class="btn btn-select-unpaid">💸 Unpaid Only</button>
+            <button onclick="selectPaid()" class="btn btn-select-paid">✅ Paid Only</button>
+        </div>
+    </div>
+
+    <div class="bulk-card">
+        <h2 class="section-title">👥 Select Members</h2>
+        <div id="selectedCount" class="selected-count">
+            0 members selected
+        </div>
+
+        <div class="member-list">
+            {% for member in members %}
+            <div class="member-row" data-paid="{{ 'true' if member.is_paid else 'false' }}">
+                <input type="checkbox" class="member-checkbox" value="{{ member.id }}" data-name="{{ member.name }}"
+                    data-phone="{{ member.phone }}" title="Select {{ member.name }}"
+                    aria-label="Select {{ member.name }}">
+                <div class="member-info">
+                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-phone">{{ member.phone }}</div>
+                </div>
+                <div class="badge status-pill {{ 'badge-paid' if member.is_paid else 'badge-unpaid' }}">
+                    {{ 'PAID' if member.is_paid else 'UNPAID' }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bulk-card">
+        <h2 class="section-title">🚀 Actions</h2>
+
+        <div class="actions-grid">
+            <form method="POST" action="{{ url_for('bulk_payment') }}"
+                onsubmit="return submitBulkAction(event, 'payment')">
+                <div class="action-box action-box-payment">
+                    <h3 class="action-title-payment">💰 Bulk Payment</h3>
+                    <p class="action-description">Record payment for selected members</p>
+
+                    <input type="hidden" name="member_ids" id="paymentMemberIds">
+
+                    <label for="bulk_payment_month" class="field-label">Month:</label>
+                    <select id="bulk_payment_month" name="month" required title="Select month" class="field-control">
+                        {% for month in available_months %}
+                        <option value="{{ month }}">{{ month }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="bulk_payment_amount" class="field-label">Amount:</label>
+                    <input type="number" id="bulk_payment_amount" name="amount" required min="0" step="0.01"
+                        placeholder="2000" title="Enter payment amount" class="field-control">
+
+                    <button type="submit" class="btn btn-success btn-full">💾 Record Payments</button>
+                </div>
+            </form>
+
+            <div class="action-box action-box-message">
+                <h3 class="action-title-message">💬 Bulk Message</h3>
+                <p class="action-description">Send WhatsApp to selected members</p>
+
+                <label for="messageTemplate" class="field-label">Message Template:</label>
+                <select id="messageTemplate" name="message_template" onchange="updateMessage()"
+                    title="Select message template" class="field-control">
+                    <option value="reminder">Payment Reminder</option>
+                    <option value="promo">Promotion</option>
+                    <option value="custom">Custom Message</option>
+                </select>
+
+                <textarea id="messageText" rows="4" placeholder="Your message..."
+                    class="field-control field-control-textarea"
+                    title="Message text">Hi {name}, your gym fee for {{ current_month }} is pending. Please pay soon!</textarea>
+
+                <button onclick="sendBulkMessages()" class="btn btn-primary btn-full">📨 Send Messages</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const templates = {
+        reminder: "Hi {name}, your gym fee for {{ current_month }} is pending. Please pay soon!",
+        promo: "Hi {name}! 🎉 Special offer: Get 20% off on your next month's subscription!",
+        custom: ""
+    };
+
+    function updateMessage() {
+        const template = document.getElementById('messageTemplate').value;
+        document.getElementById('messageText').value = templates[template];
+    }
+
+    function getSelectedMembers() {
+        const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+        return Array.from(checkboxes).map(cb => ({
+            id: cb.value,
+            name: cb.dataset.name,
+            phone: cb.dataset.phone
+        }));
+    }
+
+    function updateCount() {
+        const count = document.querySelectorAll('.member-checkbox:checked').length;
+        document.getElementById('selectedCount').textContent = `${count} members selected`;
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.member-checkbox').forEach(cb => cb.checked = true);
+        updateCount();
+    }
+
+    function selectNone() {
+        document.querySelectorAll('.member-checkbox').forEach(cb => cb.checked = false);
+        updateCount();
+    }
+
+    function selectUnpaid() {
+        document.querySelectorAll('.member-checkbox').forEach(cb => {
+            cb.checked = cb.closest('.member-row').dataset.paid === 'false';
+        });
+        updateCount();
+    }
+
+    function selectPaid() {
+        document.querySelectorAll('.member-checkbox').forEach(cb => {
+            cb.checked = cb.closest('.member-row').dataset.paid === 'true';
+        });
+        updateCount();
+    }
+
+    function submitBulkAction(event, type) {
+        const selected = getSelectedMembers();
+        if (selected.length === 0) {
+            alert('Please select at least one member!');
+            event.preventDefault();
+            return false;
+        }
+
+        document.getElementById('paymentMemberIds').value = selected.map(m => m.id).join(',');
+        return confirm(`Record payment for ${selected.length} members?`);
+    }
+
+    function sendBulkMessages() {
+        const selected = getSelectedMembers();
+        if (selected.length === 0) {
+            alert('Please select at least one member!');
+            return;
+        }
+
+        const messageTemplate = document.getElementById('messageText').value;
+        if (!messageTemplate.trim()) {
+            alert('Please enter a message!');
+            return;
+        }
+
+        selected.forEach((member, index) => {
+            setTimeout(() => {
+                const message = messageTemplate.replace('{name}', member.name);
+                const url = `https://wa.me/${member.phone.replace(/\s/g, '')}?text=${encodeURIComponent(message)}`;
+                window.open(url, '_blank');
+            }, index * 500);
+        });
+    }
+
+    document.querySelectorAll('.member-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateCount);
+    });
+</script>
+{% endblock %}

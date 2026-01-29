@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Approval Pending - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .payment-pending-card {
+        max-width: 500px;
+        margin: 4rem auto;
+        text-align: center;
+    }
+
+    .payment-pending-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .payment-pending-title {
+        color: var(--secondary);
+        margin-bottom: 1rem;
+    }
+
+    .payment-pending-text {
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .payment-pending-logout {
+        margin-top: 2rem;
+        display: inline-block;
+    }
+</style>
+
+<div class="card payment-pending-card">
+    <div class="payment-pending-icon">⏳</div>
+    <h1 class="payment-pending-title">Approval Pending</h1>
+    <p class="payment-pending-text">
+        Your manual payment screenshot has been received.<br>
+        The admin will verify and activate your account shortly (1-24 hours).
+    </p>
+    <a href="{{ url_for('logout') }}" class="btn btn-secondary payment-pending-logout">Logout</a>
+</div>
+{% endblock %}

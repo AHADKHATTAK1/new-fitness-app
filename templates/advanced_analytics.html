@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Analytics - Gym Manager{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <h1 class="page-title">📊 Advanced Business Analytics</h1>
+
+    <!-- Key Metrics Overview -->
+    <div class="metrics-grid">
+        <div class="metric-card highlight">
+            <div class="metric-icon">💰</div>
+            <div class="metric-value">₨{{ total_revenue|default(0)|round(2) }}</div>
+            <div class="metric-label">Total Revenue (This Month)</div>
+            <div class="metric-trend {% if revenue_growth >= 0 %}positive{% else %}negative{% endif %}">
+                {{ revenue_growth|default(0) }}% vs Last Month
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon">👥</div>
+            <div class="metric-value">{{ total_members|default(0) }}</div>
+            <div class="metric-label">Total Members</div>
+            <div class="metric-trend {% if member_growth >= 0 %}positive{% else %}negative{% endif %}">
+                +{{ new_members_this_month|default(0) }} this month
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon">📈</div>
+            <div class="metric-value">{{ retention_rate|default(0) }}%</div>
+            <div class="metric-label">Retention Rate</div>
+            <div class="metric-trend">Last 3 Months</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-value">{{ avg_attendance|default(0) }}</div>
+            <div class="metric-label">Avg Daily Attendance</div>
+            <div class="metric-trend">Peak Hour: {{ peak_hour|default('N/A') }}</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <!-- Revenue Forecast Chart -->
+        <div class="chart-card">
+            <h3>📊 Revenue Forecast (Next 6 Months)</h3>
+            <canvas id="revenueForecastChart"></canvas>
+        </div>
+
+        <!-- Member Growth Chart -->
+        <div class="chart-card">
+            <h3>👥 Member Growth Trend</h3>
+            <canvas id="memberGrowthChart"></canvas>
+        </div>
+
+        <!-- Attendance Heatmap -->
+        <div class="chart-card full-width">
+            <h3>🔥 Attendance Heatmap (Peak Hours)</h3>
+            <canvas id="attendanceHeatmap"></canvas>
+        </div>
+
+        <!-- Revenue by Membership Type -->
+        <div class="chart-card">
+            <h3>💳 Revenue by Membership Type</h3>
+            <canvas id="revenueByTypeChart"></canvas>
+        </div>
+
+        <!-- Payment Collection Rate -->
+        <div class="chart-card">
+            <h3>💵 Payment Collection Rate</h3>
+            <canvas id="collectionRateChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Business Insights -->
+    <div class="insights-section">
+        <h2>🧠 Smart Business Insights</h2>
+        <div class="insights-grid">
+            {% for insight in insights %}
+            <div class="insight-card {{ insight.type }}">
+                <div class="insight-icon">{{ insight.icon }}</div>
+                <div class="insight-content">
+                    <h4>{{ insight.title }}</h4>
+                    <p>{{ insight.message }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Member Segments -->
+    <div class="segments-section">
+        <h2>👥 Member Segments</h2>
+        <div class="segments-grid">
+            <div class="segment-card vip">
+                <h3>⭐ VIP Members</h3>
+                <div class="segment-value">{{ vip_count|default(0) }}</div>
+                <p>Premium members</p>
+            </div>
+            <div class="segment-card active">
+                <h3>✅ Active Members</h3>
+                <div class="segment-value">{{ active_count|default(0) }}</div>
+                <p>Regular attendance</p>
+            </div>
+            <div class="segment-card risk">
+                <h3>⚠️ At Risk</h3>
+                <div class="segment-value">{{ at_risk_count|default(0) }}</div>
+                <p>Low engagement</p>
+            </div>
+            <div class="segment-card churned">
+                <h3>❌ Churned</h3>
+                <div class="segment-value">{{ churned_count|default(0) }}</div>
+                <p>Inactive 30+ days</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .analytics-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: #1e293b;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .metric-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .metric-card.highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .metric-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-trend {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .metric-trend.positive {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .metric-trend.negative {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .charts-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .chart-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-card.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .chart-card h3 {
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+    }
+
+    .insights-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .insight-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .insight-card.warning {
+        border-left-color: #f59e0b;
+        background: #fffbeb;
+    }
+
+    .insight-card.success {
+        border-left-color: #10b981;
+        background: #f0fdf4;
+    }
+
+    .insight-card.danger {
+        border-left-color: #ef4444;
+        background: #fef2f2;
+    }
+
+    .insight-icon {
+        font-size: 2rem;
+    }
+
+    .segments-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .segment-card {
+        text-align: center;
+        padding: 2rem 1rem;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .segment-value {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 1rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 768px) {
+        .charts-section {
+            grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Revenue Forecast Chart
+        new Chart(document.getElementById('revenueForecastChart'), {
+            type: 'line',
+            data: {
+                labels: {{ forecast_months | tojson | safe }},
+        datasets: [{
+            label: 'Actual Revenue',
+            data: {{ actual_revenue | tojson | safe }},
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        tension: 0.4
+                }, {
+            label: 'Forecasted Revenue',
+            data: {{ forecasted_revenue | tojson | safe }},
+        borderColor: '#06b6d4',
+        borderDash: [5, 5],
+        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+        tension: 0.4
+                }]
+            },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        }
+    }
+        });
+
+    // Member Growth Chart
+    new Chart(document.getElementById('memberGrowthChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ growth_months | tojson | safe }},
+        datasets: [{
+            label: 'New Members',
+            data: {{ new_members_data | tojson | safe }},
+        backgroundColor: '#10b981'
+                }, {
+            label: 'Churned Members',
+            data: {{ churned_members_data | tojson | safe }},
+        backgroundColor: '#ef4444'
+                }]
+            },
+        options: {
+        responsive: true
+    }
+        });
+
+    // Revenue by Type
+    new Chart(document.getElementById('revenueByTypeChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ membership_types | tojson | safe }},
+        datasets: [{
+            data: {{ revenue_by_type | tojson | safe }},
+        backgroundColor: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']
+                }]
+            }
+        });
+
+    // Collection Rate
+    new Chart(document.getElementById('collectionRateChart'), {
+        type: 'line',
+        data: {
+            labels: {{ collection_months | tojson | safe }},
+        datasets: [{
+            label: 'Collection Rate %',
+            data: {{ collection_rates | tojson | safe }},
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        fill: true,
+        tension: 0.4
+                }]
+            },
+        options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+        });
+
+    // Attendance Heatmap
+    new Chart(document.getElementById('attendanceHeatmap'), {
+        type: 'bar',
+        data: {
+            labels: {{ heatmap_hours | tojson | safe }},
+        datasets: [{
+            label: 'Average Attendance',
+            data: {{ heatmap_data | tojson | safe }},
+        backgroundColor: function (context) {
+            const value = context.parsed.y;
+            if (value > 50) return '#ef4444';
+            if (value > 30) return '#f59e0b';
+            return '#10b981';
+        }
+                }]
+            },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+        });
+    });
+</script>
+{% endblock %}

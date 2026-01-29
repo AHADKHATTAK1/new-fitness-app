@@ -1,0 +1,1261 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    /* Enhanced Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* 3D Member Card  */
+    .member-card-3d {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .member-card-3d:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(6, 182, 212, 0.2), 0 0 20px rgba(234, 179, 8, 0.2);
+    }
+
+    .member-card-3d::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transition: left 0.5s;
+    }
+
+    .member-card-3d:hover::before {
+        left: 100%;
+    }
+
+    /*Stagger animation delay */
+    .member-card-3d:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .member-card-3d:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .member-card-3d:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .member-card-3d:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .member-card-3d:nth-child(n+5) {
+        animation-delay: 0.5s;
+    }
+
+    /* Revenue Chart */
+    .revenue-chart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 200px;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 16px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    .revenue-bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--primary), var(--secondary));
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        animation: barGrowth 1s ease-out forwards;
+        transform-origin: bottom;
+    }
+
+    @keyframes barGrowth {
+        from {
+            transform: scaleY(0);
+        }
+
+        to {
+            transform: scaleY(1);
+        }
+    }
+
+    .revenue-bar:hover {
+        filter: brightness(1.2);
+        transform: scaleY(1.05);
+    }
+
+    .revenue-bar-label {
+        position: absolute;
+        bottom: -25px;
+        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* Smooth Page Transitions */
+    .page-wrapper {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Enhanced Stats Cards */
+    .stat-card-enhanced {
+        animation: scaleIn 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .stat-card-enhanced:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-card-enhanced:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .stat-card-enhanced:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .stat-card-enhanced:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    /* Better Member Photo */
+    .member-photo-enhanced {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .member-photo-enhanced:hover {
+        transform: scale(1.2) rotate(5deg);
+        border-color: var(--primary);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.5);
+    }
+
+    /* Status Badge Enhanced */
+    .badge-enhanced {
+        display: inline-block;
+        padding: 0.35rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        animation: pulse 2s ease-in-out infinite;
+        transition: all 0.3s ease;
+    }
+
+    .badge-enhanced:hover {
+        transform: scale(1.1);
+        animation: none;
+    }
+
+    .badge-paid {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        border: 1px solid var(--success);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-unpaid {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--error);
+        border: 1px solid var(--error);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .carousel-header {
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        height: 220px;
+        background: rgba(15, 23, 42, 0.6);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.15);
+    }
+
+    .carousel-slides {
+        display: flex;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+
+    .carousel-slide {
+        min-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 2.5rem;
+        text-align: center;
+        background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    }
+
+    .carousel-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+        font-weight: 800;
+    }
+
+    .carousel-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+    }
+
+    .stats-grid,
+    .insights-grid,
+    .smart-alerts-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .insights-grid,
+    .smart-alerts-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .stat-card-base {
+        text-align: center;
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card-purple {
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .stat-card-cyan {
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .stat-card-green {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .stat-card-red {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+    }
+
+    .stat-glow {
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    .stat-glow-purple {
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    }
+
+    .stat-glow-cyan {
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+        animation-delay: 0.5s;
+    }
+
+    .stat-glow-green {
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        animation-delay: 1s;
+    }
+
+    .stat-glow-red {
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+        animation-delay: 1.5s;
+    }
+
+    .stat-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-icon-purple {
+        filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.7));
+    }
+
+    .stat-icon-cyan {
+        filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.7));
+    }
+
+    .stat-icon-green {
+        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.7));
+    }
+
+    .stat-icon-red {
+        filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8));
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .stat-label-primary {
+        color: var(--primary);
+    }
+
+    .stat-label-secondary {
+        color: var(--secondary);
+    }
+
+    .stat-label-success {
+        color: var(--success);
+    }
+
+    .stat-label-error {
+        color: var(--error);
+    }
+
+    .stat-value {
+        font-size: 3rem;
+        font-weight: 900;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-value-primary {
+        background: linear-gradient(135deg, #fff, var(--primary));
+    }
+
+    .stat-value-secondary {
+        background: linear-gradient(135deg, #fff, var(--secondary));
+    }
+
+    .stat-value-success {
+        background: linear-gradient(135deg, #fff, var(--success));
+    }
+
+    .stat-value-error {
+        background: linear-gradient(135deg, #fff, var(--error));
+    }
+
+    .stat-note {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        color: var(--text-muted);
+    }
+
+    .insight-card {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    .insight-card-yellow {
+        background: rgba(234, 179, 8, 0.05);
+        border-left: 5px solid #eab308;
+    }
+
+    .insight-card-slate {
+        background: rgba(148, 163, 184, 0.05);
+        border-left: 5px solid #94a3b8;
+    }
+
+    .insight-icon {
+        font-size: 2.5rem;
+    }
+
+    .insight-icon-yellow {
+        filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.4));
+    }
+
+    .insight-icon-slate {
+        filter: drop-shadow(0 0 10px rgba(148, 163, 184, 0.4));
+    }
+
+    .insight-title {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .insight-title-yellow {
+        color: #eab308;
+    }
+
+    .insight-title-slate {
+        color: #94a3b8;
+    }
+
+    .insight-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #fff;
+    }
+
+    .insight-value-unit {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .smart-alerts-wrap {
+        margin-bottom: 2rem;
+    }
+
+    .smart-alerts-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        font-weight: 800;
+    }
+
+    .alert-card-unpaid {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid var(--error);
+    }
+
+    .alert-card-trials {
+        background: rgba(251, 191, 36, 0.1);
+        border-left: 4px solid #fbbf24;
+    }
+
+    .alert-card-birthday {
+        background: rgba(236, 72, 153, 0.1);
+        border-left: 4px solid #ec4899;
+    }
+
+    .alert-card-inactive {
+        background: rgba(148, 163, 184, 0.1);
+        border-left: 4px solid #94a3b8;
+    }
+
+    .alert-head {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-emoji {
+        font-size: 2rem;
+    }
+
+    .alert-title {
+        margin: 0;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .alert-title-unpaid {
+        color: var(--error);
+    }
+
+    .alert-title-trials {
+        color: #fbbf24;
+    }
+
+    .alert-title-birthday {
+        color: #ec4899;
+    }
+
+    .alert-title-inactive {
+        color: #94a3b8;
+    }
+
+    .alert-subtitle {
+        margin: 0.25rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .alert-scroll {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .alert-item {
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .alert-item-name {
+        font-size: 0.85rem;
+    }
+
+    .alert-item-note {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+
+    .wa-link {
+        color: #25D366;
+        text-decoration: none;
+        font-size: 1.2rem;
+    }
+
+    .revenue-card {
+        margin-bottom: 2rem;
+        background: rgba(15, 23, 42, 0.6);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .revenue-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .revenue-card-title {
+        color: var(--primary);
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .revenue-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: white;
+        font-size: 1.5rem;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+    }
+
+    .revenue-toggle:hover {
+        opacity: 1;
+    }
+
+    .revenue-caption {
+        text-align: center;
+        margin-top: 2rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .members-toolbar {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .members-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .members-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+    }
+
+    .btn-gradient-secondary {
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        border: none;
+    }
+
+    .member-search {
+        padding: 0.75rem 1rem;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+        width: 250px;
+        transition: all 0.3s;
+    }
+
+    .member-search:focus {
+        width: 300px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .member-row {
+        transition: all 0.3s ease;
+    }
+
+    .member-row-paid:hover {
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    .member-row-unpaid:hover {
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .fallback-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .fallback-avatar-paid {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .fallback-avatar-unpaid {
+        background: linear-gradient(135deg, var(--error), #d97706);
+    }
+
+    .member-link-paid,
+    .member-link-unpaid {
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .member-link-paid {
+        color: var(--primary);
+    }
+
+    .member-link-paid:hover {
+        color: var(--secondary);
+    }
+
+    .member-link-unpaid {
+        color: var(--error);
+    }
+
+    .member-link-unpaid:hover {
+        color: #d97706;
+    }
+
+    .members-section-title {
+        margin-bottom: 1.5rem;
+        font-weight: 800;
+    }
+
+    .members-section-title-paid {
+        color: var(--success);
+    }
+
+    .members-section-title-unpaid {
+        color: var(--error);
+    }
+
+    .view-btn-paid {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .view-btn-unpaid {
+        background: linear-gradient(135deg, var(--error), #d97706);
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 2rem;
+    }
+
+    .mt-2 {
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="page-wrapper">
+    <!-- VIP Glass Carousel Header -->
+    <div class="carousel-header">
+        <div class="carousel-slides">
+            <div class="carousel-slide">
+                <h2 class="carousel-title">🎉 Welcome to {{ gym_details.name }}!</h2>
+                <p class="carousel-subtitle">Manage your gym with ultimate ease</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Stats Cards with Glassmorphism -->
+    <div class="stats-grid">
+        <!-- Total Members -->
+        <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-purple">
+            <div class="stat-glow stat-glow-purple"></div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-purple">👥</div>
+                <h3 class="stat-label stat-label-primary">Total Members</h3>
+                <div class="stat-value stat-value-primary">{{ total_members }}</div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-cyan">
+            <div class="stat-glow stat-glow-cyan"></div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-cyan">💰</div>
+                <h3 class="stat-label stat-label-secondary">This Month Revenue</h3>
+                <div class="stat-value stat-value-secondary">{{ gym_details.currency or '$' }}{{ revenue }}</div>
+            </div>
+        </div>
+
+        <!-- Paid Members -->
+        <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-green">
+            <div class="stat-glow stat-glow-green"></div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-green">✅</div>
+                <h3 class="stat-label stat-label-success">Paid Members</h3>
+                <div class="stat-value stat-value-success">{{ paid|length }}</div>
+                <div class="stat-note">Current Month</div>
+            </div>
+        </div>
+
+        <!-- Unpaid Members (RESTORED OPTION) -->
+        <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-red">
+            <div class="stat-glow stat-glow-red"></div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-red">❌</div>
+                <h3 class="stat-label stat-label-error">Unpaid Members</h3>
+                <div class="stat-value stat-value-error">{{ unpaid|length }}</div>
+                <div class="stat-note">Pending Fees</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Insights Row -->
+    <div class="insights-grid">
+        <!-- Expiring Soon Insight -->
+        <div class="card stat-card-enhanced member-card-3d insight-card insight-card-yellow">
+            <div class="insight-icon insight-icon-yellow">⏰</div>
+            <div>
+                <h4 class="insight-title insight-title-yellow">Expiring Soon</h4>
+                <div class="insight-value">{{ expiring_count }} <span class="insight-value-unit">members</span></div>
+            </div>
+        </div>
+
+        <!-- Inactive Alert Insight -->
+        {% if inactive_members_alert %}
+        <div class="card stat-card-enhanced member-card-3d insight-card insight-card-slate">
+            <div class="insight-icon insight-icon-slate">😴</div>
+            <div>
+                <h4 class="insight-title insight-title-slate">Inactive</h4>
+                <div class="insight-value">{{ inactive_members_alert|length }} <span class="insight-value-unit">silent
+                        members</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- SMART ALERTS SECTION -->
+{% if unpaid_members_alert or expiring_trials_alert or birthdays_today_alert or inactive_members_alert %}
+<div class="smart-alerts-wrap">
+    <h2 class="smart-alerts-title">🔔 Smart Alerts</h2>
+
+    <div class="smart-alerts-grid">
+
+        <!-- Unpaid Members Alert -->
+        {% if unpaid_members_alert %}
+        <div class="card member-card-3d alert-card-unpaid">
+            <div class="alert-head">
+                <div class="alert-emoji">💸</div>
+                <div>
+                    <h3 class="alert-title alert-title-unpaid">Payment Due</h3>
+                    <p class="alert-subtitle">{{
+                        unpaid_members_alert|length }} members</p>
+                </div>
+            </div>
+            <div class="alert-scroll">
+                {% for member in unpaid_members_alert %}
+                <div class="alert-item">
+                    <span class="alert-item-name">{{ member.name }}</span>
+                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20your%20gym%20fee%20for%20{{ current_month }}%20is%20pending!"
+                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Trials Expiring Soon -->
+        {% if expiring_trials_alert %}
+        <div class="card member-card-3d alert-card-trials">
+            <div class="alert-head">
+                <div class="alert-emoji">⏰</div>
+                <div>
+                    <h3 class="alert-title alert-title-trials">Trials Expiring</h3>
+                    <p class="alert-subtitle">Next 3 days</p>
+                </div>
+            </div>
+            <div class="alert-scroll">
+                {% for member in expiring_trials_alert %}
+                <div class="alert-item">
+                    <div>
+                        <div class="alert-item-name">{{ member.name }}</div>
+                        <div class="alert-item-note">{{ member.days_left }} days left
+                        </div>
+                    </div>
+                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20your%20trial%20ends%20soon!%20Convert%20to%20full%20membership?"
+                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Birthdays Today -->
+        {% if birthdays_today_alert %}
+        <div class="card member-card-3d alert-card-birthday">
+            <div class="alert-head">
+                <div class="alert-emoji">🎂</div>
+                <div>
+                    <h3 class="alert-title alert-title-birthday">Birthdays Today</h3>
+                    <p class="alert-subtitle">Celebrate!</p>
+                </div>
+            </div>
+            <div class="alert-scroll">
+                {% for member in birthdays_today_alert %}
+                <div class="alert-item">
+                    <span class="alert-item-name">{{ member.name }}</span>
+                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Happy%20Birthday%20{{ member.name }}!%20🎉%20Wishing%20you%20health%20and%20happiness!"
+                        target="_blank" rel="noopener noreferrer" class="wa-link">🎉</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Inactive Members -->
+        {% if inactive_members_alert %}
+        <div class="card member-card-3d alert-card-inactive">
+            <div class="alert-head">
+                <div class="alert-emoji">😴</div>
+                <div>
+                    <h3 class="alert-title alert-title-inactive">Inactive Members</h3>
+                    <p class="alert-subtitle">No check-in 14+
+                        days</p>
+                </div>
+            </div>
+            <div class="alert-scroll">
+                {% for member in inactive_members_alert %}
+                <div class="alert-item">
+                    <div>
+                        <div class="alert-item-name">{{ member.name }}</div>
+                        <div class="alert-item-note">{{ member.days_inactive }} days
+                        </div>
+                    </div>
+                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20we%20miss%20you!%20Everything%20okay?"
+                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endif %}
+
+<!-- Revenue Chart Section -->
+<div class="card member-card-3d revenue-card">
+    <div class="revenue-card-head">
+        <h2 class="revenue-card-title">📊 Revenue Trend</h2>
+        <button onclick="toggleChart()" class="revenue-toggle">
+            👁️
+        </button>
+    </div>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h2 class="mb-3">Dashboard</h2>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions-bar mb-4">
+                    <a href="/subscription_plans" class="action-btn action-btn-premium">
+                        <span class="action-icon">💎</span>
+                        <div class="action-text">
+                            <div class="action-title">Subscription Plans</div>
+                            <div class="action-subtitle">Upgrade your tier</div>
+                        </div>
+                    </a>
+
+                    <a href="/webhooks" class="action-btn action-btn-integrations">
+                        <span class="action-icon">🔗</span>
+                        <div class="action-text">
+                            <div class="action-title">Webhooks</div>
+                            <div class="action-subtitle">Manage integrations</div>
+                        </div>
+                    </a>
+
+                    <a href="/add_member?gym_id={{ selected_gym.id if selected_gym else '' }}"
+                        class="action-btn action-btn-primary">
+                        <span class="action-icon">➕</span>
+                        <div class="action-text">
+                            <div class="action-title">Add Member</div>
+                            <div class="action-subtitle">Quick add</div>
+                        </div>
+                    </a>
+
+                    <a href="/fees?gym_id={{ selected_gym.id if selected_gym else '' }}"
+                        class="action-btn action-btn-success">
+                        <span class="action-icon">💰</span>
+                        <div class="action-text">
+                            <div class="action-title">Record Payment</div>
+                            <div class="action-subtitle">Collect fees</div>
+                        </div>
+                    </a>
+                </div>
+
+                <style>
+                    .quick-actions-bar {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 1rem;
+                        margin-bottom: 2rem;
+                    }
+
+                    .action-btn {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        padding: 1.25rem;
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                        text-decoration: none;
+                        color: #333;
+                        transition: all 0.3s ease;
+                        border-left: 4px solid #ddd;
+                    }
+
+                    .action-btn:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+                        text-decoration: none;
+                    }
+
+                    .action-btn-premium {
+                        border-left-color: #9b59b6;
+                        background: linear-gradient(135deg, #fff 0%, #f8f4ff 100%);
+                    }
+
+                    .action-btn-premium:hover {
+                        background: linear-gradient(135deg, #f8f4ff 0%, #f0e6ff 100%);
+                    }
+
+                    .action-btn-integrations {
+                        border-left-color: #3498db;
+                        background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
+                    }
+
+                    .action-btn-integrations:hover {
+                        background: linear-gradient(135deg, #f0f8ff 0%, #e3f2ff 100%);
+                    }
+
+                    .action-btn-primary {
+                        border-left-color: #667eea;
+                    }
+
+                    .action-btn-success {
+                        border-left-color: #27ae60;
+                    }
+
+                    .action-icon {
+                        font-size: 2rem;
+                        line-height: 1;
+                    }
+
+                    .action-text {
+                        flex: 1;
+                    }
+
+                    .action-title {
+                        font-weight: 600;
+                        font-size: 1rem;
+                        margin-bottom: 0.25rem;
+                    }
+
+                    .action-subtitle {
+                        font-size: 0.875rem;
+                        color: #666;
+                    }
+
+                    @media (max-width: 768px) {
+                        .quick-actions-bar {
+                            grid-template-columns: 1fr 1fr;
+                        }
+
+                        .action-btn {
+                            padding: 1rem;
+                        }
+
+                        .action-icon {
+                            font-size: 1.5rem;
+                        }
+
+                        .action-title {
+                            font-size: 0.9rem;
+                        }
+
+                        .action-subtitle {
+                            font-size: 0.75rem;
+                        }
+                    }
+                </style>
+                <div id="revenue-chart-container">
+                    <div class="revenue-chart">
+                        {% for trend in revenue_trend %}
+                        <div class="revenue-bar"
+                            data-height="{{ (trend.revenue / max_revenue * 100) if max_revenue > 0 else 0 }}"
+                            title="{{ gym_details.currency }}{{ trend.revenue }}">
+                            <div class="revenue-bar-label">{{ trend.month }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="revenue-caption">
+                        Last 6 Months
+                        Revenue</p>
+                </div>
+            </div>
+
+            <script>
+                let isChartHidden = false;
+
+                document.querySelectorAll('.revenue-bar[data-height]').forEach((bar) => {
+                    bar.style.height = `${bar.dataset.height}%`;
+                });
+
+                function toggleChart() {
+                    const container = document.getElementById('revenue-chart-container');
+                    isChartHidden = !isChartHidden;
+
+                    if (isChartHidden) {
+                        container.style.display = 'none';
+                    } else {
+                        container.style.display = 'block';
+                    }
+                }
+            </script>
+
+            <!-- Search and Actions -->
+            <div class="members-toolbar">
+                <h1 class="members-title">
+                    Members</h1>
+                <div class="members-actions">
+                    <a href="{{ url_for('analytics') }}" class="btn btn-gradient-primary">
+                        📊 Analytics
+                    </a>
+                    {% if feature_access.bulk_operations %}
+                    <a href="{{ url_for('bulk_operations') }}" class="btn btn-gradient-secondary">
+                        ⚡ Bulk Operations
+                    </a>
+                    {% endif %}
+                    <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="🔍 Search members..."
+                        class="member-search">
+                    <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d">✨ Add Member</a>
+                </div>
+            </div>
+
+            <!-- Paid Members Table -->
+            <div class="card member-card-3d" id="paid-members">
+                <h2 class="members-section-title members-section-title-paid">✅ Paid Members ({{
+                    current_month
+                    }})</h2>
+                {% if paid %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in paid %}
+                            <tr class="member-row member-row-paid">
+                                <td>
+                                    {% if member.photo %}
+                                    <img src="{{ url_for('static', filename='uploads/' + member.photo) }}"
+                                        class="member-photo-enhanced" alt="{{member.name}}">
+                                    {% else %}
+                                    <div class="member-photo-enhanced fallback-avatar fallback-avatar-paid">
+                                        {{ member.name[0] }}</div>
+                                    {% endif %}
+                                </td>
+                                <td><a href="{{ url_for('member_details', member_id=member.id) }}"
+                                        class="member-link-paid">{{ member.name }}</a></td>
+                                <td>{{ member.phone }}</td>
+                                <td><span class="badge-enhanced badge-paid">✅ Paid</span></td>
+                                <td>
+                                    <a href="{{ url_for('member_details', member_id=member.id) }}"
+                                        class="btn btn-sm view-btn-paid">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-state">No paid members for this
+                    month</p>
+                {% endif %}
+            </div>
+
+            <!-- Unpaid Members -->
+            <div class="card member-card-3d mt-2" id="unpaid-members">
+                <h2 class="members-section-title members-section-title-unpaid">❌ Unpaid Members ({{
+                    current_month }})
+                </h2>
+                {% if unpaid %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in unpaid %}
+                            <tr class="member-row member-row-unpaid">
+                                <td>
+                                    {% if member.photo %}
+                                    <img src="{{ url_for('static', filename='uploads/' + member.photo) }}"
+                                        class="member-photo-enhanced" alt="{{member.name}}">
+                                    {% else %}
+                                    <div class="member-photo-enhanced fallback-avatar fallback-avatar-unpaid">
+                                        {{ member.name[0] }}</div>
+                                    {% endif %}
+                                </td>
+                                <td><a href="{{ url_for('member_details', member_id=member.id) }}"
+                                        class="member-link-unpaid">{{
+                                        member.name }}</a></td>
+                                <td>{{ member.phone }}</td>
+                                <td><span class="badge-enhanced badge-unpaid">❌ Unpaid</span></td>
+                                <td>
+                                    <a href="{{ url_for('member_details', member_id=member.id) }}"
+                                        class="btn btn-sm view-btn-unpaid">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-state">All members have paid! 🎉
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <script>
+            function filterMembers() {
+                var input = document.getElementById("memberSearch");
+                var filter = input.value.toUpperCase();
+                var tables = document.getElementsByTagName("table");
+
+                for (var j = 0; j < tables.length; j++) {
+                    var tr = tables[j].getElementsByTagName("tr");
+                    for (var i = 0; i < tr.length; i++) {
+                        var td = tr[i].getElementsByTagName("td");
+                        if (td.length > 0) {
+                            var rowText = tr[i].textContent || tr[i].innerText;
+                            if (rowText.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+
+        {% endblock %}

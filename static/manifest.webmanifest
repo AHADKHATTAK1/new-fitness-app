@@ -1,0 +1,56 @@
+{
+    "name": "Gym Manager Pro",
+    "short_name": "GymPro",
+    "description": "Professional gym and fitness management system",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1f2937",
+    "theme_color": "#8b5cf6",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/static/icons/icon-144x144.svg",
+            "sizes": "144x144",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/static/screenshots/dashboard.png",
+            "sizes": "1280x720",
+            "type": "image/png"
+        }
+    ],
+    "categories": [
+        "business",
+        "fitness",
+        "productivity"
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "View gym statistics",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/static/icons/icon-144x144.svg",
+                    "sizes": "144x144"
+                }
+            ]
+        },
+        {
+            "name": "Add Member",
+            "short_name": "Add Member",
+            "description": "Register new member",
+            "url": "/add_member",
+            "icons": [
+                {
+                    "src": "/static/icons/icon-144x144.svg",
+                    "sizes": "144x144"
+                }
+            ]
+        }
+    ]
+}

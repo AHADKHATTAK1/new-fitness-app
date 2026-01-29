@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Webhook Logs - Gym Manager{% endblock %}
+
+{% block content %}
+<div class="logs-container">
+    <div class="logs-header">
+        <h1>📊 Webhook Delivery Logs</h1>
+        <a href="/webhooks" class="btn-secondary">← Back to Webhooks</a>
+    </div>
+
+    {% if logs %}
+    <div class="logs-stats">
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ logs|selectattr('success')|list|length }}</div>
+                <div class="stat-label">Successful</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ logs|rejectattr('success')|list|length }}</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-info">
+                <div class="stat-value">
+                    {% set avg_time = (logs|selectattr('response_time_ms')|map(attribute='response_time_ms')|sum /
+                    logs|length)|round(0) if logs|length > 0 else 0 %}
+                    {{ avg_time }}ms
+                </div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="logs-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Event</th>
+                    <th>Time</th>
+                    <th>Response</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="{% if log.success %}log-success{% else %}log-error{% endif %}">
+                    <td>
+                        {% if log.success %}
+                        <span class="status-badge badge-success">✓ Success</span>
+                        {% else %}
+                        <span class="status-badge badge-error">✗ Failed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <code class="event-code">{{ log.event_type }}</code>
+                    </td>
+                    <td class="log-time">
+                        {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else 'N/A' }}
+                    </td>
+                    <td>
+                        {% if log.response_code %}
+                        <span class="response-code code-{{ log.response_code // 100 }}xx">
+                            {{ log.response_code }}
+                        </span>
+                        {% if log.response_time_ms %}
+                        <span class="response-time">{{ log.response_time_ms }}ms</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="response-code code-error">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.error_message %}
+                        <button class="btn-sm btn-info" onclick="showDetails({{ loop.index0 }})">
+                            View Error
+                        </button>
+                        {% else %}
+                        <button class="btn-sm btn-info" onclick="showDetails({{ loop.index0 }})">
+                            View Payload
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="log-details log-details-hidden" id="details-{{ loop.index0 }}">
+                    <td colspan="5">
+                        <div class="details-content">
+                            {% if log.error_message %}
+                            <div class="error-section">
+                                <h4>Error Message:</h4>
+                                <pre class="error-message">{{ log.error_message }}</pre>
+                            </div>
+                            {% endif %}
+
+                            {% if log.payload %}
+                            <div class="payload-section">
+                                <h4>Payload:</h4>
+                                <pre class="payload-json">{{ log.payload }}</pre>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No Delivery Logs Yet</h3>
+        <p>Logs will appear here when this webhook is triggered</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .logs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .logs-header h1 {
+        font-size: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .logs-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.875rem;
+    }
+
+    .logs-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #f5f5f5;
+    }
+
+    th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+    td {
+        padding: 1rem;
+    }
+
+    .log-success {
+        background: rgba(76, 175, 80, 0.05);
+    }
+
+    .log-error {
+        background: rgba(244, 67, 54, 0.05);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: #d4f4dd;
+        color: #1e7e34;
+    }
+
+    .badge-error {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .event-code {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .log-time {
+        color: #666;
+        font-size: 0.875rem;
+    }
+
+    .response-code {
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        margin-right: 0.5rem;
+    }
+
+    .code-2xx {
+        background: #d4f4dd;
+        color: #1e7e34;
+    }
+
+    .code-4xx {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .code-5xx {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .code-error {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .response-time {
+        color: #666;
+        font-size: 0.875rem;
+    }
+
+    .log-details {
+        background: #f9f9f9 !important;
+    }
+
+    .log-details-hidden {
+        display: none;
+    }
+
+    .details-content {
+        padding: 1rem;
+    }
+
+    .details-content h4 {
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .error-message,
+    .payload-json {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .error-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #666;
+    }
+</style>
+
+<script>
+    function showDetails(index) {
+        const detailsRow = document.getElementById(`details-${index}`);
+        detailsRow.classList.toggle('log-details-hidden');
+    }
+</script>
+{% endblock %}

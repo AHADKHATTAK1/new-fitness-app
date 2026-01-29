@@ -1,0 +1,779 @@
+{% extends "base.html" %}
+
+{% block title %}💰 Payment Center - Premium{% endblock %}
+
+{% block content %}
+<style>
+    @media (max-width: 768px) {
+        .payment-container {
+            padding: 80px 16px 16px 16px;
+        }
+    }
+
+    .payment-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .payment-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        padding: 40px;
+        border-radius: 24px;
+        color: white;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+    }
+
+    .payment-header h1 {
+        font-size: 36px;
+        margin: 0 0 10px 0;
+        font-weight: 800;
+    }
+
+    .payment-header p {
+        font-size: 18px;
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    .payment-tabs {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+    }
+
+    .payment-tab {
+        flex: 1;
+        min-width: 200px;
+        padding: 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        color: #111827;
+    }
+
+    .payment-tab.active {
+        border-color: #8b5cf6;
+        background: linear-gradient(135deg, #f3e8ff 0%, #fdf4ff 100%);
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+    }
+
+    .payment-tab.active .payment-tab-title {
+        color: #4c1d95;
+    }
+
+    .payment-tab.active .payment-tab-subtitle-muted {
+        color: #6d28d9;
+    }
+
+    .payment-tab:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .payment-form-card {
+        background: white;
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        margin-bottom: 32px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #1f2937;
+        font-size: 15px;
+    }
+
+    .form-hint {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+        color: #111827;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    .payment-history-table {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 20px;
+        font-weight: 600;
+    }
+
+    .table-row {
+        padding: 20px;
+        border-bottom: 1px solid #f3f4f6;
+        transition: all 0.2s ease;
+    }
+
+    .table-row:hover {
+        background: #f9fafb;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status-paid {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #9ca3af;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .payment-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .payment-header-title {
+        margin: 0;
+        color: #ffffff;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+    }
+
+    .payment-header-subtitle {
+        margin: 0.5rem 0 0 0;
+        color: rgba(255, 255, 255, 0.96);
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.22);
+    }
+
+    .payment-subscription-btn {
+        background: linear-gradient(135deg, var(--accent-gold), #d97706);
+        color: #000;
+        font-weight: 700;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 0 20px var(--gold-shadow);
+        border: none;
+    }
+
+    .payment-tab-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+        line-height: 1;
+    }
+
+    .payment-tab-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #111827;
+    }
+
+    .payment-tab-subtitle {
+        font-size: 13px;
+        margin-top: 4px;
+        color: #4b5563;
+    }
+
+    @media (max-width: 768px) {
+        .payment-tab {
+            min-width: 160px;
+            padding: 16px;
+        }
+
+        .payment-tab-title {
+            font-size: 15px;
+        }
+
+        .payment-tab-subtitle {
+            font-size: 12px;
+        }
+    }
+
+    .payment-tab-subtitle-muted {
+        color: #6b7280;
+    }
+
+    .payment-tab-subtitle-paid {
+        color: #10b981;
+    }
+
+    .payment-tab-subtitle-unpaid {
+        color: #ef4444;
+    }
+
+    .payment-section-title {
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #111827;
+        font-weight: 800;
+    }
+
+    .payment-member-label {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .payment-section-title-green {
+        color: #10b981;
+    }
+
+    .payment-section-title-red {
+        color: #ef4444;
+    }
+
+    .payment-section-icon {
+        font-size: 32px;
+    }
+
+    .payment-required-mark {
+        color: #ef4444;
+    }
+
+    .payment-two-col-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .payment-submit-btn {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .payment-submit-btn.is-loading {
+        opacity: 0.75;
+        cursor: not-allowed;
+    }
+
+    .payment-submit-icon {
+        font-size: 20px;
+        margin-right: 8px;
+    }
+
+    .tab-content-hidden {
+        display: none;
+    }
+
+    .payment-tab:focus-visible {
+        outline: 3px solid rgba(139, 92, 246, 0.45);
+        outline-offset: 2px;
+    }
+
+    .member-list-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .member-row {
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .member-row-paid {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02));
+        border-left: 4px solid #10b981;
+    }
+
+    .member-row-unpaid {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.02));
+        border-left: 4px solid #ef4444;
+    }
+
+    .member-row-main {
+        flex: 1;
+    }
+
+    .member-row-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .member-row-phone {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .member-row-right {
+        text-align: right;
+    }
+
+    .member-badge {
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .member-badge-paid {
+        background: #10b981;
+    }
+
+    .member-badge-unpaid {
+        background: #ef4444;
+    }
+
+    .empty-title-muted {
+        color: #6b7280;
+    }
+
+    .empty-title-success {
+        color: #10b981;
+    }
+
+    .empty-text-muted {
+        color: #9ca3af;
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .history-title {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .history-total {
+        text-align: right;
+    }
+
+    .history-total-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .history-total-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #10b981;
+    }
+
+    .history-list {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .history-row {
+        padding: 1.25rem;
+        background: rgba(139, 92, 246, 0.03);
+        border-left: 3px solid var(--primary);
+        border-radius: 12px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .history-member-name {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .history-member-phone {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .history-meta-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .history-amount {
+        font-weight: 700;
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+
+    .history-month,
+    .history-paid-on {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .history-paid-on {
+        font-size: 0.9rem;
+    }
+
+    .history-date-block {
+        text-align: right;
+    }
+</style>
+
+<div class="payment-container">
+    <!-- Premium Header with Subscription Button -->
+    <div class="payment-header">
+        <div class="payment-header-row">
+            <div>
+                <h1 class="payment-header-title">💰 Payment Center</h1>
+                <p class="payment-header-subtitle">Record payments & manage transaction history</p>
+            </div>
+            <a href="{{ url_for('subscription_plans') }}" class="btn payment-subscription-btn">
+                💎 Subscription Plans
+            </a>
+        </div>
+    </div>
+
+    <!-- Enhanced Tabs with Paid/Unpaid -->
+    <div class="payment-tabs">
+        <div class="payment-tab active" onclick="showTab('record')">
+            <div class="payment-tab-icon">💳</div>
+            <div class="payment-tab-title">Record Payment</div>
+            <div class="payment-tab-subtitle payment-tab-subtitle-muted">Add new transaction</div>
+        </div>
+        <div class="payment-tab" onclick="showTab('paid')">
+            <div class="payment-tab-icon">✅</div>
+            <div class="payment-tab-title">Paid Members</div>
+            <div class="payment-tab-subtitle payment-tab-subtitle-paid">{{ paid_members|length }} this month</div>
+        </div>
+        <div class="payment-tab" onclick="showTab('unpaid')">
+            <div class="payment-tab-icon">❌</div>
+            <div class="payment-tab-title">Unpaid Members</div>
+            <div class="payment-tab-subtitle payment-tab-subtitle-unpaid">{{ unpaid_members|length }} pending</div>
+        </div>
+        <div class="payment-tab" onclick="showTab('history')">
+            <div class="payment-tab-icon">📜</div>
+            <div class="payment-tab-title">Payment History</div>
+            <div class="payment-tab-subtitle payment-tab-subtitle-muted">{{ fees|length }} total</div>
+        </div>
+    </div>
+
+    <!-- Record Payment Form -->
+    <div id="record-tab" class="tab-content">
+        <div class="payment-form-card">
+            <h2 class="payment-section-title">
+                <span class="payment-section-icon">💳</span>
+                Record New Payment
+            </h2>
+
+            <form id="paymentForm" action="/fees" method="POST">
+                <div class="form-group">
+                    <label for="member_id" class="payment-member-label">
+                        <span class="payment-required-mark">*</span> Select Member
+                    </label>
+                    <select name="member_id" id="member_id" class="form-input" required>
+                        <option value="">Choose a member...</option>
+                        {% for member in members %}
+                        <option value="{{ member.id }}">
+                            {{ member.name }} - {{ member.phone }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="payment-two-col-grid">
+                    <div class="form-group">
+                        <label for="amount">
+                            <span class="payment-required-mark">*</span> Amount (Rs)
+                        </label>
+                        <input type="number" name="amount" id="amount" class="form-input" placeholder="e.g., 3000"
+                            required min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="month">
+                            <span class="payment-required-mark">*</span> Month
+                        </label>
+                        <input type="text" name="month" id="month" class="form-input" required placeholder="YYYY-MM"
+                            pattern="\d{4}-\d{2}">
+                        <small class="form-hint">Use format: YYYY-MM (example: 2026-03)</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment_method">Payment Method</label>
+                    <select name="payment_method" id="payment_method" class="form-input">
+                        <option value="cash">💵 Cash</option>
+                        <option value="online">💳 Online Transfer</option>
+                        <option value="jazzcash">📱 JazzCash</option>
+                        <option value="easypaisa">📱 EasyPaisa</option>
+                        <option value="card">💳 Debit/Credit Card</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes (Optional)</label>
+                    <textarea name="notes" id="notes" class="form-input" rows="3"
+                        placeholder="Add any additional notes..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary payment-submit-btn">
+                    <span class="payment-submit-icon">✓</span>
+                    Record Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Paid Members Tab -->
+    <div id="paid-tab" class="tab-content tab-content-hidden">
+        <div class="payment-form-card">
+            <h2 class="payment-section-title payment-section-title-green">
+                <span class="payment-section-icon">✅</span>
+                Paid Members ({{ current_month }})
+            </h2>
+            {% if paid_members %}
+            <div class="member-list-grid">
+                {% for member in paid_members %}
+                <div class="member-row member-row-paid">
+                    <div class="member-row-main">
+                        <div class="member-row-name">{{ member.name }}</div>
+                        <div class="member-row-phone">📱 {{ member.phone }}</div>
+                    </div>
+                    <div class="member-row-right">
+                        <span class="member-badge member-badge-paid">✓ PAID</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">😔</div>
+                <h3 class="empty-title-muted">No Paid Members This Month</h3>
+                <p class="empty-text-muted">Record payments to see them here!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Unpaid Members Tab -->
+    <div id="unpaid-tab" class="tab-content tab-content-hidden">
+        <div class="payment-form-card">
+            <h2 class="payment-section-title payment-section-title-red">
+                <span class="payment-section-icon">❌</span>
+                Unpaid Members ({{ current_month }})
+            </h2>
+            {% if unpaid_members %}
+            <div class="member-list-grid">
+                {% for member in unpaid_members %}
+                <div class="member-row member-row-unpaid">
+                    <div class="member-row-main">
+                        <div class="member-row-name">{{ member.name }}</div>
+                        <div class="member-row-phone">📱 {{ member.phone }}</div>
+                    </div>
+                    <div class="member-row-right">
+                        <span class="member-badge member-badge-unpaid">❌ UNPAID</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🎉</div>
+                <h3 class="empty-title-success">All Members Paid!</h3>
+                <p class="empty-text-muted">Great job collecting this month's fees!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Payment History Tab -->
+    <div id="history-tab" class="tab-content tab-content-hidden">
+        <div class="payment-form-card">
+            <div class="history-header">
+                <h2 class="history-title">
+                    <span class="payment-section-icon">📜</span>
+                    Payment History
+                </h2>
+                <div class="history-total">
+                    <div class="history-total-label">Total Collected</div>
+                    <div class="history-total-value">{{ gym_details.currency or 'Rs' }}
+                        {{ total_collected }}</div>
+                </div>
+            </div>
+
+            {% if fees %}
+            <div class="history-list">
+                {% for fee in fees %}
+                <div class="history-row">
+                    <div>
+                        <div class="history-member-name">{{ fee.member.name if fee.member else 'Unknown Member' }}</div>
+                        <div class="history-member-phone">📱 {{ fee.member.phone if fee.member and fee.member.phone else
+                            'N/A' }}</div>
+                    </div>
+                    <div>
+                        <div class="history-meta-label">
+                            Amount</div>
+                        <div class="history-amount">{{ gym_details.currency or 'Rs' }} {{ fee.amount }}</div>
+                    </div>
+                    <div>
+                        <div class="history-meta-label">
+                            Month</div>
+                        <div class="history-month">{{ fee.month }}</div>
+                    </div>
+                    <div class="history-date-block">
+                        <div class="history-meta-label">
+                            Paid On</div>
+                        <div class="history-paid-on">{{ fee.paid_date.strftime('%d %b %Y') if fee.paid_date and
+                            fee.paid_date.strftime is defined else (fee.paid_date or 'N/A') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3 class="empty-title-muted">No Payment History</h3>
+                <p class="empty-text-muted">Record your first payment to see it here!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        const allowedTabs = ['record', 'paid', 'unpaid', 'history'];
+        if (!allowedTabs.includes(tabName)) {
+            tabName = 'record';
+        }
+
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.add('tab-content-hidden');
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll('.payment-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab and activate corresponding button
+        const tabs = document.querySelectorAll('.payment-tab');
+        if (tabName === 'record') {
+            document.getElementById('record-tab').classList.remove('tab-content-hidden');
+            tabs[0].classList.add('active');
+        } else if (tabName === 'paid') {
+            document.getElementById('paid-tab').classList.remove('tab-content-hidden');
+            tabs[1].classList.add('active');
+        } else if (tabName === 'unpaid') {
+            document.getElementById('unpaid-tab').classList.remove('tab-content-hidden');
+            tabs[2].classList.add('active');
+        } else if (tabName === 'history') {
+            document.getElementById('history-tab').classList.remove('tab-content-hidden');
+            tabs[3].classList.add('active');
+        }
+
+        localStorage.setItem('feesActiveTab', tabName);
+    }
+
+    function normalizeMonthValue(value) {
+        const digitsOnly = value.replace(/[^0-9]/g, '').slice(0, 6);
+        if (digitsOnly.length <= 4) {
+            return digitsOnly;
+        }
+        return `${digitsOnly.slice(0, 4)}-${digitsOnly.slice(4)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const monthInput = document.getElementById('month');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+
+        if (!monthInput.value) {
+            monthInput.value = `${year}-${month}`;
+        }
+
+        monthInput.addEventListener('input', function () {
+            this.value = normalizeMonthValue(this.value);
+            if (!/^\d{4}-\d{2}$/.test(this.value)) {
+                this.setCustomValidity('Please enter month in YYYY-MM format.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        monthInput.addEventListener('blur', function () {
+            if (this.value && !/^\d{4}-\d{2}$/.test(this.value)) {
+                this.reportValidity();
+            }
+        });
+
+        const savedTab = localStorage.getItem('feesActiveTab') || 'record';
+        showTab(savedTab);
+
+        const paymentForm = document.getElementById('paymentForm');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', function () {
+                const submitBtn = paymentForm.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.add('is-loading');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="payment-submit-icon">⏳</span>Saving Payment...';
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

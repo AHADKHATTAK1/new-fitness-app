@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Super Admin - Approvals{% endblock %}
+
+{% block content %}
+<style>
+    .super-admin-card {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+
+    .super-admin-title {
+        margin-bottom: 2rem;
+        color: var(--primary);
+    }
+
+    .proof-thumb {
+        height: 50px;
+        border-radius: 4px;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 2rem;
+    }
+</style>
+
+<div class="card super-admin-card">
+    <h1 class="super-admin-title">🛡️ Super Admin - Payment Approvals</h1>
+
+    {% if pending_users %}
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Joined</th>
+                <th>Proof</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in pending_users %}
+            <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.joined }}</td>
+                <td>
+                    {% if u.proof %}
+                    <a href="{{ url_for('static', filename='uploads/' + u.proof) }}" target="_blank">
+                        <img src="{{ url_for('static', filename='uploads/' + u.proof) }}" class="proof-thumb"
+                            alt="Payment proof for {{ u.username }}" title="Payment proof for {{ u.username }}">
+                        View Full
+                    </a>
+                    {% else %}
+                    No Proof
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('approve_payment', target_username=u.username) }}" class="btn btn-success"
+                        onclick="return confirm('Approve this user?')">
+                        ✅ Approve
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No pending approvals.</p>
+    {% endif %}
+</div>
+{% endblock %}

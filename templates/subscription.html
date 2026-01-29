@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Required - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .subscription-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .subscription-card {
+        max-width: 500px;
+        width: 100%;
+        border: 1px solid var(--primary);
+    }
+
+    .subscription-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .lock-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .subscription-title {
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .subscription-note {
+        color: var(--text-muted);
+    }
+
+    .market-toggle {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .market-btn {
+        border: 1px solid var(--text-muted);
+        background: transparent;
+        color: var(--text-muted);
+    }
+
+    .market-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .plan-box {
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .plan-box-us {
+        background: hsla(260, 80%, 20%, 0.5);
+        border: 1px solid var(--border);
+    }
+
+    .plan-box-pk {
+        background: hsla(150, 80%, 20%, 0.5);
+        border: 1px solid var(--success);
+    }
+
+    .plan-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .plan-row-spaced {
+        margin-bottom: 0.5rem;
+    }
+
+    .plan-label {
+        color: var(--text-muted);
+    }
+
+    .plan-name {
+        font-weight: 600;
+    }
+
+    .plan-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    .pay-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        transition: transform 0.1s;
+    }
+
+    .pay-note {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .pay-option {
+        margin-bottom: 1rem;
+    }
+
+    .pk-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .provider-btn {
+        width: 100%;
+        padding: 1rem;
+        border: none;
+        border-radius: 8px;
+        color: white;
+    }
+
+    .provider-jazzcash {
+        background: #c2121c;
+    }
+
+    .provider-easypaisa {
+        background: #00a859;
+    }
+
+    .pk-note {
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .hidden-plan {
+        display: none;
+    }
+
+    .referral-wrap {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .referral-title {
+        margin-bottom: 0.5rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .referral-row {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .referral-input {
+        flex: 1;
+    }
+</style>
+
+<div class="subscription-wrap">
+    <div class="card subscription-card">
+        <div class="subscription-header">
+            <div class="lock-icon">🔒</div>
+            <h1 class="subscription-title">
+                Subscription Required</h1>
+            <p class="subscription-note">Your 3-day free trial has ended. Please choose a payment option to continue.
+            </p>
+        </div>
+
+        {% if payment_market == 'PK' %}
+        <div id="pk-plan">
+            <div class="plan-box plan-box-pk">
+                <div class="plan-row plan-row-spaced">
+                    <span class="plan-label">Plan</span>
+                    <span class="plan-name">Standard Monthly (PK)</span>
+                </div>
+                <div class="plan-row">
+                    <span class="plan-label">Amount Due</span>
+                    <span class="plan-amount">Rs 5,000</span>
+                </div>
+            </div>
+
+            <div class="pk-methods">
+                <form action="{{ url_for('initiate_payment') }}" method="POST">
+                    <input type="hidden" name="provider" value="jazzcash">
+                    <button type="submit" class="btn provider-btn provider-jazzcash">
+                        <span>🔴 JazzCash</span>
+                    </button>
+                </form>
+
+                <form action="{{ url_for('initiate_payment') }}" method="POST">
+                    <input type="hidden" name="provider" value="easypaisa">
+                    <button type="submit" class="btn provider-btn provider-easypaisa">
+                        <span>🟢 EasyPaisa</span>
+                    </button>
+                </form>
+            </div>
+
+            <p class="pk-note">
+                Instant activation. Secured payment gateways.
+            </p>
+        </div>
+        {% else %}
+        <div id="us-plan">
+            <div class="plan-box plan-box-us">
+                <div class="plan-row plan-row-spaced">
+                    <span class="plan-label">Plan</span>
+                    <span class="plan-name">Standard Monthly (US)</span>
+                </div>
+                <div class="plan-row">
+                    <span class="plan-label">Amount Due</span>
+                    <span class="plan-amount">$60.00</span>
+                </div>
+            </div>
+
+            <form action="{{ url_for('initiate_payment') }}" method="POST" class="pay-option">
+                <input type="hidden" name="provider" value="stripe">
+                <input type="hidden" name="plan" value="monthly_us">
+                <button type="submit" class="btn btn-success pay-btn">
+                    <span>Pay Monthly ($60) 💳</span>
+                </button>
+            </form>
+
+            <form action="{{ url_for('initiate_payment') }}" method="POST" class="pay-option">
+                <input type="hidden" name="provider" value="stripe">
+                <input type="hidden" name="plan" value="mini_monthly_us">
+                <button type="submit" class="btn btn-primary pay-btn">
+                    <span>Mini Plan - 1 Month ($6) 💎</span>
+                </button>
+            </form>
+
+            <p class="pay-note">
+                Secured by <strong>Stripe</strong>. Automatic activation.
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="referral-wrap">
+            <p class="referral-title">Have a referral code? Activate premium access</p>
+            <form action="{{ url_for('apply_referral') }}" method="POST" class="referral-row">
+                <input type="hidden" name="next" value="subscription">
+                <input type="text" name="referral_code" class="form-control referral-input"
+                    placeholder="Enter referral code" required>
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

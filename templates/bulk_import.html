@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Import - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .bulk-import-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .bulk-import-title {
+        font-size: 2.8rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 30%, var(--secondary) 60%, var(--accent-gold) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+    }
+
+    .bulk-import-subtitle {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+    }
+
+    .bulk-card-instructions {
+        margin-bottom: 2rem;
+        background: linear-gradient(145deg, hsla(210, 100%, 50%, 0.1), hsla(210, 100%, 40%, 0.05));
+    }
+
+    .bulk-section-title {
+        margin-bottom: 1rem;
+    }
+
+    .bulk-instruction-list {
+        color: var(--text);
+        line-height: 2;
+        font-size: 1.05rem;
+    }
+
+    .bulk-feature-box {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+        border-left: 4px solid var(--accent-gold);
+        border-radius: 12px;
+    }
+
+    .bulk-feature-title {
+        color: var(--accent-gold);
+        font-size: 1.1rem;
+    }
+
+    .bulk-feature-list {
+        margin: 0.75rem 0 0 1.5rem;
+        line-height: 1.8;
+    }
+
+    .bulk-required-box {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(139, 92, 246, 0.1);
+        border-left: 4px solid var(--primary);
+        border-radius: 12px;
+    }
+
+    .bulk-required-title {
+        color: var(--primary);
+    }
+
+    .bulk-required-list {
+        margin: 0.5rem 0 0 1.5rem;
+        line-height: 1.6;
+    }
+
+    .bulk-required-note {
+        margin-top: 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .bulk-card-download {
+        margin-bottom: 2rem;
+    }
+
+    .bulk-download-title {
+        margin-bottom: 1rem;
+        color: var(--accent-gold);
+    }
+
+    .bulk-download-text {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .bulk-download-btn {
+        font-size: 1.1rem;
+    }
+
+    .bulk-upload-title {
+        margin-bottom: 1rem;
+        color: var(--secondary);
+    }
+
+    .bulk-upload-text {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .bulk-file-wrap {
+        position: relative;
+    }
+
+    .bulk-file-input {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 2px dashed var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .bulk-file-input.drag-active {
+        border-color: var(--primary);
+        background: hsla(210, 100%, 50%, 0.1);
+    }
+
+    .bulk-file-name {
+        margin-top: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .bulk-file-hint {
+        margin-top: 0.35rem;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+    }
+
+    .bulk-file-error {
+        margin-top: 0.45rem;
+        color: var(--error);
+        font-size: 0.86rem;
+        display: none;
+    }
+
+    .bulk-file-error.visible {
+        display: block;
+    }
+
+    .bulk-file-name.is-selected {
+        color: var(--success);
+    }
+
+    .bulk-upload-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .bulk-action-btn {
+        flex: 1;
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .bulk-action-btn.is-loading {
+        opacity: 0.75;
+        cursor: not-allowed;
+    }
+
+    .bulk-upload-note {
+        margin-top: 1rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .bulk-card-format {
+        margin-top: 2rem;
+        background: hsla(230, 20%, 15%, 0.5);
+    }
+
+    .bulk-format-title {
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+
+    .bulk-table-wrap {
+        overflow-x: auto;
+    }
+
+    .bulk-format-table {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .bulk-status-paid {
+        color: var(--success);
+        font-weight: bold;
+    }
+
+    .bulk-status-unpaid {
+        color: var(--error);
+    }
+
+    .bulk-format-note {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: hsla(0, 0%, 100%, 0.05);
+        border-radius: 6px;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="bulk-import-header">
+    <h1 class="bulk-import-title">
+        📊 Advanced Import Center
+    </h1>
+    <p class="bulk-import-subtitle">Upload Excel or CSV with validation, preview & smart
+        duplicate handling</p>
+</div>
+
+<!-- Instructions Card -->
+<div class="card bulk-card-instructions">
+    <h2 class="bulk-section-title">📋 How to Use</h2>
+
+    <ol class="bulk-instruction-list">
+        <li><strong>📥 Download Template</strong> - Get sample Excel with all required columns</li>
+        <li><strong>✍️ Fill Your Data</strong> - Add member details in the Excel file</li>
+        <li><strong>⬆️ Upload File</strong> - System validates data automatically</li>
+        <li><strong>👁️ Preview Results</strong> - Review validation, see duplicates, choose strategy</li>
+        <li><strong>✅ Confirm Import</strong> - Import only valid data with your chosen duplicate handling</li>
+    </ol>
+
+    <div class="bulk-feature-box">
+        <strong class="bulk-feature-title">✨ New: Smart Import Features</strong>
+        <ul class="bulk-feature-list">
+            <li><strong>Auto-Validation:</strong> Required fields checked automatically</li>
+            <li><strong>Duplicate Detection:</strong> Phone numbers matched against existing members</li>
+            <li><strong>Smart Handling:</strong> Choose Skip/Update/Merge for duplicates</li>
+            <li><strong>Auto-Payments:</strong> Mark "Paid" to record fees for joining month</li>
+            <li><strong>Preview Mode:</strong> See validation results before importing</li>
+            <li><strong>Error Reports:</strong> Detailed messages for each issue found</li>
+        </ul>
+    </div>
+
+    <div class="bulk-required-box">
+        <strong class="bulk-required-title">📝 Required Fields:</strong>
+        <ul class="bulk-required-list">
+            <li><strong>Name</strong> - Member's full name (minimum 2 characters)</li>
+            <li><strong>Phone</strong> - Unique phone number (10-15 digits)</li>
+        </ul>
+        <div class="bulk-required-note">
+            <em>Email, Membership Type, and Dates are optional but recommended</em>
+        </div>
+    </div>
+</div>
+
+<!-- Download Template Card -->
+<div class="card bulk-card-download">
+    <h2 class="bulk-download-title">📄 Step 1: Download Template</h2>
+    <p class="bulk-download-text">
+        Download the sample Excel file with pre-filled headers and example data
+    </p>
+
+    <a href="{{ url_for('download_template') }}" class="btn btn-secondary bulk-download-btn">
+        📥 Download Excel Template
+    </a>
+</div>
+
+<!-- Upload File Card -->
+<div class="card">
+    <h2 class="bulk-upload-title">📤 Step 2: Upload Your File</h2>
+    <p class="bulk-upload-text">
+        Select your completed Excel (.xlsx) or CSV (.csv) file
+    </p>
+
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        <div class="form-group">
+            <label for="import_file">Select File *</label>
+            <div class="bulk-file-wrap">
+                <input type="file" id="import_file" name="import_file" accept=".xlsx,.csv" required
+                    class="bulk-file-input" onchange="updateFileName(this)">
+            </div>
+            <div id="fileName" class="bulk-file-name"></div>
+            <div class="bulk-file-hint">Accepted: .xlsx or .csv (max 16 MB)</div>
+            <div id="fileError" class="bulk-file-error"></div>
+        </div>
+
+        <input type="hidden" name="action" value="upload">
+
+        <div class="bulk-upload-actions">
+            <button type="submit" class="btn btn-success bulk-action-btn">
+                ⬆️ Upload & Preview
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn bulk-action-btn">
+                ❌ Cancel
+            </a>
+        </div>
+
+        <div class="bulk-upload-note">
+            <em>✨ You'll see a preview before importing</em>
+        </div>
+    </form>
+</div>
+
+<!-- File Format Example -->
+<div class="card bulk-card-format">
+    <h3 class="bulk-format-title">📊 Expected File Format</h3>
+
+    <div class="bulk-table-wrap">
+        <table class="bulk-format-table">
+            <thead>
+                <tr>
+                    <th>Name *</th>
+                    <th>Phone *</th>
+                    <th>Email</th>
+                    <th>Membership Type</th>
+                    <th>Joined Date</th>
+                    <th>Status</th>
+                    <th>Month</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ahmed Ali</td>
+                    <td>03001234567</td>
+                    <td>ahmed@example.com</td>
+                    <td>Gym</td>
+                    <td>2025-01-01</td>
+                    <td><span class="bulk-status-paid">Paid</span></td>
+                    <td>2025-01</td>
+                    <td>3000</td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>03117654321</td>
+                    <td>jane@example.com</td>
+                    <td>Gym + Cardio</td>
+                    <td>2025-01-05</td>
+                    <td><span class="bulk-status-unpaid">Unpaid</span></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>John Doe</td>
+                    <td>03009876543</td>
+                    <td>john@example.com</td>
+                    <td>Gym</td>
+                    <td>2025-01-10</td>
+                    <td><span class="bulk-status-paid">Paid</span></td>
+                    <td>2025-01</td>
+                    <td>2500</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bulk-format-note">
+        <strong>Note:</strong> Fields marked with * are required. Date format should be YYYY-MM-DD.
+    </div>
+</div>
+
+<script>
+    function setFileError(message) {
+        const errorElement = document.getElementById('fileError');
+        if (!message) {
+            errorElement.textContent = '';
+            errorElement.classList.remove('visible');
+            return;
+        }
+        errorElement.textContent = message;
+        errorElement.classList.add('visible');
+    }
+
+    function isValidFile(file) {
+        if (!file) {
+            setFileError('Please select a file before uploading.');
+            return false;
+        }
+
+        const fileNameLower = file.name.toLowerCase();
+        const isAllowedType = fileNameLower.endsWith('.xlsx') || fileNameLower.endsWith('.csv');
+        if (!isAllowedType) {
+            setFileError('Invalid file type. Please upload only .xlsx or .csv files.');
+            return false;
+        }
+
+        const maxSizeBytes = 16 * 1024 * 1024;
+        if (file.size > maxSizeBytes) {
+            setFileError('File is too large. Maximum allowed size is 16 MB.');
+            return false;
+        }
+
+        setFileError('');
+        return true;
+    }
+
+    function updateFileName(input) {
+        const fileName = document.getElementById('fileName');
+        fileName.classList.remove('is-selected');
+        fileName.innerHTML = '';
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (!isValidFile(file)) {
+                input.value = '';
+                return;
+            }
+            const fileSize = (file.size / 1024).toFixed(2);
+            fileName.innerHTML = `<strong>Selected:</strong> ${file.name} (${fileSize} KB)`;
+            fileName.classList.add('is-selected');
+        }
+    }
+
+    // Drag and drop support
+    const fileInput = document.getElementById('import_file');
+    fileInput.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.target.classList.add('drag-active');
+    });
+
+    fileInput.addEventListener('dragleave', (e) => {
+        e.target.classList.remove('drag-active');
+    });
+
+    fileInput.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.target.classList.remove('drag-active');
+
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileName(fileInput);
+        }
+    });
+
+    // Form submission animation
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        if (!fileInput.files || !fileInput.files[0] || !isValidFile(fileInput.files[0])) {
+            e.preventDefault();
+            return;
+        }
+
+        const btn = this.querySelector('button[type="submit"]');
+        btn.classList.add('is-loading');
+        btn.innerHTML = '⏳ Uploading & Validating...';
+        btn.disabled = true;
+    });
+</script>
+
+{% endblock %}

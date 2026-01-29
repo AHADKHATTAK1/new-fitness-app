@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Member - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .edit-member-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+    }
+
+    .edit-member-card {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .edit-member-control {
+        width: 100%;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+    }
+
+    .edit-member-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .edit-member-action {
+        flex: 1;
+    }
+
+    .edit-member-cancel {
+        text-align: center;
+    }
+</style>
+
+<h1 class="edit-member-title">Edit Member</h1>
+
+<div class="card edit-member-card">
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Member Name *</label>
+            <input type="text" id="name" name="name" value="{{ member.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number *</label>
+            <input type="tel" id="phone" name="phone" value="{{ member.phone }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ member.email }}">
+        </div>
+
+        <div class="form-group">
+            <label for="joined_date">Joined Date</label>
+            <input type="date" id="joined_date" name="joined_date" value="{{ member.joined_date }}" required
+                class="edit-member-control">
+        </div>
+
+        <div class="form-group">
+            <label for="membership_type">Membership Type</label>
+            <select id="membership_type" name="membership_type" class="edit-member-control">
+                <option value="Gym" {% if member.membership_type=='Gym' %}selected{% endif %}>Gym</option>
+                <option value="Cardio" {% if member.membership_type=='Cardio' %}selected{% endif %}>Cardio</option>
+                <option value="Personal Training" {% if member.membership_type=='Personal Training' %}selected{% endif
+                    %}>Personal Training</option>
+                <option value="Other" {% if member.membership_type=='Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <div class="edit-member-actions">
+            <a href="{{ url_for('member_details', member_id=member.id) }}"
+                class="btn btn-secondary edit-member-action edit-member-cancel">Cancel</a>
+            <button type="submit" class="btn btn-success edit-member-action">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

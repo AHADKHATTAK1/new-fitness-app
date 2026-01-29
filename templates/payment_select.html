@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Select Payment Method - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .payment-select-wrap {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .payment-select-title {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .payment-option {
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .payment-option-clickable {
+        cursor: pointer;
+    }
+
+    .payment-option-full {
+        height: 100%;
+    }
+
+    .payment-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .payment-title-card {
+        margin-bottom: 1rem;
+    }
+
+    .payment-title-card.primary {
+        color: var(--primary);
+    }
+
+    .payment-title-card.success {
+        color: var(--success);
+    }
+
+    .payment-desc {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .manual-link {
+        text-decoration: none;
+        color: inherit;
+    }
+</style>
+
+<div class="payment-select-wrap">
+    <h1 class="payment-select-title">Choose Payment Method</h1>
+
+    <div class="payment-grid">
+        <!-- Option A: Stripe (Auto) -->
+        <div class="card payment-option payment-option-clickable"
+            onclick="document.getElementById('stripe-form').submit()">
+            <div class="payment-icon">💳</div>
+            <h2 class="payment-title-card primary">Credit / Debit Card</h2>
+            <p class="payment-desc">
+                International Payment via Stripe.<br>
+                <strong>Instant Activation</strong> ✅
+            </p>
+            <div class="payment-price">$60.00</div>
+
+            <form id="stripe-form" action="{{ url_for('create_checkout_session') }}" method="POST">
+                <button type="submit" class="btn btn-primary full-width">Pay Securely</button>
+            </form>
+        </div>
+
+        <!-- Option B: Manual (Pakistan) -->
+        <a href="{{ url_for('manual_payment') }}" class="manual-link">
+            <div class="card payment-option payment-option-full">
+                <div class="payment-icon">🏦</div>
+                <h2 class="payment-title-card success">JazzCash / Bank</h2>
+                <p class="payment-desc">
+                    Local Transfer in Pakistan.<br>
+                    <strong>Manual Approval (1-24h)</strong> 🕒
+                </p>
+                <div class="payment-price">Rs. 2000</div>
+                <!-- Django code mentioned 2000 PKR -->
+
+                <button class="btn btn-success full-width">Upload Screenshot</button>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

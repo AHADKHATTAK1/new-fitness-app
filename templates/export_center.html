@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Export Center - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .export-center-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .export-center-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .export-center-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 3rem;
+    }
+
+    .export-center-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .export-card {
+        padding: 2rem;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .export-card.dimmed {
+        opacity: 0.6;
+    }
+
+    .export-card-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .export-card-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .export-card-desc {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .export-card-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .export-card-btn-warning {
+        background: var(--warning);
+        color: white;
+    }
+
+    .export-card-btn-secondary {
+        background: var(--secondary);
+        color: white;
+    }
+
+    .export-card-btn-disabled {
+        opacity: 0.5;
+    }
+
+    .export-tips {
+        margin-top: 3rem;
+        padding: 1.5rem;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid var(--primary);
+    }
+
+    .export-tips-title {
+        margin-bottom: 1rem;
+    }
+
+    .export-tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .export-tips-item {
+        margin-bottom: 0.5rem;
+    }
+
+    .export-tips-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .export-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<div class="export-center-wrap">
+    <h1 class="export-center-title">
+        📊 Export Center
+    </h1>
+
+    <p class="export-center-subtitle">
+        Download comprehensive reports and data exports for your gym management
+    </p>
+
+    <div class="export-center-grid">
+
+        <!-- Complete Members Database -->
+        <div class="card export-card">
+            <div class="export-card-icon">👥</div>
+            <h2 class="export-card-title">Complete Members</h2>
+            <p class="export-card-desc">
+                Full member database with personal info, payment history, and membership details
+            </p>
+            <a href="{{ url_for('export_members_complete') }}" class="btn btn-primary export-card-btn">
+                📥 Download Excel
+            </a>
+        </div>
+
+        <!-- Revenue Report -->
+        <div class="card export-card">
+            <div class="export-card-icon">💰</div>
+            <h2 class="export-card-title">Revenue Report</h2>
+            <p class="export-card-desc">
+                Detailed revenue breakdown by month, member type, and payment method
+            </p>
+            <a href="{{ url_for('export_revenue_report') }}" class="btn btn-success export-card-btn">
+                📥 Download Excel
+            </a>
+        </div>
+
+        <!-- Unpaid Members -->
+        <div class="card export-card">
+            <div class="export-card-icon">⚠️</div>
+            <h2 class="export-card-title">Unpaid Members</h2>
+            <p class="export-card-desc">
+                List of members with pending payments and overdue amounts
+            </p>
+            <a href="{{ url_for('export_unpaid_members') }}" class="btn export-card-btn export-card-btn-warning">
+                📥 Download Excel
+            </a>
+        </div>
+
+        <!-- Attendance Analysis (Coming Soon) -->
+        <div class="card export-card dimmed">
+            <div class="export-card-icon">📈</div>
+            <h2 class="export-card-title">Attendance Analysis</h2>
+            <p class="export-card-desc">
+                Member check-in frequency and engagement statistics
+            </p>
+            <button class="btn export-card-btn export-card-btn-disabled" disabled>
+                🔜 Coming Soon
+            </button>
+        </div>
+
+        <!-- Quick Dashboard Export -->
+        <div class="card export-card">
+            <div class="export-card-icon">⚡</div>
+            <h2 class="export-card-title">Quick Export</h2>
+            <p class="export-card-desc">
+                Basic member list with current month payment status
+            </p>
+            <a href="{{ url_for('download_excel') }}" class="btn export-card-btn export-card-btn-secondary">
+                📥 Download Excel
+            </a>
+        </div>
+
+        <!-- Custom Report Builder (Coming Soon) -->
+        <div class="card export-card dimmed">
+            <div class="export-card-icon">🎯</div>
+            <h2 class="export-card-title">Custom Report</h2>
+            <p class="export-card-desc">
+                Build custom reports with date ranges and filters
+            </p>
+            <button class="btn export-card-btn export-card-btn-disabled" disabled>
+                🔜 Coming Soon
+            </button>
+        </div>
+
+    </div>
+
+    <div class="card export-tips">
+        <h3 class="export-tips-title">💡 Pro Tips</h3>
+        <ul class="export-tips-list">
+            <li class="export-tips-item">✅ All exports are professionally formatted Excel files</li>
+            <li class="export-tips-item">✅ Column widths auto-adjusted for readability</li>
+            <li class="export-tips-item">✅ Headers are styled with your gym colors</li>
+            <li>✅ Files include timestamp in filename for easy organization</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

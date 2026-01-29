@@ -1,0 +1,604 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .settings-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 50%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+    }
+
+    .settings-card {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .settings-card-spaced {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .subscription-card {
+        margin: 0 auto 2rem auto;
+        border: 1px solid var(--border);
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.4));
+    }
+
+    .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .card-title-inline {
+        margin: 0;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .badge-active {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        border: 1px solid var(--success);
+    }
+
+    .badge-expired {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--error);
+        border: 1px solid var(--error);
+    }
+
+    .subscription-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .subscription-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .subscription-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+    }
+
+    .subscription-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .days-left {
+        font-size: 0.7rem;
+        color: var(--warning);
+    }
+
+    .renew-wrap {
+        margin-top: 1.5rem;
+    }
+
+    .full-width-btn {
+        width: 100%;
+    }
+
+    .btn-center {
+        justify-content: center;
+    }
+
+    .currency-select {
+        width: 100%;
+        padding: 0.8rem;
+        background: var(--bg-card);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+
+    .preview-wrap {
+        margin-bottom: 1rem;
+    }
+
+    .logo-preview {
+        max-width: 200px;
+        border-radius: 8px;
+    }
+
+    .upload-label {
+        cursor: pointer;
+        margin: 0;
+        display: inline-block;
+    }
+
+    .hidden-input {
+        display: none;
+    }
+
+    .file-name {
+        margin-left: 1rem;
+        color: var(--text-muted);
+    }
+
+    .save-btn {
+        margin-top: 1.5rem;
+    }
+
+    .card-warning {
+        border-left: 4px solid var(--warning);
+    }
+
+    .card-primary {
+        border-left: 4px solid var(--primary);
+    }
+
+    .card-danger {
+        border-left: 4px solid var(--error);
+    }
+
+    .section-title {
+        margin-bottom: 1rem;
+    }
+
+    .muted-text {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .billing-card {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .billing-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+
+    .invoice-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .empty-billing {
+        color: var(--text-muted);
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .feature-pill {
+        padding: 0.6rem 0.75rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .feature-pill.enabled {
+        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .feature-pill.disabled {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.28);
+        color: var(--text-muted);
+    }
+
+    .feature-status {
+        font-weight: 700;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .api-pill {
+        cursor: default;
+    }
+</style>
+
+<h1 class="settings-title">
+    ⚙️ Gym Settings</h1>
+
+<!-- NEW: Subscription Status Card -->
+<div class="card settings-card subscription-card">
+    <div class="card-header-row">
+        <h2 class="card-title-inline">
+            💎 My Subscription
+        </h2>
+        {% if subscription.status == 'Active' %}
+        <span class="badge badge-active">
+            ✅ Active
+        </span>
+        {% else %}
+        <span class="badge badge-expired">
+            ❌ Expired
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="subscription-grid">
+        <div class="subscription-box">
+            <div class="subscription-label">Current Plan</div>
+            <div class="subscription-value">{{ subscription.plan_name }} ({{ subscription.market }})</div>
+        </div>
+        <div class="subscription-box">
+            <div class="subscription-label">Valid Until</div>
+            <div class="subscription-value">
+                {{ subscription.expiry }}
+                {% if subscription.days_left < 5 and subscription.days_left> 0 %}
+                    <span class="days-left">({{ subscription.days_left }} days
+                        left)</span>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if subscription.status != 'Active' or subscription.days_left < 5 %} <div class="renew-wrap">
+        <a href="{{ url_for('subscription') }}" class="btn btn-primary full-width-btn btn-center">
+            🔄 Renew / Upgrade Plan
+        </a>
+</div>
+{% endif %}
+</div>
+
+<div class="card settings-card-spaced">
+    <h2 class="section-title">🚀 Plan Feature Access</h2>
+    <p class="muted-text">
+        Features are unlocked based on your paid subscription tier.
+    </p>
+
+    <div class="feature-grid">
+        <div class="feature-pill {% if feature_access.member_management %}enabled{% else %}disabled{% endif %}">
+            <span>Member Management</span><span class="feature-status">{% if feature_access.member_management %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.payment_tracking %}enabled{% else %}disabled{% endif %}">
+            <span>Payment Tracking</span><span class="feature-status">{% if feature_access.payment_tracking %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.basic_reports %}enabled{% else %}disabled{% endif %}">
+            <span>Basic Reports</span><span class="feature-status">{% if feature_access.basic_reports %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.mobile_app %}enabled{% else %}disabled{% endif %}">
+            <span>Mobile App (PWA)</span><span class="feature-status">{% if feature_access.mobile_app %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.email_support %}enabled{% else %}disabled{% endif %}">
+            <span>Email Support</span><span class="feature-status">{% if feature_access.email_support %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.marketing_automation %}enabled{% else %}disabled{% endif %}">
+            <span>Marketing Automation</span><span class="feature-status">{% if feature_access.marketing_automation
+                %}✅{% else %}🔒{% endif %}</span>
+        </div>
+        <div
+            class="feature-pill {% if feature_access.ai_churn_prediction or feature_access.advanced_analytics %}enabled{% else %}disabled{% endif %}">
+            <span>AI Analytics</span><span class="feature-status">{% if feature_access.ai_churn_prediction or
+                feature_access.advanced_analytics %}✅{% else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.api_access %}enabled{% else %}disabled{% endif %}">
+            <span>API Access</span><span class="feature-status">{% if feature_access.api_access %}✅{% else %}🔒{% endif
+                %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.multi_gym_management %}enabled{% else %}disabled{% endif %}">
+            <span>Multi-Gym Management</span><span class="feature-status">{% if feature_access.multi_gym_management
+                %}✅{% else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.priority_support %}enabled{% else %}disabled{% endif %}">
+            <span>Priority Support</span><span class="feature-status">{% if feature_access.priority_support %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.custom_branding %}enabled{% else %}disabled{% endif %}">
+            <span>Custom Branding</span><span class="feature-status">{% if feature_access.custom_branding %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.bulk_operations %}enabled{% else %}disabled{% endif %}">
+            <span>Bulk Operations</span><span class="feature-status">{% if feature_access.bulk_operations %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.advanced_reports %}enabled{% else %}disabled{% endif %}">
+            <span>Advanced Reports</span><span class="feature-status">{% if feature_access.advanced_reports %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.webhooks %}enabled{% else %}disabled{% endif %}">
+            <span>Webhooks</span><span class="feature-status">{% if feature_access.webhooks %}✅{% else %}🔒{% endif
+                %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.white_label %}enabled{% else %}disabled{% endif %}">
+            <span>White-Label</span><span class="feature-status">{% if feature_access.white_label %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.custom_domain %}enabled{% else %}disabled{% endif %}">
+            <span>Custom Domain</span><span class="feature-status">{% if feature_access.custom_domain %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.dedicated_account_manager %}enabled{% else %}disabled{% endif %}">
+            <span>Dedicated Account Manager</span><span class="feature-status">{% if
+                feature_access.dedicated_account_manager %}✅{% else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.sla_guarantee %}enabled{% else %}disabled{% endif %}">
+            <span>SLA Guarantee</span><span class="feature-status">{% if feature_access.sla_guarantee %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access['24_7_support'] %}enabled{% else %}disabled{% endif %}">
+            <span>24/7 Support</span><span class="feature-status">{% if feature_access['24_7_support'] %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.on_premise_deployment %}enabled{% else %}disabled{% endif %}">
+            <span>On-Premise Deployment</span><span class="feature-status">{% if feature_access.on_premise_deployment
+                %}✅{% else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.custom_development %}enabled{% else %}disabled{% endif %}">
+            <span>Custom Development</span><span class="feature-status">{% if feature_access.custom_development %}✅{%
+                else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.phone_support %}enabled{% else %}disabled{% endif %}">
+            <span>Phone Support</span><span class="feature-status">{% if feature_access.phone_support %}✅{% else %}🔒{%
+                endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.training_sessions %}enabled{% else %}disabled{% endif %}">
+            <span>Training Sessions</span><span class="feature-status">{% if feature_access.training_sessions %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.data_migration %}enabled{% else %}disabled{% endif %}">
+            <span>Data Migration</span><span class="feature-status">{% if feature_access.data_migration %}✅{% else
+                %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.compliance_support %}enabled{% else %}disabled{% endif %}">
+            <span>Compliance Support</span><span class="feature-status">{% if feature_access.compliance_support %}✅{%
+                else %}🔒{% endif %}</span>
+        </div>
+        <div class="feature-pill {% if feature_access.multi_region_deployment %}enabled{% else %}disabled{% endif %}">
+            <span>Multi-Region Deployment</span><span class="feature-status">{% if
+                feature_access.multi_region_deployment %}✅{% else %}🔒{% endif %}</span>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        {% if feature_access.member_management %}
+        <a href="{{ url_for('add_member') }}" class="btn btn-secondary btn-center">👥 Member Management</a>
+        {% endif %}
+        {% if feature_access.payment_tracking %}
+        <a href="{{ url_for('fees') }}" class="btn btn-secondary btn-center">💳 Payment Tracking</a>
+        {% endif %}
+        {% if feature_access.basic_reports %}
+        <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-center">📊 Basic Reports</a>
+        {% endif %}
+        {% if feature_access.mobile_app %}
+        <a href="{{ url_for('scanner') }}" class="btn btn-secondary btn-center">📱 Mobile App / Scanner</a>
+        {% endif %}
+        {% if feature_access.advanced_analytics %}
+        <a href="{{ url_for('advanced_analytics') }}" class="btn btn-secondary btn-center">🧠 Open AI Analytics</a>
+        {% endif %}
+        {% if feature_access.bulk_operations %}
+        <a href="{{ url_for('bulk_operations') }}" class="btn btn-secondary btn-center">⚡ Open Bulk Ops</a>
+        {% endif %}
+        {% if feature_access.advanced_reports %}
+        <a href="{{ url_for('export_center') }}" class="btn btn-secondary btn-center">📤 Advanced Reports / Export</a>
+        {% endif %}
+        {% if feature_access.webhooks %}
+        <a href="{{ url_for('webhooks') }}" class="btn btn-secondary btn-center">🔗 Open Webhooks</a>
+        {% endif %}
+        {% if feature_access.api_access %}
+        <span class="btn btn-secondary btn-center api-pill">🧩 API Access Enabled</span>
+        {% endif %}
+        {% if feature_access.marketing_automation %}
+        <span class="btn btn-secondary btn-center api-pill">📣 Marketing Automation Enabled</span>
+        {% endif %}
+        {% if feature_access.multi_gym_management %}
+        <span class="btn btn-secondary btn-center api-pill">🏢 Multi-Gym Management Enabled</span>
+        {% endif %}
+        {% if feature_access.priority_support %}
+        <span class="btn btn-secondary btn-center api-pill">⭐ Priority Support Enabled</span>
+        {% endif %}
+        {% if feature_access.custom_branding %}
+        <span class="btn btn-secondary btn-center api-pill">🎨 Custom Branding Enabled</span>
+        {% endif %}
+        {% if feature_access.white_label %}
+        <span class="btn btn-secondary btn-center api-pill">🏷️ White-Label Enabled</span>
+        {% endif %}
+        {% if feature_access.custom_domain %}
+        <span class="btn btn-secondary btn-center api-pill">🌐 Custom Domain Enabled</span>
+        {% endif %}
+        {% if feature_access.dedicated_account_manager %}
+        <span class="btn btn-secondary btn-center api-pill">👤 Dedicated Account Manager Enabled</span>
+        {% endif %}
+        {% if feature_access.sla_guarantee %}
+        <span class="btn btn-secondary btn-center api-pill">🛡️ SLA Guarantee Enabled</span>
+        {% endif %}
+        {% if feature_access['24_7_support'] %}
+        <span class="btn btn-secondary btn-center api-pill">☎️ 24/7 Support Enabled</span>
+        {% endif %}
+        {% if feature_access.on_premise_deployment %}
+        <span class="btn btn-secondary btn-center api-pill">🏠 On-Premise Deployment Enabled</span>
+        {% endif %}
+        {% if feature_access.custom_development %}
+        <span class="btn btn-secondary btn-center api-pill">🧰 Custom Development Enabled</span>
+        {% endif %}
+        {% if feature_access.phone_support %}
+        <span class="btn btn-secondary btn-center api-pill">📞 Phone Support Enabled</span>
+        {% endif %}
+        {% if feature_access.training_sessions %}
+        <span class="btn btn-secondary btn-center api-pill">🎓 Training Sessions Enabled</span>
+        {% endif %}
+        {% if feature_access.data_migration %}
+        <span class="btn btn-secondary btn-center api-pill">🗃️ Data Migration Enabled</span>
+        {% endif %}
+        {% if feature_access.compliance_support %}
+        <span class="btn btn-secondary btn-center api-pill">✅ Compliance Support Enabled</span>
+        {% endif %}
+        {% if feature_access.multi_region_deployment %}
+        <span class="btn btn-secondary btn-center api-pill">🌍 Multi-Region Deployment Enabled</span>
+        {% endif %}
+        <a href="{{ url_for('subscription_plans') }}" class="btn btn-primary btn-center">💎 Upgrade / Manage
+            Subscription</a>
+    </div>
+</div>
+
+<div class="card settings-card">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="gym_name">Gym Name</label>
+            <input type="text" id="gym_name" name="gym_name" value="{{ details.name }}" required
+                placeholder="Enter your gym name">
+        </div>
+
+        <div class="form-group">
+            <label for="currency">Currency Symbol</label>
+            <select id="currency" name="currency" class="currency-select" aria-label="Currency Symbol"
+                title="Currency Symbol">
+                <option value="AUTO" {% if details.currency in ['$', 'Rs' , 'USD' , 'PKR' , None, '' ] %}selected{%
+                    endif %}>
+                    Auto (Region)
+                </option>
+                <option value="$" {% if details.currency=='$' %}selected{% endif %}>$ (USD)</option>
+                <option value="Rs" {% if details.currency=='Rs' %}selected{% endif %}>Rs (PKR)</option>
+                <option value="€" {% if details.currency=='€' %}selected{% endif %}>€ (EUR)</option>
+                <option value="£" {% if details.currency=='£' %}selected{% endif %}>£ (GBP)</option>
+                <option value="¥" {% if details.currency=='¥' %}selected{% endif %}>¥ (JPY)</option>
+                <option value="AED" {% if details.currency=='AED' %}selected{% endif %}>AED</option>
+                <option value="INR" {% if details.currency=='INR' %}selected{% endif %}>INR</option>
+            </select>
+            <small class="muted-text">Auto uses Pakistan = Rs, all other regions = $.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Gym Logo</label>
+            {% if details.logo %}
+            <div class="preview-wrap">
+                <img src="{{ url_for('static', filename='uploads/' + details.logo) }}" alt="Gym Logo"
+                    class="logo-preview">
+            </div>
+            {% endif %}
+
+            <label for="gym_logo" class="btn btn-secondary upload-label">
+                📁 Upload New Logo
+            </label>
+            <input type="file" id="gym_logo" name="gym_logo" accept="image/*" class="hidden-input"
+                onchange="document.getElementById('file-name').textContent = this.files[0].name">
+            <span id="file-name" class="file-name"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success full-width-btn save-btn">
+            💾 Save Settings
+        </button>
+    </form>
+</div>
+
+<div class="card settings-card-spaced card-warning">
+    <h2 class="section-title">🔄 Restore Data (Backup)</h2>
+    <p class="muted-text">
+        Upload your gym data file (<code>.json</code>) to restore all members, fees, and history.
+        <br><strong>⚠️ Warning:</strong> This will replace all current data!
+    </p>
+
+    <form action="{{ url_for('restore_backup') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="backup_file" class="btn btn-secondary upload-label">
+                📂 Select Backup File
+            </label>
+            <input type="file" id="backup_file" name="backup_file" accept=".json" required class="hidden-input"
+                onchange="document.getElementById('backup-name').textContent = this.files[0].name">
+            <span id="backup-name" class="file-name"></span>
+        </div>
+
+        <button type="submit" class="btn btn-warning full-width-btn"
+            onclick="return confirm('⚠️ Are you sure? This will OVERWRITE all current data permanently!')">
+            🔄 Restore Data Now
+        </button>
+    </form>
+</div>
+
+
+<div class="card settings-card-spaced card-primary">
+    <h2 class="section-title">🧹 Data Cleanup</h2>
+    <p class="muted-text">
+        Automatically find and merge duplicate members (same name & phone).
+        <br>It keeps the oldest member and moves all fees/attendance to them.
+    </p>
+
+    <form action="{{ url_for('merge_duplicates') }}" method="POST">
+        <button type="submit" class="btn btn-primary full-width-btn"
+            onclick="return confirm('⚠️ confirm merge? This will combine duplicates and cannot be undone.')">
+            🔍 Scan & Merge Duplicates
+        </button>
+    </form>
+</div>
+
+<div class="card settings-card-spaced card-danger">
+    <h2 class="section-title">🗑️ Reset All Data</h2>
+    <p class="muted-text">
+        <strong>⚠️ DANGER ZONE:</strong> This will delete ALL members, fees, and attendance records permanently.
+        <br>This cannot be undone!
+    </p>
+
+    <form action="{{ url_for('reset_admin') }}" method="GET">
+        <button type="submit" class="btn btn-danger full-width-btn"
+            onclick="return confirm('⚠️⚠️⚠️ FINAL WARNING!\n\nThis will DELETE EVERYTHING:\n• All Members\n• All Fees\n• All Attendance Records\n\nAre you ABSOLUTELY SURE?')">
+            🗑️ Reset All Data
+        </button>
+    </form>
+</div>
+
+<div class="card billing-card">
+    <h2 class="billing-title">🧾 Subscription / Billing History</h2>
+    {% if payments %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Invoice</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p.date }}</td>
+                <td>{{ details.currency or '$' }}{{ p.amount }}</td>
+                <td>{{ p.method }}</td>
+                <td><span class="badge paid">{{ p.status }}</span></td>
+                <td>
+                    <button class="btn btn-secondary invoice-btn" onclick="alert('Invoice download simulated.')">
+                        📄 Download
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-billing">No billing history found.</p>
+    {% endif %}
+</div>
+{% endblock %}

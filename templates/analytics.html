@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    /* Analytics-specific styles */
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .analytics-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 4px;
+        margin-top: 1rem;
+    }
+
+    .heatmap-cell {
+        aspect-ratio: 1;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .heatmap-cell:hover {
+        transform: scale(1.1);
+        z-index: 10;
+    }
+
+    .heatmap-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: 0.5rem 0;
+    }
+
+    .leaderboard-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(139, 92, 246, 0.05);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .leaderboard-item:hover {
+        background: rgba(139, 92, 246, 0.1);
+        border-left-color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .rank-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.2rem;
+    }
+
+    .rank-1 {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+    }
+
+    .rank-2 {
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+        color: #000;
+    }
+
+    .rank-3 {
+        background: linear-gradient(135deg, #cd7f32, #e6a664);
+        color: #fff;
+    }
+
+    .rank-other {
+        background: rgba(139, 92, 246, 0.2);
+        color: var(--primary);
+    }
+
+    .growth-chart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 200px;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 16px;
+    }
+
+    .growth-bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--secondary), var(--primary));
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        animation: barGrowth 1s ease-out forwards;
+    }
+
+    .growth-bar:hover {
+        filter: brightness(1.2);
+    }
+
+    .growth-bar-value {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 0.9rem;
+    }
+
+    .growth-bar-label {
+        position: absolute;
+        bottom: -25px;
+        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .metric-card {
+        text-align: center;
+    }
+
+    .metric-card-primary {
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    .metric-card-secondary {
+        background: rgba(6, 182, 212, 0.1);
+    }
+
+    .metric-card-success {
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .metric-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label-primary {
+        color: var(--primary);
+    }
+
+    .metric-label-secondary {
+        color: var(--secondary);
+    }
+
+    .metric-label-success {
+        color: var(--success);
+    }
+
+    .metric-value {
+        font-size: 3rem;
+        font-weight: 900;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .metric-value-primary {
+        background: linear-gradient(135deg, #fff, var(--primary));
+    }
+
+    .metric-value-secondary {
+        background: linear-gradient(135deg, #fff, var(--secondary));
+    }
+
+    .metric-value-success {
+        background: linear-gradient(135deg, #fff, var(--success));
+    }
+
+    .metric-note {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .analytics-section-card {
+        margin-bottom: 2rem;
+    }
+
+    .analytics-section-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        font-weight: 800;
+    }
+
+    .analytics-section-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .leaderboard-main {
+        flex: 1;
+    }
+
+    .leaderboard-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .leaderboard-phone {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .leaderboard-meta {
+        text-align: right;
+    }
+
+    .leaderboard-checkins {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: var(--primary);
+    }
+
+    .leaderboard-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    .analytics-empty {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 2rem;
+    }
+</style>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <div class="analytics-header">
+        <h1 class="analytics-title">📊 Analytics Dashboard</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+    <!-- Key Metrics Grid -->
+    <div class="analytics-grid">
+        <!-- Total Members -->
+        <div class="card member-card-3d metric-card metric-card-primary">
+            <div class="metric-icon">👥</div>
+            <h3 class="metric-label metric-label-primary">Total Members</h3>
+            <div class="metric-value metric-value-primary">{{ total_members }}</div>
+        </div>
+
+        <!-- Retention Rate -->
+        <div class="card member-card-3d metric-card metric-card-secondary">
+            <div class="metric-icon">🔄</div>
+            <h3 class="metric-label metric-label-secondary">Retention Rate</h3>
+            <div class="metric-value metric-value-secondary">{{ retention_rate }}%</div>
+            <div class="metric-note">Members staying active</div>
+        </div>
+
+        <!-- Total Check-ins -->
+        <div class="card member-card-3d metric-card metric-card-success">
+            <div class="metric-icon">✅</div>
+            <h3 class="metric-label metric-label-success">Total Check-ins</h3>
+            <div class="metric-value metric-value-success">{{ total_checkins }}</div>
+            <div class="metric-note">This month</div>
+        </div>
+    </div>
+
+    <!-- Member Growth Chart -->
+    <div class="card member-card-3d analytics-section-card">
+        <h2 class="analytics-section-title">📈 Member Growth (Last 6 Months)
+        </h2>
+        <div class="growth-chart">
+            {% for data in member_growth %}
+            <div class="growth-bar" data-height="{{ (data.count / max_growth * 100) if max_growth > 0 else 10 }}">
+                <div class="growth-bar-value">{{ data.count }}</div>
+                <div class="growth-bar-label">{{ data.month }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Attendance Heatmap -->
+    <div class="card member-card-3d analytics-section-card">
+        <h2 class="analytics-section-title">🔥 Attendance Heatmap</h2>
+        <p class="analytics-section-subtitle">Peak gym hours by day of week</p>
+
+        <div class="heatmap-grid">
+            <!-- Header Row -->
+            <div class="heatmap-label"></div>
+            <div class="heatmap-label">Mon</div>
+            <div class="heatmap-label">Tue</div>
+            <div class="heatmap-label">Wed</div>
+            <div class="heatmap-label">Thu</div>
+            <div class="heatmap-label">Fri</div>
+            <div class="heatmap-label">Sat</div>
+            <div class="heatmap-label">Sun</div>
+
+            {% for hour in range(6, 22) %}
+            <div class="heatmap-label">{{ hour }}:00</div>
+            {% for day in range(7) %}
+            {% set intensity = heatmap_data.get((day, hour), 0) %}
+            {% set color_intensity = (intensity / max_attendance * 100) if max_attendance > 0 else 0 %}
+            <div class="heatmap-cell" data-alpha="{{ color_intensity / 100 }}"
+                data-color="{{ 'white' if color_intensity > 50 else 'var(--text)' }}" title="{{ intensity }} check-ins">
+                {{ intensity if intensity > 0 else '' }}
+            </div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="card member-card-3d">
+        <h2 class="analytics-section-title">🏆 Top Performers (Most Active)</h2>
+
+        {% if top_performers %}
+        {% for performer in top_performers %}
+        <div class="leaderboard-item">
+            <div class="rank-badge rank-{{ loop.index if loop.index <= 3 else 'other' }}">
+                #{{ loop.index }}
+            </div>
+            <div class="leaderboard-main">
+                <div class="leaderboard-name">{{ performer.name }}</div>
+                <div class="leaderboard-phone">{{ performer.phone }}</div>
+            </div>
+            <div class="leaderboard-meta">
+                <div class="leaderboard-checkins">{{ performer.checkins }}</div>
+                <div class="leaderboard-label">check-ins</div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="analytics-empty">No attendance data yet</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.growth-bar[data-height]').forEach((bar) => {
+        bar.style.height = `${bar.dataset.height}%`;
+    });
+
+    document.querySelectorAll('.heatmap-cell[data-alpha]').forEach((cell) => {
+        cell.style.background = `rgba(139, 92, 246, ${cell.dataset.alpha})`;
+        cell.style.color = cell.dataset.color;
+    });
+</script>
+{% endblock %}

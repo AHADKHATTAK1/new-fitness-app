@@ -1,0 +1,919 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    /* Enhanced Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* 3D Member Card  */
+    .member-card-3d {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .member-card-3d:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3), 0 0 30px rgba(6, 182, 212, 0.2);
+    }
+
+    .member-card-3d::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transition: left 0.5s;
+    }
+
+    .member-card-3d:hover::before {
+        left: 100%;
+    }
+
+    /*Stagger animation delay */
+    .member-card-3d:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .member-card-3d:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .member-card-3d:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .member-card-3d:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .member-card-3d:nth-child(n+5) {
+        animation-delay: 0.5s;
+    }
+
+    /* Revenue Chart */
+    .revenue-chart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 200px;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 16px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    .revenue-bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--primary), var(--secondary));
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        animation: barGrowth 1s ease-out forwards;
+        transform-origin: bottom;
+    }
+
+    @keyframes barGrowth {
+        from {
+            transform: scaleY(0);
+        }
+
+        to {
+            transform: scaleY(1);
+        }
+    }
+
+    .revenue-bar:hover {
+        filter: brightness(1.2);
+        transform: scaleY(1.05);
+    }
+
+    .revenue-bar-label {
+        position: absolute;
+        bottom: -25px;
+        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* Smooth Page Transitions */
+    .page-wrapper {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Enhanced Stats Cards */
+    .stat-card-enhanced {
+        animation: scaleIn 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .stat-card-enhanced:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-card-enhanced:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .stat-card-enhanced:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .stat-card-enhanced:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    /* Better Member Photo */
+    .member-photo-enhanced {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .member-photo-enhanced:hover {
+        transform: scale(1.2) rotate(5deg);
+        border-color: var(--primary);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.5);
+    }
+
+    /* Status Badge Enhanced */
+    .badge-enhanced {
+        display: inline-block;
+        padding: 0.35rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        animation: pulse 2s ease-in-out infinite;
+        transition: all 0.3s ease;
+    }
+
+    .badge-enhanced:hover {
+        transform: scale(1.1);
+        animation: none;
+    }
+
+    .badge-paid {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        border: 1px solid var(--success);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-unpaid {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--error);
+        border: 1px solid var(--error);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .carousel-header {
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        height: 220px;
+        background: rgba(15, 23, 42, 0.6);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.15);
+    }
+
+    .carousel-slides-enhanced {
+        display: flex;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+
+    .carousel-slide-enhanced {
+        min-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 2.5rem;
+        text-align: center;
+        background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+        font-weight: 800;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-tile {
+        text-align: center;
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+        min-height: 210px;
+        padding: 1.25rem;
+    }
+
+    .stat-tile-purple {
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .stat-tile-cyan {
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .stat-tile-green {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .stat-tile-red {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .stat-glow {
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    .stat-glow-purple {
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    }
+
+    .stat-glow-cyan {
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+        animation-delay: 0.5s;
+    }
+
+    .stat-glow-green {
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        animation-delay: 1s;
+    }
+
+    .stat-glow-red {
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+        animation-delay: 1.5s;
+    }
+
+    .stat-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-icon-purple {
+        filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.7));
+    }
+
+    .stat-icon-cyan {
+        filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.7));
+    }
+
+    .stat-icon-green {
+        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.7));
+    }
+
+    .stat-icon-red {
+        filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7));
+    }
+
+    .stat-heading {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .stat-heading-purple {
+        color: var(--primary);
+    }
+
+    .stat-heading-cyan {
+        color: var(--secondary);
+    }
+
+    .stat-heading-green {
+        color: var(--success);
+    }
+
+    .stat-heading-red {
+        color: var(--error);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+    }
+
+    .stat-value-purple {
+        color: #e9ddff;
+    }
+
+    .stat-value-cyan {
+        color: #d7fbff;
+    }
+
+    .stat-value-green {
+        color: #d7ffea;
+    }
+
+    .stat-value-red {
+        color: #ffe3e3;
+    }
+
+    .stat-value-revenue {
+        font-size: 2.1rem;
+        letter-spacing: 0.3px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stat-subtext {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        color: var(--text-muted);
+    }
+
+    .stat-action {
+        margin-top: 0.7rem;
+    }
+
+    .stat-action .btn {
+        padding: 0.45rem 0.8rem;
+        font-size: 0.78rem;
+        border-radius: 10px;
+    }
+
+    .revenue-section {
+        margin-bottom: 2rem;
+        background: rgba(15, 23, 42, 0.6);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .revenue-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        font-weight: 800;
+    }
+
+    .revenue-video {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .chart-wrap {
+        height: 300px;
+        position: relative;
+    }
+
+    .search-actions {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .members-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .action-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .member-search {
+        padding: 0.75rem 1rem;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text);
+        width: 250px;
+        transition: all 0.3s;
+    }
+
+    .member-search:focus {
+        width: 300px;
+    }
+
+    .btn-export {
+        background: linear-gradient(135deg, var(--secondary), #4f46e5);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+    }
+
+    .section-title-paid {
+        margin-bottom: 1.5rem;
+        color: var(--success);
+        font-weight: 800;
+    }
+
+    .section-title-unpaid {
+        margin-bottom: 1.5rem;
+        color: var(--error);
+        font-weight: 800;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .row-hover-purple {
+        transition: all 0.3s ease;
+    }
+
+    .row-hover-purple:hover {
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    .row-hover-red {
+        transition: all 0.3s ease;
+    }
+
+    .row-hover-red:hover {
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .avatar-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .avatar-fallback-paid {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .avatar-fallback-unpaid {
+        background: linear-gradient(135deg, var(--error), #d97706);
+    }
+
+    .member-link {
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .member-link-paid {
+        color: var(--primary);
+    }
+
+    .member-link-paid:hover {
+        color: var(--secondary);
+    }
+
+    .member-link-unpaid {
+        color: var(--error);
+    }
+
+    .member-link-unpaid:hover {
+        color: #d97706;
+    }
+
+    .icon-action {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 2rem;
+    }
+
+    .unpaid-section {
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="page-wrapper">
+    <!-- VIP Glass Carousel Header -->
+    <div class="carousel-header">
+        <div class="carousel-slides carousel-slides-enhanced">
+            <div class="carousel-slide carousel-slide-enhanced">
+                <h2 class="welcome-title">
+                    🎉 Welcome to {{ gym_details.name }}!</h2>
+                <p class="welcome-subtitle">Manage your gym with
+                    ultimate ease</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Stats Cards with Glassmorphism -->
+    <div class="stats-grid">
+        <!-- Total Members -->
+        <div class="card stat-card-enhanced member-card-3d stat-tile stat-tile-purple">
+            <div class="stat-glow stat-glow-purple">
+            </div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-purple">
+                    👥</div>
+                <h3 class="stat-heading stat-heading-purple">
+                    Total Members</h3>
+                <div class="stat-value stat-value-purple">
+                    {{ total_members }}</div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="card stat-card-enhanced member-card-3d stat-tile stat-tile-cyan">
+            <div class="stat-glow stat-glow-cyan">
+            </div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-cyan">
+                    💰</div>
+                <h3 class="stat-heading stat-heading-cyan">
+                    This Month Revenue</h3>
+                <div class="stat-value stat-value-cyan stat-value-revenue">
+                    {{ gym_details.currency or '$' }}{{ revenue_display }}</div>
+            </div>
+        </div>
+
+        <!-- Active Members -->
+        <div class="card stat-card-enhanced member-card-3d stat-tile stat-tile-green">
+            <div class="stat-glow stat-glow-green">
+            </div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-green">
+                    ✅</div>
+                <h3 class="stat-heading stat-heading-green">
+                    Active (Paid)</h3>
+                <div class="stat-value stat-value-green">
+                    {{ paid|length }}</div>
+                <div class="stat-subtext">{{ unpaid|length }} unpaid
+                </div>
+            </div>
+        </div>
+
+        <!-- Expiring Soon -->
+        <div class="card stat-card-enhanced member-card-3d stat-tile stat-tile-red">
+            <div class="stat-glow stat-glow-red">
+            </div>
+            <div class="stat-content">
+                <div class="stat-icon stat-icon-red">
+                    ⏰</div>
+                <h3 class="stat-heading stat-heading-red">
+                    Expiring Soon</h3>
+                <div class="stat-value stat-value-red">
+                    {{ expiring_count }}</div>
+                <div class="stat-subtext">Next 3 days</div>
+                <div class="stat-action">
+                    <a href="{{ url_for('reports') }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Chart Section -->
+    <div class="card member-card-3d revenue-section">
+        <h2 class="revenue-title">📊 Revenue Trend</h2>
+        <video autoplay loop muted class="revenue-video">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-man-working-out-at-the-gym-228-large.mp4"
+                type="video/mp4">
+        </video>
+        <div class="chart-wrap">
+            <canvas id="revenueChart"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const canvas = document.getElementById('revenueChart');
+                const ctx = canvas.getContext('2d');
+
+                // Create Gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(139, 92, 246, 0.5)');
+                gradient.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+
+                // Parse the data passed from Flask
+                // We need to adhere to the format [{'month': 'Jan', 'revenue': 1000}, ...]
+                const revenueData = {{ revenue_trend | tojson | safe
+            }};
+
+            const labels = revenueData.map(d => d.month);
+            const data = revenueData.map(d => d.revenue);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monthly Revenue',
+                        data: data,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#06b6d4',
+                        pointBorderColor: '#fff',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#ccc',
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function (context) {
+                                    return 'Revenue: {{ gym_details.currency or "$" }}' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+            });
+        </script>
+    </div>
+
+    <!-- Search and Actions -->
+    <div class="search-actions">
+        <h1 class="members-title">
+            Members</h1>
+        <div class="action-row">
+            <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="🔍 Search members..."
+                class="member-search">
+            {% if feature_access.advanced_reports %}
+            <a href="{{ url_for('download_excel') }}" class="btn member-card-3d btn-export">
+                📥 Export Excel
+            </a>
+            {% endif %}
+            {% if feature_access.member_management %}
+            <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d">✨ Add Member</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Paid Members Table -->
+    <div class="card member-card-3d" id="paid-members">
+        <h2 class="section-title-paid">✅ Paid Members ({{ current_month
+            }})</h2>
+        {% if paid %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in paid %}
+                    <tr class="row-hover-purple">
+                        <td>
+                            {% if member.photo %}
+                            <img src="{{ url_for('static', filename='uploads/' + member.photo) }}"
+                                class="member-photo-enhanced" alt="{{member.name}}">
+                            {% else %}
+                            <div class="member-photo-enhanced avatar-fallback avatar-fallback-paid">
+                                {{ member.name[0] }}</div>
+                            {% endif %}
+                        </td>
+                        <td><a href="{{ url_for('member_details', member_id=member.id) }}"
+                                class="member-link member-link-paid">{{ member.name }}</a></td>
+                        <td>{{ member.phone }}</td>
+                        <td><span class="badge-enhanced badge-paid">✅ Paid</span></td>
+                        <td>
+                            <a href="{{ url_for('member_details', member_id=member.id) }}"
+                                class="btn btn-sm icon-action" aria-label="View {{ member.name }} details"
+                                title="View details">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                    <path
+                                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-state">No paid members for this month</p>
+        {% endif %}
+    </div>
+
+    <!-- Unpaid Members -->
+    <div class="card member-card-3d unpaid-section" id="unpaid-members">
+        <h2 class="section-title-unpaid">❌ Unpaid Members ({{ current_month }})
+        </h2>
+        {% if unpaid %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in unpaid %}
+                    <tr class="row-hover-red">
+                        <td>
+                            {% if member.photo %}
+                            <img src="{{ url_for('static', filename='uploads/' + member.photo) }}"
+                                class="member-photo-enhanced" alt="{{member.name}}">
+                            {% else %}
+                            <div class="member-photo-enhanced avatar-fallback avatar-fallback-unpaid">
+                                {{ member.name[0] }}</div>
+                            {% endif %}
+                        </td>
+                        <td><a href="{{ url_for('member_details', member_id=member.id) }}"
+                                class="member-link member-link-unpaid">{{
+                                member.name }}</a></td>
+                        <td>{{ member.phone }}</td>
+                        <td><span class="badge-enhanced badge-unpaid">❌ Unpaid</span></td>
+                        <td>
+                            <a href="{{ url_for('member_details', member_id=member.id) }}"
+                                class="btn btn-sm icon-action" aria-label="View {{ member.name }} details"
+                                title="View details">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                    <path
+                                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-state">All members have paid! 🎉</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filterMembers() {
+        var input = document.getElementById("memberSearch");
+        var filter = input.value.toUpperCase();
+        var tables = document.getElementsByTagName("table");
+
+        for (var j = 0; j < tables.length; j++) {
+            var tr = tables[j].getElementsByTagName("tr");
+            for (var i = 0; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td");
+                if (td.length > 0) {
+                    var rowText = tr[i].textContent || tr[i].innerText;
+                    if (rowText.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+{% endblock %}

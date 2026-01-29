@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gym Manager">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <title>{% block title %}Gym Manager{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
+    <!-- Offline Database -->
+    <script src="{{ url_for('static', filename='offline-db.js') }}" defer></script>
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-144x144.svg') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* VIP Future Theme */
+            --primary: #8b5cf6;
+            /* Violet Neon */
+            --primary-glow: rgba(139, 92, 246, 0.6);
+            --primary-dark: #6d28d9;
+            --secondary: #0ea5e9;
+            /* Electric Sky */
+            --secondary-glow: rgba(14, 165, 233, 0.6);
+            --accent-gold: #eab308;
+            /* Premium Gold */
+            --accent-gold-glow: rgba(234, 179, 8, 0.6);
+            --bg-dark: #020617;
+            /* Slate 950 */
+            --bg-card: rgba(15, 23, 42, 0.7);
+            /* Slightly more opaque for readability */
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --card-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            --neon-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+            --gold-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 15% 25%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+            /* Parallax feel */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-card);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        nav .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--bg-card);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(139, 92, 246, 0.1);
+        }
+
+        /* Neon Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #0891b2);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), hsl(140, 70%, 40%));
+            box-shadow: 0 4px 15px hsla(140, 70%, 50%, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px hsla(140, 70%, 50%, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--error), hsl(0, 80%, 45%));
+            box-shadow: 0 4px 15px hsla(0, 80%, 60%, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 25px hsla(0, 80%, 60%, 0.5);
+        }
+
+        /* Small Buttons */
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: hsla(0, 0%, 100%, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px hsla(260, 80%, 60%, 0.2);
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .flash {
+            background: var(--bg-card);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .flash.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .flash.error {
+            border-left: 4px solid var(--error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: hsla(0, 0%, 100%, 0.03);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge.paid {
+            background: hsla(140, 70%, 50%, 0.2);
+            color: var(--success);
+        }
+
+        .badge.unpaid {
+            background: hsla(0, 80%, 60%, 0.2);
+            color: var(--error);
+        }
+
+        /* Member Photo */
+        .member-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .nav-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo-img {
+            height: 40px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .nav-links-tight {
+            gap: 1.5rem;
+        }
+
+        .more-menu-wrap {
+            position: relative;
+        }
+
+        .more-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .more-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 180px;
+            margin-top: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+        }
+
+        .more-dropdown.open {
+            display: block;
+        }
+
+        .more-dropdown-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .more-dropdown-link:hover {
+            background: hsla(260, 80%, 60%, 0.1);
+        }
+
+        .more-dropdown-link.border-top {
+            border-top: 1px solid var(--border);
+        }
+
+        .plan-badge-premium {
+            background: linear-gradient(135deg, gold, orange);
+            color: black;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .plan-badge-unpaid {
+            background: hsla(0, 80%, 60%, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+        }
+
+        .logout-link {
+            color: var(--error);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .status-footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: auto;
+        }
+
+        .status-dot {
+            color: var(--success);
+        }
+    </style>
+</head>
+
+<body>
+    {% if session.logged_in %}
+    <nav>
+        <div class="nav-content">
+            <div class="logo nav-logo-wrap">
+                {% if gym_details.logo %}
+                <img src="{{ url_for('static', filename='uploads/' + gym_details.logo) }}" alt="Logo"
+                    class="nav-logo-img">
+                {% endif %}
+                {{ gym_details.name }}
+            </div>
+
+            <div class="nav-links nav-links-tight">
+                <!-- Primary Navigation -->
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                {% if feature_access.member_management %}
+                <a href="{{ url_for('add_member') }}">Add Member</a>
+                {% endif %}
+                {% if feature_access.payment_tracking %}
+                <a href="{{ url_for('fees') }}">Fees</a>
+                {% endif %}
+
+                <!-- More Dropdown -->
+                <div class="more-menu-wrap">
+                    <button type="button" onclick="toggleDropdown(event)" class="more-toggle-btn" aria-expanded="false"
+                        aria-controls="moreDropdown">
+                        More ▼
+                    </button>
+                    <div id="moreDropdown" class="more-dropdown">
+                        {% if subscription_active %}
+                        <a href="{{ url_for('expenses') }}" class="more-dropdown-link">
+                            💸 Expenses
+                        </a>
+                        <a href="{{ url_for('scanner') }}" class="more-dropdown-link border-top">
+                            📷 Scanner
+                        </a>
+                        <a href="{{ url_for('bulk_import') }}" class="more-dropdown-link border-top">
+                            📥 Bulk Import
+                        </a>
+                        <a href="{{ url_for('schedule') }}" class="more-dropdown-link border-top">
+                            📅 Schedule
+                        </a>
+                        <a href="{{ url_for('reports') }}" class="more-dropdown-link border-top">
+                            📊 Reports
+                        </a>
+                        {% endif %}
+                        {% if feature_access.bulk_operations %}
+                        <a href="{{ url_for('bulk_operations') }}" class="more-dropdown-link border-top">
+                            ⚡ Bulk Operations
+                        </a>
+                        {% endif %}
+                        {% if feature_access.advanced_analytics %}
+                        <a href="{{ url_for('advanced_analytics') }}" class="more-dropdown-link border-top">
+                            🧠 AI Analytics
+                        </a>
+                        {% endif %}
+                        {% if feature_access.webhooks %}
+                        <a href="{{ url_for('webhooks') }}" class="more-dropdown-link border-top">
+                            🔗 Webhooks
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('subscription_plans') }}" class="more-dropdown-link border-top">
+                            💎 Subscription Plans
+                        </a>
+                        <a href="{{ url_for('settings') }}" class="more-dropdown-link border-top">
+                            ⚙️ Settings
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Plan Badge -->
+                {% if subscription_active %}
+                <span class="badge plan-badge-premium">💎 {% if user_plan == 'vip' %}VIP Access{% else %}{{
+                    user_plan|replace('_', ' ')|title }}{% endif %}</span>
+                {% else %}
+                <span class="badge plan-badge-unpaid"
+                    onclick="window.location.href='{{ url_for('subscription_plans') }}'">
+                    ⚠️ Upgrade Required
+                </span>
+                {% endif %}
+
+                <!-- Logout -->
+                <a href="{{ url_for('logout') }}" class="logout-link">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('moreDropdown');
+            const toggleButton = document.querySelector('.more-toggle-btn');
+            const willOpen = !dropdown.classList.contains('open');
+
+            dropdown.classList.toggle('open', willOpen);
+            if (toggleButton) {
+                toggleButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('moreDropdown');
+            const toggleButton = document.querySelector('.more-toggle-btn');
+            const isClickInside = event.target.closest('.more-menu-wrap');
+
+            if (!isClickInside && dropdown) {
+                dropdown.classList.remove('open');
+                if (toggleButton) {
+                    toggleButton.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Auto-hide flash messages
+        setTimeout(() => {
+            const flashes = document.querySelectorAll('.flash');
+            flashes.forEach(flash => {
+                flash.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => flash.remove(), 300);
+            });
+        }, 5000);
+    </script>
+    <script>
+        // Temporary stability mode: disable PWA SW caching to prevent stale UI/server issues
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(registration => registration.unregister());
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

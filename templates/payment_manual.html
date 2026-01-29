@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Manual Payment - Gym Manager{% endblock %}
+
+{% block content %}
+<style>
+    .manual-payment-card {
+        max-width: 500px;
+        margin: 2rem auto;
+    }
+
+    .manual-payment-title {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--success);
+    }
+
+    .payment-details-box {
+        background: hsla(200, 10%, 20%, 0.5);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border: 1px dashed var(--border);
+    }
+
+    .detail-line {
+        margin-bottom: 0.5rem;
+    }
+
+    .details-separator {
+        border-color: var(--border);
+        margin: 0.5rem 0;
+    }
+
+    .proof-input {
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .full-width-btn {
+        width: 100%;
+    }
+</style>
+
+<div class="card manual-payment-card">
+    <h2 class="manual-payment-title">JazzCash / Bank Transfer</h2>
+
+    <div class="payment-details-box">
+        <p class="detail-line"><strong>Bank:</strong> Meezan Bank</p>
+        <p class="detail-line"><strong>Account:</strong> 0101-XXXX-XXXX-XX</p>
+        <p class="detail-line"><strong>Title:</strong> Gym Software Inc.</p>
+        <hr class="details-separator">
+        <p><strong>JazzCash:</strong> 0300-1234567</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="payment_proof">Upload Payment Screenshot</label>
+            <input type="file" id="payment_proof" name="payment_proof" accept="image/*" required class="proof-input"
+                aria-label="Upload Payment Screenshot" title="Upload Payment Screenshot">
+            <p class="help-text">
+                Please ensure the Transaction ID is visible.
+            </p>
+        </div>
+
+        <button type="submit" class="btn btn-success full-width-btn">Submit for Approval 🚀</button>
+    </form>
+</div>
+{% endblock %}
