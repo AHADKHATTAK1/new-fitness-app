@@ -152,6 +152,22 @@ ADMIN_EMAILS=admin@gym.com
 - Verify core routes after deploy:
 	- `/auth`, `/dashboard`, `/settings`, `/subscription_plans`, `/webhooks`, `/healthz`
 
+## Uptime monitor commands
+
+Use your deployed base URL in place of `https://your-domain.com`.
+
+PowerShell (Windows):
+
+```powershell
+Invoke-RestMethod https://your-domain.com/healthz
+```
+
+cURL (Linux/macOS):
+
+```bash
+curl -sS https://your-domain.com/healthz
+```
+
 Note: local VS Code task output may show `exit code: 1` after stopping/restarting the task terminal; startup is healthy when you see `Running on http://127.0.0.1:5000`.
 
 ## Reproducible setup
