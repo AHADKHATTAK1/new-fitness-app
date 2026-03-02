@@ -2724,6 +2724,41 @@ def settings():
 
             return redirect(url_for('settings'))
 
+        if action == 'revoke_staff_access':
+            if auth_manager.legacy:
+                flash('Staff sharing requires database mode.', 'error')
+                return redirect(url_for('settings'))
+
+            if not current_user:
+                flash('Session expired. Please login again.', 'error')
+                return redirect(url_for('auth'))
+
+            access_id = request.form.get('access_id')
+            if not access_id:
+                flash('Invalid revoke request.', 'error')
+                return redirect(url_for('settings'))
+
+            try:
+                access_id_int = int(access_id)
+            except Exception:
+                flash('Invalid revoke request.', 'error')
+                return redirect(url_for('settings'))
+
+            access = auth_manager.session.query(StaffAccess).filter_by(
+                id=access_id_int,
+                owner_user_id=current_user.id,
+                is_active=True
+            ).first()
+
+            if not access:
+                flash('Staff access record not found.', 'error')
+                return redirect(url_for('settings'))
+
+            access.is_active = False
+            auth_manager.session.commit()
+            flash('Staff access revoked successfully.', 'success')
+            return redirect(url_for('settings'))
+
         name = request.form.get('gym_name')
         currency = request.form.get('currency', '$')
         if currency == 'AUTO':
@@ -2798,6 +2833,7 @@ def settings():
             ).all()
 
             shared_staff = [{
+                'access_id': access.id,
                 'email': user.email,
                 'role': user.role,
                 'created_at': access.created_at.strftime('%Y-%m-%d') if access.created_at else ''

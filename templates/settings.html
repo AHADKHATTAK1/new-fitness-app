@@ -243,6 +243,24 @@
     .shared-staff-item {
         margin-bottom: 0.25rem;
         padding-left: 0.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .shared-staff-text {
+        flex: 1;
+    }
+
+    .revoke-access-btn {
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        color: #fecaca;
+        background: rgba(239, 68, 68, 0.15);
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
     }
 </style>
 
@@ -574,9 +592,9 @@
     {% if shared_staff %}
     <div class="form-group">
         <label>Shared Staff</label>
-        <div class="shared-staff-list">{% for staff in shared_staff %}<div class="shared-staff-item">• {{ staff.email }}
-                ({{
-                staff.role }}) - shared on {{ staff.created_at }}</div>{% endfor %}</div>
+        <div class="shared-staff-list">{% for staff in shared_staff %}<div class="shared-staff-item"><div class="shared-staff-text">• {{ staff.email }}
+            ({{
+            staff.role }}) - shared on {{ staff.created_at }}</div><form method="POST"><input type="hidden" name="action" value="revoke_staff_access"><input type="hidden" name="access_id" value="{{ staff.access_id }}"><button type="submit" class="revoke-access-btn">Revoke</button></form></div>{% endfor %}</div>
     </div>
     {% endif %}
 </div>
