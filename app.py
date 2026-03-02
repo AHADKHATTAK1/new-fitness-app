@@ -55,6 +55,20 @@ except Exception as e:
 
 app = Flask(__name__)
 
+
+@app.template_filter('from_json')
+def from_json_filter(value):
+    """Safely parse JSON strings in templates."""
+    if value is None:
+        return []
+    if isinstance(value, (list, dict)):
+        return value
+    try:
+        parsed = json.loads(value)
+        return parsed if isinstance(parsed, list) else []
+    except Exception:
+        return []
+
 # Check secret key
 secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
 if secret_key == 'dev-secret-key-change-in-production':
@@ -149,6 +163,270 @@ def get_gym():
         return None
     username = session.get('username')
     return GymManager(username)  # Now uses email directly
+
+
+def _get_month_floor(gym, default_year=1970):
+    """Return the earliest selectable month start date for a gym (no fixed past limit)."""
+    floor_date = datetime(default_year, 1, 1)
+    if not gym or getattr(gym, 'legacy', False) or not getattr(gym, 'session', None) or not getattr(gym, 'gym', None):
+        return floor_date
+
+    earliest_dates = []
+
+    try:
+        first_member = (
+            gym.session.query(Member)
+            .filter(Member.gym_id == gym.gym.id, Member.joined_date.isnot(None))
+            .order_by(Member.joined_date.asc())
+            .first()
+        )
+        if first_member and first_member.joined_date:
+            earliest_dates.append(datetime(first_member.joined_date.year, first_member.joined_date.month, 1))
+    except Exception:
+        pass
+
+    try:
+        first_fee = (
+            gym.session.query(Fee)
+            .join(Member, Fee.member_id == Member.id)
+            .filter(Member.gym_id == gym.gym.id, Fee.month.isnot(None))
+            .order_by(Fee.month.asc())
+            .first()
+        )
+        if first_fee and first_fee.month:
+            parsed = datetime.strptime(str(first_fee.month)[:7], '%Y-%m')
+            earliest_dates.append(datetime(parsed.year, parsed.month, 1))
+    except Exception:
+        pass
+
+    if earliest_dates:
+        return min(min(earliest_dates), floor_date)
+    return floor_date
+
+
+def _build_available_months(gym=None, future_months=0, as_dict=False, descending=True):
+    """Build month options from earliest known gym data up to now (+ optional future months)."""
+    start_date = _get_month_floor(gym)
+    current_date = datetime.now().replace(day=1)
+
+    total_months = ((current_date.year - start_date.year) * 12 + (current_date.month - start_date.month) + 1) + max(0, future_months)
+    month_list = []
+
+    for offset in range(total_months):
+        month_index = (start_date.month - 1) + offset
+        year = start_date.year + (month_index // 12)
+        month = (month_index % 12) + 1
+        month_date = datetime(year, month, 1)
+
+        if as_dict:
+            month_list.append({
+                'value': month_date.strftime('%Y-%m'),
+                'label': month_date.strftime('%B %Y')
+            })
+        else:
+            month_list.append(month_date.strftime('%Y-%m'))
+
+    if descending:
+        month_list.reverse()
+    return month_list
+
+
+def _build_legacy_backup_payload(gym):
+    """Build backup payload in legacy JSON-compatible structure."""
+    if gym.legacy:
+        payload = gym.data.copy() if isinstance(gym.data, dict) else {}
+    else:
+        payload = {
+            'members': {},
+            'fees': {},
+            'attendance': {},
+            'expenses': [],
+            'gym_details': gym.get_gym_details()
+        }
+
+        members = gym.session.query(Member).filter_by(gym_id=gym.gym.id).all() if gym.gym else []
+        for member in members:
+            member_id = str(member.id)
+            payload['members'][member_id] = {
+                'id': member_id,
+                'name': member.name,
+                'phone': member.phone,
+                'photo': member.photo_url,
+                'membership_type': member.membership_type,
+                'joined_date': member.joined_date.strftime('%Y-%m-%d') if member.joined_date else None,
+                'is_trial': bool(member.is_trial),
+                'trial_end_date': member.trial_end_date.strftime('%Y-%m-%d') if member.trial_end_date else None,
+                'is_active': bool(member.is_active),
+                'email': member.email
+            }
+
+            fee_records = gym.session.query(Fee).filter_by(member_id=member.id).all()
+            payload['fees'][member_id] = {}
+            for fee in fee_records:
+                payload['fees'][member_id][fee.month] = {
+                    'amount': float(fee.amount),
+                    'date': fee.paid_date.strftime('%Y-%m-%d %H:%M:%S') if fee.paid_date else datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                }
+
+            attendance_records = gym.get_attendance(member.id)
+            payload['attendance'][member_id] = attendance_records if attendance_records else []
+
+        payload['expenses'] = gym.get_expenses()
+
+    try:
+        payload['backup_meta'] = {
+            'generated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            'format': 'legacy_compatible',
+            'owner': session.get('username', 'unknown')
+        }
+    except Exception:
+        pass
+
+    return payload
+
+
+def _parse_excel_backup_to_legacy(file_obj):
+    """Parse old-structure Excel backup into legacy-compatible JSON dict."""
+    from openpyxl import load_workbook
+
+    workbook = load_workbook(file_obj, data_only=True)
+
+    def _sheet_rows(sheet_name):
+        if sheet_name not in workbook.sheetnames:
+            return []
+        ws = workbook[sheet_name]
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows:
+            return []
+        headers = [str(h).strip().lower() if h is not None else '' for h in rows[0]]
+        output = []
+        for row in rows[1:]:
+            if row is None:
+                continue
+            row_map = {}
+            has_value = False
+            for index, value in enumerate(row):
+                key = headers[index] if index < len(headers) else f'col_{index}'
+                if key:
+                    row_map[key] = value
+                if value not in (None, ''):
+                    has_value = True
+            if has_value:
+                output.append(row_map)
+        return output
+
+    members_rows = _sheet_rows('members')
+    fees_rows = _sheet_rows('fees')
+    attendance_rows = _sheet_rows('attendance')
+    expenses_rows = _sheet_rows('expenses')
+    info_rows = _sheet_rows('backup_info')
+
+    members = {}
+    fees = {}
+    attendance = {}
+    expenses = []
+
+    def _as_text(value, default=''):
+        if value is None:
+            return default
+        if hasattr(value, 'strftime'):
+            try:
+                if ' ' in default:
+                    return value.strftime('%Y-%m-%d %H:%M:%S')
+                return value.strftime('%Y-%m-%d')
+            except Exception:
+                pass
+        return str(value).strip()
+
+    def _first_non_empty(row, keys, default=None):
+        for key in keys:
+            value = row.get(key)
+            if value not in (None, ''):
+                return value
+        return default
+
+    def _as_bool(value, default=False):
+        if isinstance(value, bool):
+            return value
+        if value is None:
+            return default
+        text = str(value).strip().lower()
+        if text in ['1', 'true', 'yes', 'y']:
+            return True
+        if text in ['0', 'false', 'no', 'n']:
+            return False
+        return default
+
+    for idx, row in enumerate(members_rows, start=1):
+        member_id = _as_text(_first_non_empty(row, ['id', 'member_id'], idx))
+        phone_value = _first_non_empty(row, ['phone', 'mobile', 'contact', 'phone_number'], '')
+        joined_value = _first_non_empty(row, ['joined_date', 'join_date', 'joined'], datetime.utcnow())
+        members[member_id] = {
+            'id': member_id,
+            'name': _as_text(_first_non_empty(row, ['name', 'member_name'], ''), ''),
+            'phone': _as_text(phone_value, ''),
+            'email': _as_text(_first_non_empty(row, ['email', 'mail'], ''), '') or None,
+            'photo': _as_text(_first_non_empty(row, ['photo', 'photo_url', 'image'], ''), '') or None,
+            'membership_type': _as_text(_first_non_empty(row, ['membership_type', 'type', 'plan'], 'Gym'), 'Gym'),
+            'joined_date': _as_text(joined_value, datetime.utcnow().strftime('%Y-%m-%d')),
+            'is_trial': _as_bool(_first_non_empty(row, ['is_trial', 'trial'], False), False),
+            'trial_end_date': _as_text(_first_non_empty(row, ['trial_end_date', 'trial_end'], ''), '') or None,
+            'is_active': _as_bool(row.get('is_active'), True)
+        }
+        fees.setdefault(member_id, {})
+        attendance.setdefault(member_id, [])
+
+    for row in fees_rows:
+        member_id = _as_text(_first_non_empty(row, ['member_id', 'id'], ''), '')
+        month = _as_text(_first_non_empty(row, ['month', 'paid_month'], ''), '')
+        if not member_id or not month:
+            continue
+        fees.setdefault(member_id, {})
+        fees[member_id][month] = {
+            'amount': float(_first_non_empty(row, ['amount', 'fee', 'paid_amount'], 0) or 0),
+            'date': _as_text(_first_non_empty(row, ['date', 'paid_date', 'timestamp'], datetime.utcnow()), datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+        }
+
+    for row in attendance_rows:
+        member_id = _as_text(_first_non_empty(row, ['member_id', 'id'], ''), '')
+        if not member_id:
+            continue
+        attendance.setdefault(member_id, [])
+        confidence_value = _first_non_empty(row, ['confidence', 'score'], None)
+        try:
+            confidence_value = float(confidence_value) if confidence_value not in (None, '') else None
+        except Exception:
+            confidence_value = None
+        attendance[member_id].append({
+            'timestamp': _as_text(_first_non_empty(row, ['timestamp', 'check_in_time', 'date'], datetime.utcnow()), datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')),
+            'emotion': _as_text(_first_non_empty(row, ['emotion', 'mood'], ''), '') or None,
+            'confidence': confidence_value
+        })
+
+    for row in expenses_rows:
+        expenses.append({
+            'date': _as_text(_first_non_empty(row, ['date', 'expense_date'], ''), ''),
+            'category': _as_text(_first_non_empty(row, ['category', 'type'], ''), ''),
+            'amount': float(_first_non_empty(row, ['amount', 'value'], 0) or 0),
+            'description': _as_text(_first_non_empty(row, ['description', 'note', 'notes'], ''), '')
+        })
+
+    gym_details = {'name': 'Gym Manager', 'logo': None, 'currency': '$'}
+    for row in info_rows:
+        key = str(row.get('key') or '').strip().lower()
+        value = row.get('value')
+        if key == 'gym_name' and value:
+            gym_details['name'] = str(value)
+        elif key == 'currency' and value:
+            gym_details['currency'] = str(value)
+
+    return {
+        'members': members,
+        'fees': fees,
+        'attendance': attendance,
+        'expenses': expenses,
+        'gym_details': gym_details
+    }
 
 
 FEATURE_KEYS = [
@@ -256,6 +534,43 @@ def _require_feature(feature_key, upgrade_message):
         return redirect(url_for('subscription_plans'))
     return None
 
+
+def _build_feature_paths():
+    """Return canonical navigation paths for feature quick-actions."""
+    def _safe_url(endpoint):
+        try:
+            return url_for(endpoint)
+        except Exception:
+            return '#'
+
+    return {
+        'member_management': _safe_url('add_member'),
+        'payment_tracking': _safe_url('fees'),
+        'basic_reports': _safe_url('reports'),
+        'mobile_app': _safe_url('scanner'),
+        'advanced_analytics': _safe_url('advanced_analytics'),
+        'bulk_operations': _safe_url('bulk_operations'),
+        'advanced_reports': _safe_url('export_center'),
+        'webhooks': _safe_url('webhooks'),
+        'api_access': _safe_url('webhooks'),
+        'marketing_automation': _safe_url('schedule'),
+        'multi_gym_management': _safe_url('super_admin'),
+        'priority_support': _safe_url('subscription_plans'),
+        'custom_branding': _safe_url('settings'),
+        'white_label': _safe_url('settings'),
+        'custom_domain': _safe_url('settings'),
+        'dedicated_account_manager': _safe_url('subscription_plans'),
+        'sla_guarantee': _safe_url('subscription_plans'),
+        '24_7_support': _safe_url('subscription_plans'),
+        'on_premise_deployment': _safe_url('subscription_plans'),
+        'custom_development': _safe_url('subscription_plans'),
+        'phone_support': _safe_url('subscription_plans'),
+        'training_sessions': _safe_url('subscription_plans'),
+        'data_migration': _safe_url('bulk_import'),
+        'compliance_support': _safe_url('subscription_plans'),
+        'multi_region_deployment': _safe_url('subscription_plans')
+    }
+
 @app.context_processor
 def inject_gym_details():
     context = {}
@@ -274,6 +589,7 @@ def inject_gym_details():
     context['user_plan'] = 'starter'
     context['subscription_active'] = False
     context['feature_access'] = {key: False for key in FEATURE_KEYS}
+    context['feature_paths'] = _build_feature_paths()
     context['payment_market'] = _detect_payment_market()
 
     if 'logged_in' in session:
@@ -445,6 +761,19 @@ def check_subscription():
     if required_feature and not _has_feature_access(user, required_feature):
         flash(feature_messages.get(required_feature, 'This feature is not available in your current plan.'), 'warning')
         return redirect(url_for('subscription_plans'))
+
+
+@app.after_request
+def add_no_cache_headers(response):
+    """Avoid stale cached HTML so latest UI fixes always appear."""
+    try:
+        if response.mimetype == 'text/html':
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+    except Exception:
+        pass
+    return response
 
 # Subscription and Tier routes are now handled by tier_routes.py
 
@@ -742,7 +1071,8 @@ def stripe_webhook():
     webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
     if not webhook_secret:
-        return 'Webhook secret not configured', 500
+        print('⚠️ Stripe webhook received but STRIPE_WEBHOOK_SECRET is not configured; ignoring event')
+        return jsonify({'status': 'ignored', 'reason': 'webhook secret not configured'}), 200
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
@@ -1178,14 +1508,8 @@ def expenses():
     # Calculate P&L
     pl_data = gym.calculate_profit_loss(current_month)
     
-    # Available months for dropdown
-    available_months = []
-    for i in range(12):
-        month_date = datetime.now() - timedelta(days=30*i)
-        available_months.append({
-            'value': month_date.strftime('%Y-%m'),
-            'label': month_date.strftime('%B %Y')
-        })
+    # Available months for dropdown (no fixed past limit)
+    available_months = _build_available_months(gym=gym, as_dict=True)
     
     return render_template('expenses.html',
                          expenses=expenses_list,
@@ -1282,18 +1606,8 @@ def dashboard():
         gym = get_gym()
         if not gym: return redirect(url_for('auth'))
 
-        # Generate months for dropdown (using standard datetime instead of pandas for compatibility)
-        current_date = datetime.now()
-        available_months = []
-        for i in range(37):
-            # Go back i months from current month
-            year = current_date.year
-            month = current_date.month - i
-            while month <= 0:
-                month += 12
-                year -= 1
-            date_obj = datetime(year, month, 1)
-            available_months.append(date_obj.strftime('%Y-%m'))
+        # Generate months for dropdown (no fixed past limit)
+        available_months = _build_available_months(gym=gym, as_dict=False)
         
         # Check if month requested
         current_month = request.args.get('month')
@@ -1446,6 +1760,7 @@ def analytics():
                          top_performers=top_performers)
 
 @app.route('/advanced-analytics')
+@app.route('/advanced_analytics')
 def advanced_analytics():
     """Advanced Analytics optimized with Batch Data Engine"""
     gate = _require_feature('advanced_analytics', 'Advanced Analytics is available in Professional tier and above')
@@ -1501,6 +1816,7 @@ def advanced_analytics():
     return render_template('advanced_analytics.html',
                          total_revenue=metrics['total_revenue'],
                          revenue_growth=metrics['revenue_growth'],
+                         member_growth=metrics.get('member_growth', 0),
                          total_members=len(data['members']),
                          new_members_this_month=new_members_data[-1],
                          retention_rate=metrics['retention_rate'],
@@ -1540,16 +1856,8 @@ def bulk_operations():
     for member in all_members:
         member['is_paid'] = gym.is_fee_paid(member['id'], current_month)
     
-    # Generate months
-    current_date = datetime.now()
-    available_months = []
-    for i in range(12):
-        year = current_date.year
-        month = current_date.month - i
-        while month <= 0:
-            month += 12
-            year -= 1
-        available_months.append(f"{year}-{month:02d}")
+    # Generate months (no fixed past limit)
+    available_months = _build_available_months(gym=gym, as_dict=False)
     
     return render_template('bulk_operations.html',
                          members=all_members,
@@ -1585,30 +1893,8 @@ def add_member():
     gym = get_gym()
     if not gym: return redirect(url_for('auth'))
     
-    # Generate months for dropdown
-    current_date = datetime.now()
-    available_months = []
-    # Generate 12 past months, current month, and 24 future months (total 37)
-    # Start from 12 months ago and go forward
-    start_month_calc = current_date.replace(day=1) - timedelta(days=365) # Roughly 12 months ago
-    
-    for i in range(37):
-        # Calculate month by adding i months to the start_month_calc
-        year = start_month_calc.year
-        month = start_month_calc.month + i
-        
-        while month > 12:
-            month -= 12
-            year += 1
-        
-        date_obj = datetime(year, month, 1)
-        available_months.append({
-            'value': date_obj.strftime('%Y-%m'),
-            'label': date_obj.strftime('%B %Y')
-        })
-    
-    # Reverse to show future months first, then current, then past
-    available_months.reverse()
+    # Generate months for dropdown (no fixed past limit, keep future months)
+    available_months = _build_available_months(gym=gym, future_months=24, as_dict=True)
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -1672,6 +1958,7 @@ def add_member():
             flash(f'Error adding member: {str(e)}', 'error')
             return redirect(url_for('add_member'))
     
+    current_date = datetime.now()
     return render_template('add_member.html', 
                          available_months=available_months, 
                          current_month=current_date.strftime('%Y-%m'),
@@ -1768,21 +2055,8 @@ def fees():
         traceback.print_exc()
         flash('Some payment data could not be loaded. Showing available information.', 'warning')
     
-    # Generate months for dropdown (using standard datetime instead of pandas for compatibility)
-    current_date = datetime.now()
-    available_months = []
-    for i in range(37):
-        # Go back i months from current month
-        year = current_date.year
-        month = current_date.month - i
-        while month <= 0:
-            month += 12
-            year -= 1
-        date_obj = datetime(year, month, 1)
-        available_months.append({
-            'value': date_obj.strftime('%Y-%m'),
-            'label': date_obj.strftime('%B %Y')
-        })
+    # Generate months for dropdown (no fixed past limit, keep future months)
+    available_months = _build_available_months(gym=gym, future_months=24, as_dict=True)
     
     return render_template('fees.html', 
                          members=all_members,
@@ -2064,21 +2338,7 @@ def member_details(member_id):
         return redirect(url_for('member_details', member_id=member_id))
     
     
-    # Generate months for payment dropdown (using standard datetime instead of pandas for compatibility)
-    current_date = datetime.now()
-    available_months = []
-    for i in range(37):
-        # Go back i months from current month
-        year = current_date.year
-        month = current_date.month - i
-        while month <= 0:
-            month += 12
-            year -= 1
-        date_obj = datetime(year, month, 1)
-        available_months.append({
-            'value': date_obj.strftime('%Y-%m'),
-            'label': date_obj.strftime('%B %Y')
-        })
+    available_months = _build_available_months(gym=gym, as_dict=True)
     
     return render_template('member_details.html', 
                          member=member, 
@@ -2345,10 +2605,14 @@ def restore_backup():
         flash('No file selected!', 'error')
         return redirect(url_for('settings'))
         
-    if file and file.filename.endswith('.json'):
+    ext = os.path.splitext(file.filename.lower())[1]
+    if file and ext in ['.json', '.xlsx']:
         try:
-            # Read and validate JSON
-            data = json.load(file)
+            # Read backup payload
+            if ext == '.json':
+                data = json.load(file)
+            else:
+                data = _parse_excel_backup_to_legacy(file)
             
             # Simple validation check (must have 'members' key)
             if 'members' not in data:
@@ -2373,9 +2637,160 @@ def restore_backup():
         except Exception as e:
             flash(f'Error restoring data: {str(e)}', 'error')
     else:
-        flash('Invalid file type! Please upload a JSON file.', 'error')
+        flash('Invalid file type! Please upload a JSON or Excel (.xlsx) backup file.', 'error')
         
     return redirect(url_for('settings'))
+
+
+@app.route('/backup/download/json')
+def download_backup_json():
+    """Download full backup in legacy-compatible JSON format."""
+    gym = get_gym()
+    if not gym:
+        return redirect(url_for('auth'))
+
+    payload = _build_legacy_backup_payload(gym)
+    output = BytesIO()
+    output.write(json.dumps(payload, indent=2, default=str).encode('utf-8'))
+    output.seek(0)
+
+    filename = f"gym_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    return send_file(output, as_attachment=True, download_name=filename, mimetype='application/json')
+
+
+@app.route('/backup/download/excel')
+def download_backup_excel():
+    """Download full backup in Excel, aligned with legacy backup structure."""
+    gym = get_gym()
+    if not gym:
+        return redirect(url_for('auth'))
+
+    payload = _build_legacy_backup_payload(gym)
+
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws_info = wb.active
+    ws_info.title = 'backup_info'
+    ws_info.append(['key', 'value'])
+    for key, value in (payload.get('backup_meta') or {}).items():
+        ws_info.append([key, str(value)])
+
+    gym_details = payload.get('gym_details') or {}
+    if gym_details:
+        ws_info.append(['gym_name', str(gym_details.get('name', 'Gym Manager'))])
+        ws_info.append(['currency', str(gym_details.get('currency', '$'))])
+
+    ws_members = wb.create_sheet('members')
+    ws_members.append(['id', 'name', 'phone', 'email', 'photo', 'membership_type', 'joined_date', 'is_trial', 'trial_end_date', 'is_active'])
+    for member_id, member in (payload.get('members') or {}).items():
+        ws_members.append([
+            member_id,
+            member.get('name'),
+            member.get('phone'),
+            member.get('email'),
+            member.get('photo'),
+            member.get('membership_type'),
+            member.get('joined_date'),
+            member.get('is_trial'),
+            member.get('trial_end_date'),
+            member.get('is_active')
+        ])
+
+    ws_fees = wb.create_sheet('fees')
+    ws_fees.append(['member_id', 'month', 'amount', 'date'])
+    for member_id, fee_map in (payload.get('fees') or {}).items():
+        for month, info in (fee_map or {}).items():
+            ws_fees.append([member_id, month, info.get('amount'), info.get('date')])
+
+    ws_attendance = wb.create_sheet('attendance')
+    ws_attendance.append(['member_id', 'timestamp', 'emotion', 'confidence'])
+    for member_id, logs in (payload.get('attendance') or {}).items():
+        for row in (logs or []):
+            ws_attendance.append([member_id, row.get('timestamp'), row.get('emotion'), row.get('confidence')])
+
+    ws_expenses = wb.create_sheet('expenses')
+    ws_expenses.append(['date', 'category', 'amount', 'description'])
+    for expense in (payload.get('expenses') or []):
+        ws_expenses.append([
+            expense.get('date'),
+            expense.get('category'),
+            expense.get('amount'),
+            expense.get('description')
+        ])
+
+    if not gym.legacy and gym.gym:
+        ws_admin = wb.create_sheet('admin_user')
+        ws_admin.append(['id', 'email', 'role', 'market', 'subscription_tier', 'subscription_status', 'subscription_expiry'])
+        owner = gym.session.query(User).filter_by(id=gym.gym.user_id).first()
+        if owner:
+            ws_admin.append([
+                owner.id,
+                owner.email,
+                owner.role,
+                owner.market,
+                owner.subscription_tier,
+                owner.subscription_status,
+                owner.subscription_expiry.strftime('%Y-%m-%d %H:%M:%S') if owner.subscription_expiry else ''
+            ])
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    filename = f"gym_backup_old_structure_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+
+@app.route('/backup/download/template')
+def download_backup_template_excel():
+    """Download blank old-structure Excel backup template."""
+    gym = get_gym()
+    if not gym:
+        return redirect(url_for('auth'))
+
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws_info = wb.active
+    ws_info.title = 'backup_info'
+    ws_info.append(['key', 'value'])
+    ws_info.append(['gym_name', gym.get_gym_details().get('name', 'Gym Manager')])
+    ws_info.append(['currency', gym.get_gym_details().get('currency', '$')])
+    ws_info.append(['generated_at', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')])
+
+    ws_members = wb.create_sheet('members')
+    ws_members.append(['id', 'name', 'phone', 'email', 'photo', 'membership_type', 'joined_date', 'is_trial', 'trial_end_date', 'is_active'])
+    ws_members.append(['1001', 'Sample Member', '+1234567890', 'member@example.com', '', 'Gym', '2026-03-01', False, '', True])
+
+    ws_fees = wb.create_sheet('fees')
+    ws_fees.append(['member_id', 'month', 'amount', 'date'])
+    ws_fees.append(['1001', '2026-03', 1200, '2026-03-02 10:00:00'])
+
+    ws_attendance = wb.create_sheet('attendance')
+    ws_attendance.append(['member_id', 'timestamp', 'emotion', 'confidence'])
+    ws_attendance.append(['1001', '2026-03-02 07:30:00', 'happy', 0.9])
+
+    ws_expenses = wb.create_sheet('expenses')
+    ws_expenses.append(['date', 'category', 'amount', 'description'])
+    ws_expenses.append(['2026-03-02', 'Utilities', 350, 'Electricity bill'])
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    filename = f"gym_backup_template_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 @app.route('/merge_duplicates', methods=['POST'])
 def merge_duplicates():
@@ -2510,17 +2925,31 @@ def bulk_import():
                 # Validate and preview import data
                 from import_validator import ImportValidator
                 import openpyxl
+                import csv
+                file_ext = os.path.splitext(filepath.lower())[1]
                 
-                # Read Excel data
-                wb = openpyxl.load_workbook(filepath)
-                ws = wb.active
-                
-                # Convert to list of dicts
-                headers = [cell.value for cell in ws[1]]
                 rows_data = []
-                for row in ws.iter_rows(min_row=2, values_only=True):
-                    row_dict = {headers[i]: row[i] for i in range(len(headers)) if i < len(row)}
-                    rows_data.append(row_dict)
+
+                if file_ext == '.csv':
+                    try:
+                        with open(filepath, 'r', encoding='utf-8-sig', newline='') as f:
+                            reader = csv.DictReader(f)
+                            rows_data = list(reader)
+                    except UnicodeDecodeError:
+                        with open(filepath, 'r', encoding='latin-1', newline='') as f:
+                            reader = csv.DictReader(f)
+                            rows_data = list(reader)
+                else:
+                    # Read Excel data
+                    wb = openpyxl.load_workbook(filepath)
+                    ws = wb.active
+                    
+                    # Convert to list of dicts
+                    headers = [cell.value for cell in ws[1]]
+                    for row in ws.iter_rows(min_row=2, values_only=True):
+                        row_dict = {headers[i]: row[i] for i in range(len(headers)) if i < len(row)}
+                        rows_data.append(row_dict)
+                    wb.close()
                 
                 # Validate
                 validator = ImportValidator(gym)
@@ -2632,7 +3061,10 @@ def download_template():
     ws.title = "Members"
     
     # Headers
-    headers = ['Name', 'Phone', 'Email', 'Membership Type', 'Joined Date', 'Status', 'Paid Month', 'Amount']
+    headers = [
+        'Name', 'Phone', 'Email', 'Membership Type', 'Joined Date',
+        'Status', 'Paid Month', 'Amount', 'Paid Months', 'Amounts'
+    ]
     
     # Style for headers
     header_font = Font(bold=True, color="FFFFFF")
@@ -2649,9 +3081,9 @@ def download_template():
     # Sample Data (with Payment Example)
     current_month = datetime.now().strftime('%Y-%m')
     sample_data = [
-        ['John Doe', '03001234567', 'john@example.com', 'Gym', '2025-01-01', 'Paid', current_month, 2500],
-        ['Jane Smith', '03117654321', 'jane@example.com', 'Gym + Cardio', '2025-01-05', 'Unpaid', '', ''],
-        ['Ahmed Ali', '03009876543', 'ahmed@example.com', 'Gym', '2025-01-10', 'Paid', current_month, 3000]
+        ['John Doe', '03001234567', 'john@example.com', 'Gym', '2025-01-01', 'Paid', current_month, 2500, '', ''],
+        ['Jane Smith', '03117654321', 'jane@example.com', 'Gym + Cardio', '2025-01-05', 'Unpaid', '', '', '', ''],
+        ['Ahmed Ali', '03009876543', 'ahmed@example.com', 'Gym', '2025-01-10', 'Paid', '', '', '2024-11,2024-12,2025-01', '2500,2500,3000']
     ]
     
     for row_num, row_data in enumerate(sample_data, 2):
@@ -2659,7 +3091,7 @@ def download_template():
             ws.cell(row=row_num, column=col_num).value = cell_value
     
     # Adjust column widths
-    column_widths = [20, 15, 25, 20, 15]
+    column_widths = [20, 15, 25, 20, 15, 12, 12, 10, 24, 18]
     for i, width in enumerate(column_widths, 1):
         ws.column_dimensions[chr(64 + i)].width = width
     
@@ -2902,7 +3334,7 @@ def generate_smart_response(message, gym_name, username=None):
     """Generate intelligent responses based on message content with a VIP brand voice"""
     
     # Greeting / Start
-    if any(word in message for word in ['hi', 'hello', 'hey', 'start', 'salaam', 'aoa']):
+    if any(word in message for word in ['hi', 'hello', 'hey', 'start']):
         return {
             'text': f"💎 **Welcome to {gym_name} VIP Concierge!**\n\n"
                    f"How can I assist you today? I can help you with **Subscriptions**, **Gym Hours**, **Classes**, or **Account** details.\n\n"
@@ -2987,6 +3419,28 @@ def generate_smart_response(message, gym_name, username=None):
                    "How can I serve you today?",
             'quick_replies': ['Subscription Plans', 'Gym Hours', 'Contact Us']
         }
+
+@app.errorhandler(500)
+def handle_internal_server_error(error):
+    """Graceful fallback for unexpected server errors."""
+    try:
+        print("\n❌ INTERNAL SERVER ERROR")
+        print(f"Path: {request.path}")
+        print(traceback.format_exc())
+    except Exception:
+        pass
+
+    # API-style endpoints should return JSON
+    if request.path.startswith('/webhooks') or request.path.startswith('/stripe/webhook') or request.path.startswith('/chatbot_api'):
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+    flash('Something went wrong on this page. Please try again.', 'error')
+
+    # For authenticated users, keep UX smooth by sending them to dashboard
+    if session.get('logged_in'):
+        return redirect(url_for('dashboard'))
+
+    return redirect(url_for('auth'))
 
 if __name__ == '__main__':
     # Modular routes are now initialized at the global scope for Gunicorn compatibility

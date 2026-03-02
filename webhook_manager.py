@@ -14,7 +14,7 @@ import json
 import hmac
 import hashlib
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, create_engine, inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from models import get_session, User, get_database_url
@@ -96,9 +96,46 @@ class WebhookManager:
                 Webhook.__table__,
                 WebhookLog.__table__
             ])
+            WebhookManager._ensure_schema(engine)
             print("✅ Webhook tables created")
         except Exception as e:
             print(f"Webhook table creation: {e}")
+
+    @staticmethod
+    def _ensure_schema(engine):
+        """Ensure webhook tables have required columns for older DBs."""
+        required_columns = {
+            'webhooks': {
+                'events': 'TEXT',
+                'secret': 'VARCHAR(100)',
+                'is_active': 'BOOLEAN DEFAULT 1',
+                'created_at': 'DATETIME',
+                'last_triggered': 'DATETIME',
+                'total_calls': 'INTEGER DEFAULT 0',
+                'failed_calls': 'INTEGER DEFAULT 0'
+            },
+            'webhook_logs': {
+                'response_code': 'INTEGER',
+                'response_time_ms': 'INTEGER',
+                'success': 'BOOLEAN',
+                'error_message': 'TEXT',
+                'created_at': 'DATETIME'
+            }
+        }
+
+        try:
+            inspector = inspect(engine)
+            with engine.begin() as conn:
+                for table_name, columns in required_columns.items():
+                    if table_name not in inspector.get_table_names():
+                        continue
+                    existing = {col['name'] for col in inspector.get_columns(table_name)}
+                    for column_name, column_type in columns.items():
+                        if column_name in existing:
+                            continue
+                        conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}"))
+        except Exception as schema_error:
+            print(f"Webhook schema ensure warning: {schema_error}")
     
     @staticmethod
     def trigger_event(user_id, event_type, data):
@@ -202,9 +239,9 @@ class WebhookManager:
             
             # Update webhook stats
             webhook.last_triggered = datetime.utcnow()
-            webhook.total_calls += 1
+            webhook.total_calls = (webhook.total_calls or 0) + 1
             if not success:
-                webhook.failed_calls += 1
+                webhook.failed_calls = (webhook.failed_calls or 0) + 1
             
             # Log the delivery
             log = WebhookLog(
@@ -241,7 +278,8 @@ class WebhookManager:
     @staticmethod
     def _log_failure(webhook, event_type, payload, error_msg, session):
         """Log webhook failure"""
-        webhook.failed_calls += 1
+        webhook.total_calls = (webhook.total_calls or 0) + 1
+        webhook.failed_calls = (webhook.failed_calls or 0) + 1
         webhook.last_triggered = datetime.utcnow()
         
         log = WebhookLog(

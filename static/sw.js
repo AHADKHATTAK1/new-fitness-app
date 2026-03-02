@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-manager-v6';
+const CACHE_NAME = 'gym-manager-v7';
 const STATIC_ASSETS = [
     '/auth',
     '/static/offline-db.js',
@@ -53,11 +53,13 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(event.request)
             .then(response => {
-                // Clone the response
                 const responseClone = response.clone();
 
-                // Only cache successful responses
-                if (response && response.status === 200) {
+                // Cache only static assets to avoid stale dynamic HTML/UI data
+                const requestUrl = new URL(event.request.url);
+                const isStaticAsset = requestUrl.pathname.startsWith('/static/');
+
+                if (response && response.status === 200 && isStaticAsset) {
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, responseClone);
                     });
@@ -66,14 +68,12 @@ self.addEventListener('fetch', event => {
                 return response;
             })
             .catch(() => {
-                // If network fails, try cache
                 return caches.match(event.request)
                     .then(response => {
                         if (response) {
                             return response;
                         }
 
-                        // If not in cache, return offline page for navigation requests
                         if (event.request.mode === 'navigate') {
                             return caches.match('/auth');
                         }

@@ -546,21 +546,29 @@ class GymManager:
             'confidence': float(r.confidence) if r.confidence else None
         } for r in records]
 
-    def bulk_import_members(self, filepath):
+    def bulk_import_members(self, filepath, duplicate_strategy='skip'):
         """Import members from Excel/CSV with batch processing - NO PANDAS"""
         import csv
         from openpyxl import load_workbook
+        import re
         
         try:
             # Read file based on extension
             rows_data = []
             headers = []
+            file_ext = os.path.splitext(str(filepath).lower())[1]
             
-            if filepath.endswith('.csv'):
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    reader = csv.DictReader(f)
-                    headers = reader.fieldnames
-                    rows_data = list(reader)
+            if file_ext == '.csv':
+                try:
+                    with open(filepath, 'r', encoding='utf-8-sig', newline='') as f:
+                        reader = csv.DictReader(f)
+                        headers = reader.fieldnames
+                        rows_data = list(reader)
+                except UnicodeDecodeError:
+                    with open(filepath, 'r', encoding='latin-1', newline='') as f:
+                        reader = csv.DictReader(f)
+                        headers = reader.fieldnames
+                        rows_data = list(reader)
             else:
                 # Excel file - use openpyxl instead of pandas
                 wb = load_workbook(filepath, read_only=True, data_only=True)
@@ -575,7 +583,88 @@ class GymManager:
             success = 0
             errors = []
             new_members = []
-            fee_records = []  # NEW: Store fee records for paid months
+            payment_records = []
+            duplicate_strategy = (duplicate_strategy or 'skip').lower()
+            if duplicate_strategy not in {'skip', 'update', 'merge'}:
+                duplicate_strategy = 'skip'
+
+            def _clean_phone(raw_phone):
+                if not raw_phone:
+                    return ''
+                return re.sub(r'[^\d+]', '', str(raw_phone).strip())
+
+            def _normalize_month(raw_month):
+                if raw_month is None:
+                    return None
+                token = str(raw_month).strip()
+                if not token:
+                    return None
+                for fmt in ('%Y-%m', '%Y/%m', '%b-%Y', '%B-%Y'):
+                    try:
+                        dt = datetime.strptime(token, fmt)
+                        return dt.strftime('%Y-%m')
+                    except Exception:
+                        continue
+                if re.match(r'^\d{4}-\d{2}$', token):
+                    return token
+                return None
+
+            def _to_float(value, default=0.0):
+                try:
+                    if value is None or value == '':
+                        return float(default)
+                    return float(value)
+                except Exception:
+                    return float(default)
+
+            def _split_tokens(value):
+                if value is None:
+                    return []
+                if isinstance(value, (list, tuple)):
+                    return [str(v).strip() for v in value if str(v).strip()]
+                text = str(value).strip()
+                if not text:
+                    return []
+                return [v.strip() for v in re.split(r'[;,|]', text) if v.strip()]
+
+            def _extract_payment_entries(row, joined_date):
+                status_val = str(row.get('Status') or row.get('Paid') or row.get('Payment') or '').strip().lower()
+                if 'unpaid' in status_val:
+                    return []
+
+                single_month_raw = row.get('Paid Month') or row.get('Month')
+                single_amount_raw = row.get('Amount') or row.get('Fee') or 0.0
+
+                multi_months_raw = row.get('Paid Months') or row.get('Payment Months') or row.get('Paid History')
+                multi_amounts_raw = row.get('Amounts') or row.get('Paid Amounts')
+
+                months = []
+                multi_month_tokens = _split_tokens(multi_months_raw)
+                if multi_month_tokens:
+                    for token in multi_month_tokens:
+                        normalized = _normalize_month(token)
+                        if normalized:
+                            months.append(normalized)
+
+                single_month = _normalize_month(single_month_raw)
+                if single_month:
+                    months.append(single_month)
+
+                if not months and 'paid' in status_val:
+                    months.append(joined_date.strftime('%Y-%m'))
+
+                amounts = [_to_float(val, single_amount_raw) for val in _split_tokens(multi_amounts_raw)]
+                default_amount = _to_float(single_amount_raw, 0.0)
+
+                entries = []
+                for idx, month in enumerate(months):
+                    amount = amounts[idx] if idx < len(amounts) else default_amount
+                    entries.append({
+                        'month': month,
+                        'amount': amount,
+                        'paid_date': joined_date
+                    })
+                return entries
             
             # Legacy Mode: Fallback to single add
             if self.legacy:
@@ -590,20 +679,24 @@ class GymManager:
                 return success, len(errors), errors
 
             # Database Mode: Batch Processing
-            # 1. Get existing phones to avoid duplicates
-            existing_phones = {m.phone for m in self.session.query(Member).filter_by(gym_id=self.gym.id).all()}
+            existing_members = self.session.query(Member).filter_by(gym_id=self.gym.id).all()
+            member_by_phone = {m.phone: m for m in existing_members if m.phone}
+            existing_phones = set(member_by_phone.keys())
+            existing_fee_keys = {
+                (row.member_id, row.month)
+                for row in self.session.query(Fee.member_id, Fee.month)
+                .join(Member, Member.id == Fee.member_id)
+                .filter(Member.gym_id == self.gym.id)
+                .all()
+            }
             
             for index, row in enumerate(rows_data):
                 try:
                     name = str(row['Name']).strip() if row.get('Name') else ''
-                    phone = str(row['Phone']).strip() if row.get('Phone') else ''
+                    phone = _clean_phone(row.get('Phone'))
                     
                     if not name or not phone:
                         errors.append(f"Row {index}: Missing name or phone")
-                        continue
-                    
-                    if phone in existing_phones:
-                        errors.append(f"Row {index}: Member with phone {phone} already exists")
                         continue
                         
                     # Handle optional fields
@@ -621,49 +714,64 @@ class GymManager:
                         except:
                             pass
 
-                    member = Member(
-                        gym_id=self.gym.id,
-                        name=name,
-                        phone=phone,
-                        email=email,
-                        membership_type=membership_type,
-                        joined_date=joined_date,
-                        photo_url=None,
-                        is_trial=False,
-                        is_active=True  # Force active status
-                    )
-                    new_members.append(member)
-                    existing_phones.add(phone) # Prevent duplicates within same file
-                    
-                    # SMART PAYMENT DETECTION: Check for Paid Month, Status, or dedicated Payment columns
-                    paid_month = None
-                    fee_amount = 0.0
-                    
-                    # Try to find payment info in various possible column names
-                    status_val = str(row.get('Status') or row.get('Paid') or row.get('Payment') or '').strip().lower()
-                    month_val = str(row.get('Paid Month') or row.get('Month') or '').strip()
-                    amount_val = row.get('Amount') or row.get('Fee') or 0.0
-                    
-                    # Log for debugging
-                    print(f"DEBUG Import: Name={name}, Status={status_val}, Month={month_val}")
-                    
-                    # Logic: If explicitly marked 'paid' or if a payment month is provided
-                    # BUT skip if explicitly marked 'unpaid'
-                    joined_month_str = joined_date.strftime('%Y-%m')
-                    
-                    if 'unpaid' in status_val:
-                        paid_month = None
-                    elif 'paid' in status_val or month_val:
-                        paid_month = month_val if month_val else joined_month_str
-                        fee_amount = float(amount_val) if amount_val else 0.0
-                    
-                    if paid_month:
-                        fee_records.append({
-                            'phone': phone,
-                            'month': paid_month,
-                            'amount': fee_amount,
-                            'paid_date': joined_date # Use joining date as payment date for accuracy
-                        })
+                    payment_entries = _extract_payment_entries(row, joined_date)
+
+                    if phone in existing_phones:
+                        existing_member = member_by_phone.get(phone)
+                        if not existing_member:
+                            errors.append(f"Row {index}: Member with phone {phone} already exists")
+                            continue
+
+                        if duplicate_strategy == 'skip':
+                            # Skip member profile updates, but still import historical payments if provided
+                            pass
+                        elif duplicate_strategy == 'update':
+                            existing_member.name = name
+                            existing_member.email = email
+                            existing_member.membership_type = membership_type
+                            existing_member.joined_date = joined_date
+                            existing_member.is_active = True
+                        else:  # merge
+                            if name:
+                                existing_member.name = name
+                            if email:
+                                existing_member.email = email
+                            if membership_type:
+                                existing_member.membership_type = membership_type
+                            if joined_date:
+                                existing_member.joined_date = joined_date
+                            existing_member.is_active = True
+
+                        for entry in payment_entries:
+                            payment_records.append({
+                                'member_obj': existing_member,
+                                'month': entry['month'],
+                                'amount': entry['amount'],
+                                'paid_date': entry['paid_date']
+                            })
+                    else:
+                        member = Member(
+                            gym_id=self.gym.id,
+                            name=name,
+                            phone=phone,
+                            email=email,
+                            membership_type=membership_type,
+                            joined_date=joined_date,
+                            photo_url=None,
+                            is_trial=False,
+                            is_active=True
+                        )
+                        new_members.append(member)
+                        member_by_phone[phone] = member
+                        existing_phones.add(phone)
+
+                        for entry in payment_entries:
+                            payment_records.append({
+                                'member_obj': member,
+                                'month': entry['month'],
+                                'amount': entry['amount'],
+                                'paid_date': entry['paid_date']
+                            })
                     
                     success += 1
                     
@@ -683,31 +791,32 @@ class GymManager:
                         self.session.commit()
                         print(f"✓ Bulk Import: Committed batch {i}-{min(i+batch_size, total_to_add)}")
                     
-                    # NEW: Process fee records for paid months
-                    if fee_records:
-                        print(f"💰 Processing {len(fee_records)} fee records...")
-                        for fee_data in fee_records:
+                    # Process fee records for paid months (new + existing members)
+                    if payment_records:
+                        print(f"💰 Processing {len(payment_records)} payment records...")
+                        for payment in payment_records:
                             try:
-                                # Find member by phone
-                                member = self.session.query(Member).filter_by(
-                                    gym_id=self.gym.id,
-                                    phone=fee_data['phone']
-                                ).first()
-                                
-                                if member:
-                                    # Create fee record
-                                    fee = Fee(
-                                        member_id=member.id,
-                                        month=fee_data['month'],
-                                        amount=fee_data['amount'],
-                                        paid_date=fee_data.get('paid_date', datetime.now().date())
-                                    )
-                                    self.session.add(fee)
+                                member = payment.get('member_obj')
+                                if not member or not getattr(member, 'id', None):
+                                    continue
+
+                                fee_key = (member.id, payment['month'])
+                                if fee_key in existing_fee_keys:
+                                    continue
+
+                                fee = Fee(
+                                    member_id=member.id,
+                                    month=payment['month'],
+                                    amount=payment['amount'],
+                                    paid_date=payment.get('paid_date', datetime.now().date())
+                                )
+                                self.session.add(fee)
+                                existing_fee_keys.add(fee_key)
                             except Exception as e:
                                 print(f"⚠️ Fee record error: {str(e)}")
-                        
+
                         self.session.commit()
-                        print(f"✅ Fee records processed successfully")
+                        print("✅ Payment history imported successfully")
                     
                     # Final flush
                     self.session.flush()
@@ -1098,7 +1207,7 @@ class GymManager:
                 'month': f.month,
                 'amount': float(f.amount) if f.amount else 0.0,
                 'paid_date': f.paid_date.strftime('%Y-%m-%d') if f.paid_date else None,
-                'notes': f.notes or ''
+                'notes': getattr(f, 'notes', '') or ''
             } for f in fees]
         except Exception as e:
             print(f"Error getting payment history: {str(e)}")
@@ -1139,8 +1248,12 @@ class GymManager:
             joinedload(Member.fees),  # Eager load fees to prevent N+1
             joinedload(Member.notes)   # Eager load notes too
         ).all()
-        
-        total_members = len(members_query)
+
+        total_members = self.session.query(func.count(Member.id)).filter(
+            Member.gym_id == self.gym.id
+        ).scalar() or 0
+
+        active_members_count = len(members_query)
         
         # Get payments for current and last month
         payments_query = self.session.query(Fee).join(Member).filter(
@@ -1161,7 +1274,7 @@ class GymManager:
                 last_month_revenue += float(p.amount)
                 
         paid_count = len(paid_member_ids)
-        unpaid_count = total_members - paid_count
+        unpaid_count = active_members_count - paid_count
         
         # Calculate revenue change
         revenue_change = 0
@@ -1264,6 +1377,7 @@ class GymManager:
 
         return {
             'total_members': total_members,
+            'active_members_count': active_members_count,
             'paid_count': paid_count,
             'unpaid_count': unpaid_count,
             'revenue': current_revenue,

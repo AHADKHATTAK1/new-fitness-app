@@ -247,6 +247,7 @@
         margin-bottom: 1rem;
         background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
         filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
         font-weight: 800;
@@ -466,6 +467,7 @@
         font-weight: 700;
         background: linear-gradient(135deg, #fff, var(--primary));
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
@@ -679,6 +681,7 @@
         <div class="chart-wrap">
             <canvas id="revenueChart"></canvas>
         </div>
+        <script id="revenue-data" type="application/json">{{ revenue_trend | tojson | safe }}</script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -692,73 +695,73 @@
 
                 // Parse the data passed from Flask
                 // We need to adhere to the format [{'month': 'Jan', 'revenue': 1000}, ...]
-                const revenueData = {{ revenue_trend | tojson | safe
-            }};
+                const revenueDataRaw = document.getElementById('revenue-data').textContent || '[]';
+                const revenueData = JSON.parse(revenueDataRaw);
 
-            const labels = revenueData.map(d => d.month);
-            const data = revenueData.map(d => d.revenue);
+                const labels = revenueData.map(d => d.month);
+                const data = revenueData.map(d => d.revenue);
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Monthly Revenue',
-                        data: data,
-                        borderColor: '#8b5cf6',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#06b6d4',
-                        pointBorderColor: '#fff',
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Monthly Revenue',
+                            data: data,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#06b6d4',
+                            pointBorderColor: '#fff',
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            pointHoverBackgroundColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#ccc',
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function (context) {
+                                        return 'Revenue: {{ gym_details.currency or "$" }}' + context.parsed.y;
+                                    }
+                                }
+                            }
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleColor: '#fff',
-                            bodyColor: '#ccc',
-                            padding: 10,
-                            cornerRadius: 8,
-                            displayColors: false,
-                            callbacks: {
-                                label: function (context) {
-                                    return 'Revenue: {{ gym_details.currency or "$" }}' + context.parsed.y;
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        }
                     }
-                }
-            });
+                });
             });
         </script>
     </div>

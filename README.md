@@ -103,6 +103,9 @@ ADMIN_EMAILS=admin@gym.com
 - `/bulk_import` → import workflow
 - `/reports` → analytics reports
 - `/webhooks` → webhook management
+- `/backup/download/json` → full JSON backup (restore-compatible)
+- `/backup/download/excel` → full Excel backup (old structure)
+- `/backup/download/template` → sample Excel template (old structure)
 
 ## Helper scripts in repo
 
@@ -120,3 +123,41 @@ ADMIN_EMAILS=admin@gym.com
 ## Reproducible setup
 
 This repository includes a pinned `requirements.txt` to keep local and deployment environments consistent.
+
+## Recent update history (March 2026)
+
+- Subscription and access flow improvements:
+	- Added/updated referral + VIP activation handling.
+	- Enforced trial-aware feature access and post-payment unlock behavior.
+	- Expanded plan and market handling (US/PK), including mini plan support.
+
+- Payment reliability updates:
+	- Improved payment initiation user/email resolution.
+	- Hardened callback/webhook processing paths and subscription extension updates.
+	- Prevented avoidable 500 responses for missing Stripe webhook secret (safe ignored response).
+
+- Webhook module stability:
+	- Added safer webhook table/schema handling for older databases.
+	- Added defensive counter updates for null/legacy values.
+	- Verified `/webhooks`, create, test, logs, and delete flows end-to-end.
+
+- Analytics and routing fixes:
+	- Added advanced analytics route alias support.
+	- Fixed missing template context values causing analytics errors.
+	- Added global 500 fallback behavior and safer route error handling.
+
+- Dashboard visibility and UI fixes:
+	- Reworked dashboard stat rendering to ensure data is visible server-side and client-side.
+	- Added no-cache handling for dynamic HTML responses and updated service worker caching strategy.
+	- Standardized gradient text compatibility by adding `background-clip: text;` alongside `-webkit-background-clip: text;` across templates.
+	- Replaced fixed month dropdown windows with data-driven month generation across key pages (dashboard, fees, expenses, bulk operations, add member, member details).
+	- Enabled past month/year selection without a hardcoded historical limit.
+
+- Import and operations enhancements:
+	- Extended bulk import to support historical paid months/amount data.
+	- Improved duplicate/member update handling during imports.
+
+- Backup enhancements:
+	- Added old-structure Excel backup download and restore support.
+	- Added Excel template download to standardize backup file format.
+	- Improved Excel restore parsing with alias support for common column names.

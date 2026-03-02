@@ -201,6 +201,10 @@
         border-color: rgba(16, 185, 129, 0.35);
     }
 
+    .feature-pill.enabled.feature-pill-clickable {
+        cursor: pointer;
+    }
+
     .feature-pill.disabled {
         background: rgba(239, 68, 68, 0.08);
         border-color: rgba(239, 68, 68, 0.28);
@@ -384,84 +388,156 @@
 
     <div class="quick-actions">
         {% if feature_access.member_management %}
-        <a href="{{ url_for('add_member') }}" class="btn btn-secondary btn-center">👥 Member Management</a>
+        <a href="{{ feature_paths.member_management }}" class="btn btn-secondary btn-center">👥 Member Management</a>
         {% endif %}
         {% if feature_access.payment_tracking %}
-        <a href="{{ url_for('fees') }}" class="btn btn-secondary btn-center">💳 Payment Tracking</a>
+        <a href="{{ feature_paths.payment_tracking }}" class="btn btn-secondary btn-center">💳 Payment Tracking</a>
         {% endif %}
         {% if feature_access.basic_reports %}
-        <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-center">📊 Basic Reports</a>
+        <a href="{{ feature_paths.basic_reports }}" class="btn btn-secondary btn-center">📊 Basic Reports</a>
         {% endif %}
         {% if feature_access.mobile_app %}
-        <a href="{{ url_for('scanner') }}" class="btn btn-secondary btn-center">📱 Mobile App / Scanner</a>
+        <a href="{{ feature_paths.mobile_app }}" class="btn btn-secondary btn-center">📱 Mobile App / Scanner</a>
         {% endif %}
         {% if feature_access.advanced_analytics %}
-        <a href="{{ url_for('advanced_analytics') }}" class="btn btn-secondary btn-center">🧠 Open AI Analytics</a>
+        <a href="{{ feature_paths.advanced_analytics }}" class="btn btn-secondary btn-center">🧠 Open AI Analytics</a>
         {% endif %}
         {% if feature_access.bulk_operations %}
-        <a href="{{ url_for('bulk_operations') }}" class="btn btn-secondary btn-center">⚡ Open Bulk Ops</a>
+        <a href="{{ feature_paths.bulk_operations }}" class="btn btn-secondary btn-center">⚡ Open Bulk Ops</a>
         {% endif %}
         {% if feature_access.advanced_reports %}
-        <a href="{{ url_for('export_center') }}" class="btn btn-secondary btn-center">📤 Advanced Reports / Export</a>
+        <a href="{{ feature_paths.advanced_reports }}" class="btn btn-secondary btn-center">📤 Advanced Reports /
+            Export</a>
         {% endif %}
         {% if feature_access.webhooks %}
-        <a href="{{ url_for('webhooks') }}" class="btn btn-secondary btn-center">🔗 Open Webhooks</a>
+        <a href="{{ feature_paths.webhooks }}" class="btn btn-secondary btn-center">🔗 Open Webhooks</a>
         {% endif %}
         {% if feature_access.api_access %}
-        <span class="btn btn-secondary btn-center api-pill">🧩 API Access Enabled</span>
+        <a href="{{ feature_paths.api_access }}" class="btn btn-secondary btn-center api-pill">🧩 API Access Enabled</a>
         {% endif %}
         {% if feature_access.marketing_automation %}
-        <span class="btn btn-secondary btn-center api-pill">📣 Marketing Automation Enabled</span>
+        <a href="{{ feature_paths.marketing_automation }}" class="btn btn-secondary btn-center api-pill">📣 Marketing
+            Automation Enabled</a>
         {% endif %}
         {% if feature_access.multi_gym_management %}
-        <span class="btn btn-secondary btn-center api-pill">🏢 Multi-Gym Management Enabled</span>
+        <a href="{{ feature_paths.multi_gym_management }}" class="btn btn-secondary btn-center api-pill">🏢 Multi-Gym
+            Management Enabled</a>
         {% endif %}
         {% if feature_access.priority_support %}
-        <span class="btn btn-secondary btn-center api-pill">⭐ Priority Support Enabled</span>
+        <a href="{{ feature_paths.priority_support }}" class="btn btn-secondary btn-center api-pill">⭐ Priority Support
+            Enabled</a>
         {% endif %}
         {% if feature_access.custom_branding %}
-        <span class="btn btn-secondary btn-center api-pill">🎨 Custom Branding Enabled</span>
+        <a href="{{ feature_paths.custom_branding }}" class="btn btn-secondary btn-center api-pill">🎨 Custom Branding
+            Enabled</a>
         {% endif %}
         {% if feature_access.white_label %}
-        <span class="btn btn-secondary btn-center api-pill">🏷️ White-Label Enabled</span>
+        <a href="{{ feature_paths.white_label }}" class="btn btn-secondary btn-center api-pill">🏷️ White-Label
+            Enabled</a>
         {% endif %}
         {% if feature_access.custom_domain %}
-        <span class="btn btn-secondary btn-center api-pill">🌐 Custom Domain Enabled</span>
+        <a href="{{ feature_paths.custom_domain }}" class="btn btn-secondary btn-center api-pill">🌐 Custom Domain
+            Enabled</a>
         {% endif %}
         {% if feature_access.dedicated_account_manager %}
-        <span class="btn btn-secondary btn-center api-pill">👤 Dedicated Account Manager Enabled</span>
+        <a href="{{ feature_paths.dedicated_account_manager }}" class="btn btn-secondary btn-center api-pill">👤
+            Dedicated Account Manager Enabled</a>
         {% endif %}
         {% if feature_access.sla_guarantee %}
-        <span class="btn btn-secondary btn-center api-pill">🛡️ SLA Guarantee Enabled</span>
+        <a href="{{ feature_paths.sla_guarantee }}" class="btn btn-secondary btn-center api-pill">🛡️ SLA Guarantee
+            Enabled</a>
         {% endif %}
         {% if feature_access['24_7_support'] %}
-        <span class="btn btn-secondary btn-center api-pill">☎️ 24/7 Support Enabled</span>
+        <a href="{{ feature_paths['24_7_support'] }}" class="btn btn-secondary btn-center api-pill">☎️ 24/7 Support
+            Enabled</a>
         {% endif %}
         {% if feature_access.on_premise_deployment %}
-        <span class="btn btn-secondary btn-center api-pill">🏠 On-Premise Deployment Enabled</span>
+        <a href="{{ feature_paths.on_premise_deployment }}" class="btn btn-secondary btn-center api-pill">🏠 On-Premise
+            Deployment Enabled</a>
         {% endif %}
         {% if feature_access.custom_development %}
-        <span class="btn btn-secondary btn-center api-pill">🧰 Custom Development Enabled</span>
+        <a href="{{ feature_paths.custom_development }}" class="btn btn-secondary btn-center api-pill">🧰 Custom
+            Development Enabled</a>
         {% endif %}
         {% if feature_access.phone_support %}
-        <span class="btn btn-secondary btn-center api-pill">📞 Phone Support Enabled</span>
+        <a href="{{ feature_paths.phone_support }}" class="btn btn-secondary btn-center api-pill">📞 Phone Support
+            Enabled</a>
         {% endif %}
         {% if feature_access.training_sessions %}
-        <span class="btn btn-secondary btn-center api-pill">🎓 Training Sessions Enabled</span>
+        <a href="{{ feature_paths.training_sessions }}" class="btn btn-secondary btn-center api-pill">🎓 Training
+            Sessions Enabled</a>
         {% endif %}
         {% if feature_access.data_migration %}
-        <span class="btn btn-secondary btn-center api-pill">🗃️ Data Migration Enabled</span>
+        <a href="{{ feature_paths.data_migration }}" class="btn btn-secondary btn-center api-pill">🗃️ Data Migration
+            Enabled</a>
         {% endif %}
         {% if feature_access.compliance_support %}
-        <span class="btn btn-secondary btn-center api-pill">✅ Compliance Support Enabled</span>
+        <a href="{{ feature_paths.compliance_support }}" class="btn btn-secondary btn-center api-pill">✅ Compliance
+            Support Enabled</a>
         {% endif %}
         {% if feature_access.multi_region_deployment %}
-        <span class="btn btn-secondary btn-center api-pill">🌍 Multi-Region Deployment Enabled</span>
+        <a href="{{ feature_paths.multi_region_deployment }}" class="btn btn-secondary btn-center api-pill">🌍
+            Multi-Region Deployment Enabled</a>
         {% endif %}
         <a href="{{ url_for('subscription_plans') }}" class="btn btn-primary btn-center">💎 Upgrade / Manage
             Subscription</a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const featureLabelPathMap = {
+            'Member Management': '{{ feature_paths.member_management }}',
+            'Payment Tracking': '{{ feature_paths.payment_tracking }}',
+            'Basic Reports': '{{ feature_paths.basic_reports }}',
+            'Mobile App (PWA)': '{{ feature_paths.mobile_app }}',
+            'Email Support': '{{ feature_paths.priority_support }}',
+            'Marketing Automation': '{{ feature_paths.marketing_automation }}',
+            'AI Analytics': '{{ feature_paths.advanced_analytics }}',
+            'API Access': '{{ feature_paths.api_access }}',
+            'Multi-Gym Management': '{{ feature_paths.multi_gym_management }}',
+            'Priority Support': '{{ feature_paths.priority_support }}',
+            'Custom Branding': '{{ feature_paths.custom_branding }}',
+            'Bulk Operations': '{{ feature_paths.bulk_operations }}',
+            'Advanced Reports': '{{ feature_paths.advanced_reports }}',
+            'Webhooks': '{{ feature_paths.webhooks }}',
+            'White-Label': '{{ feature_paths.white_label }}',
+            'Custom Domain': '{{ feature_paths.custom_domain }}',
+            'Dedicated Account Manager': '{{ feature_paths.dedicated_account_manager }}',
+            'SLA Guarantee': '{{ feature_paths.sla_guarantee }}',
+            '24/7 Support': '{{ feature_paths["24_7_support"] }}',
+            'On-Premise Deployment': '{{ feature_paths.on_premise_deployment }}',
+            'Custom Development': '{{ feature_paths.custom_development }}',
+            'Phone Support': '{{ feature_paths.phone_support }}',
+            'Training Sessions': '{{ feature_paths.training_sessions }}',
+            'Data Migration': '{{ feature_paths.data_migration }}',
+            'Compliance Support': '{{ feature_paths.compliance_support }}',
+            'Multi-Region Deployment': '{{ feature_paths.multi_region_deployment }}'
+        };
+
+        document.querySelectorAll('.feature-grid .feature-pill.enabled').forEach(function (pill) {
+            const label = pill.querySelector('span')?.textContent?.trim();
+            const path = featureLabelPathMap[label];
+            if (!path || path === '#') return;
+
+            pill.classList.add('feature-pill-clickable');
+            pill.setAttribute('role', 'link');
+            pill.setAttribute('tabindex', '0');
+
+            const goToPath = function () {
+                window.location.href = path;
+            };
+
+            pill.addEventListener('click', goToPath);
+            pill.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    goToPath();
+                }
+            });
+        });
+    });
+</script>
 
 <div class="card settings-card">
     <form method="POST" enctype="multipart/form-data">
