@@ -265,6 +265,30 @@
         font-size: 0.75rem;
     }
 
+    .staff-activity-list {
+        margin-top: 0.5rem;
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .staff-activity-item {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        background: var(--surface-elevated);
+    }
+
+    .staff-activity-action {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .staff-activity-meta {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.15rem;
+    }
+
     .revoke-access-btn {
         border: 1px solid rgba(239, 68, 68, 0.5);
         color: #fecaca;
@@ -623,6 +647,26 @@
                     <form method="POST"><input type="hidden" name="action" value="revoke_staff_access"><input
                             type="hidden" name="access_id" value="{{ staff.access_id }}"><button type="submit"
                             class="revoke-access-btn">Revoke</button></form>
+                </div>
+            </div>{% endfor %}</div>
+    </div>
+    {% endif %}
+
+    {% if staff_activity_logs %}
+    <div class="form-group">
+        <label>Recent Staff Activity</label>
+        <div class="staff-activity-list">{% for item in staff_activity_logs %}<div class="staff-activity-item">
+                <div class="staff-activity-action">{{ item.action.replace('_', ' ').title() }}</div>
+                <div class="staff-activity-meta">
+                    {% if item.details and item.details.staff_email %}
+                    {{ item.details.staff_email }}
+                    {% endif %}
+                    {% if item.details and item.details.gym_name %}
+                    • {{ item.details.gym_name }}
+                    {% endif %}
+                    {% if item.timestamp %}
+                    • {{ item.timestamp }}
+                    {% endif %}
                 </div>
             </div>{% endfor %}</div>
     </div>

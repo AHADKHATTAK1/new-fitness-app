@@ -2752,6 +2752,21 @@ def settings():
                     'warning'
                 )
 
+            try:
+                security_manager.log_action(
+                    current_user.id,
+                    'STAFF_ACCESS_SHARED',
+                    {
+                        'staff_email': staff_email,
+                        'gym_name': owner_gym.name,
+                        'email_sent': bool(email_sent) if 'email_sent' in locals() else False
+                    },
+                    request.remote_addr,
+                    request.user_agent.string if request.user_agent else None
+                )
+            except Exception:
+                pass
+
             return redirect(url_for('settings'))
 
         if action == 'revoke_staff_access':
@@ -2817,6 +2832,22 @@ def settings():
                 flash('Staff access revoked successfully. User still has access to other shared gyms.', 'success')
             else:
                 flash('Staff access revoked successfully.', 'success')
+
+            try:
+                security_manager.log_action(
+                    current_user.id,
+                    'STAFF_ACCESS_REVOKED',
+                    {
+                        'staff_email': staff_user.email if staff_user else None,
+                        'gym_name': gym_name,
+                        'has_other_active_access': remaining_active > 0
+                    },
+                    request.remote_addr,
+                    request.user_agent.string if request.user_agent else None
+                )
+            except Exception:
+                pass
+
             return redirect(url_for('settings'))
 
         if action == 'resend_staff_invite':
@@ -2884,6 +2915,21 @@ def settings():
                     'warning'
                 )
 
+            try:
+                security_manager.log_action(
+                    current_user.id,
+                    'STAFF_ACCESS_RESEND',
+                    {
+                        'staff_email': staff_user.email,
+                        'gym_name': gym_name,
+                        'email_sent': bool(email_sent) if 'email_sent' in locals() else False
+                    },
+                    request.remote_addr,
+                    request.user_agent.string if request.user_agent else None
+                )
+            except Exception:
+                pass
+
             return redirect(url_for('settings'))
 
         name = request.form.get('gym_name')
@@ -2948,6 +2994,7 @@ def settings():
                 }
         
     shared_staff = []
+    staff_activity_logs = []
     if not auth_manager.legacy and current_user:
         owner_gym = auth_manager.session.query(Gym).filter_by(user_id=current_user.id).first()
         if owner_gym:
@@ -2966,7 +3013,23 @@ def settings():
                 'created_at': access.created_at.strftime('%Y-%m-%d') if access.created_at else ''
             } for access, user in accesses]
 
-    return render_template('settings.html', details=gym.get_gym_details(), payments=payments, subscription=subscription, shared_staff=shared_staff)
+            try:
+                audit_logs = security_manager.get_audit_logs(user_id=current_user.id, limit=50)
+                staff_activity_logs = [
+                    log for log in audit_logs
+                    if log.get('action') in {'STAFF_ACCESS_SHARED', 'STAFF_ACCESS_REVOKED', 'STAFF_ACCESS_RESEND'}
+                ][:10]
+            except Exception:
+                staff_activity_logs = []
+
+    return render_template(
+        'settings.html',
+        details=gym.get_gym_details(),
+        payments=payments,
+        subscription=subscription,
+        shared_staff=shared_staff,
+        staff_activity_logs=staff_activity_logs
+    )
 
 @app.route('/restore_backup', methods=['POST'])
 def restore_backup():

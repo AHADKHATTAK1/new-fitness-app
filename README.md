@@ -137,6 +137,8 @@ This repository includes a pinned `requirements.txt` to keep local and deploymen
 	- Added/updated referral + VIP activation handling.
 	- Enforced trial-aware feature access and post-payment unlock behavior.
 	- Expanded plan and market handling (US/PK), including mini plan support.
+	- Added staff sharing controls in settings (share, revoke, resend invite) with email notifications.
+	- Added owner-visible recent staff access activity log in settings for operational audit visibility.
 
 - Payment reliability updates:
 	- Improved payment initiation user/email resolution.
