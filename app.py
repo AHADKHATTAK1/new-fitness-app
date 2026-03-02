@@ -2708,10 +2708,19 @@ def settings():
                 """
 
             try:
-                email_sender.send_email(staff_email, subject, body)
-                flash(f'Staff access shared with {staff_email} and email notification sent.', 'success')
+                email_sent = email_sender.send_email(staff_email, subject, body)
+                if email_sent:
+                    flash(f'Staff access shared with {staff_email} and email notification sent.', 'success')
+                else:
+                    flash(
+                        f'Staff access shared with {staff_email}, but email was not sent. Configure SMTP in environment settings to enable notifications.',
+                        'warning'
+                    )
             except Exception:
-                flash(f'Staff access shared with {staff_email}, but email notification failed.', 'warning')
+                flash(
+                    f'Staff access shared with {staff_email}, but email failed. Configure SMTP credentials to enable notifications.',
+                    'warning'
+                )
 
             return redirect(url_for('settings'))
 
