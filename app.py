@@ -2754,9 +2754,39 @@ def settings():
                 flash('Staff access record not found.', 'error')
                 return redirect(url_for('settings'))
 
+            staff_user = auth_manager.session.query(User).filter_by(id=access.staff_user_id).first()
+            access_gym = auth_manager.session.query(Gym).filter_by(id=access.gym_id).first()
+            gym_name = access_gym.name if access_gym else 'your gym'
+
             access.is_active = False
+
+            remaining_active = auth_manager.session.query(StaffAccess).filter_by(
+                staff_user_id=access.staff_user_id,
+                is_active=True
+            ).count()
+
             auth_manager.session.commit()
-            flash('Staff access revoked successfully.', 'success')
+
+            if staff_user and staff_user.email:
+                try:
+                    login_url = request.host_url.rstrip('/') + url_for('auth')
+                    email_sender.send_email(
+                        staff_user.email,
+                        f"Staff Access Revoked - {gym_name}",
+                        f"""
+                        <h3>Staff Access Revoked</h3>
+                        <p>Your staff access to <strong>{gym_name}</strong> has been revoked.</p>
+                        <p>If this is unexpected, please contact your gym owner.</p>
+                        <p>Login page: <a href=\"{login_url}\">{login_url}</a></p>
+                        """
+                    )
+                except Exception:
+                    pass
+
+            if remaining_active > 0:
+                flash('Staff access revoked successfully. User still has access to other shared gyms.', 'success')
+            else:
+                flash('Staff access revoked successfully.', 'success')
             return redirect(url_for('settings'))
 
         name = request.form.get('gym_name')
