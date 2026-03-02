@@ -253,6 +253,18 @@
         flex: 1;
     }
 
+    .shared-staff-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .resend-invite-btn {
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
     .revoke-access-btn {
         border: 1px solid rgba(239, 68, 68, 0.5);
         color: #fecaca;
@@ -603,9 +615,15 @@
                 <div class="shared-staff-text">• {{ staff.email }}
                     ({{
                     staff.role }}) - shared on {{ staff.created_at }}</div>
-                <form method="POST"><input type="hidden" name="action" value="revoke_staff_access"><input type="hidden"
-                        name="access_id" value="{{ staff.access_id }}"><button type="submit"
-                        class="revoke-access-btn">Revoke</button></form>
+                <div class="shared-staff-actions">
+                    <form method="POST"><input type="hidden" name="action" value="resend_staff_invite"><input
+                            type="hidden" name="access_id" value="{{ staff.access_id }}"><button type="submit"
+                            class="btn btn-secondary resend-invite-btn">Resend Invite</button>
+                    </form>
+                    <form method="POST"><input type="hidden" name="action" value="revoke_staff_access"><input
+                            type="hidden" name="access_id" value="{{ staff.access_id }}"><button type="submit"
+                            class="revoke-access-btn">Revoke</button></form>
+                </div>
             </div>{% endfor %}</div>
     </div>
     {% endif %}

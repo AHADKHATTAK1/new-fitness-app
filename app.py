@@ -2819,6 +2819,73 @@ def settings():
                 flash('Staff access revoked successfully.', 'success')
             return redirect(url_for('settings'))
 
+        if action == 'resend_staff_invite':
+            if auth_manager.legacy:
+                flash('Staff sharing requires database mode.', 'error')
+                return redirect(url_for('settings'))
+
+            if not current_user:
+                flash('Session expired. Please login again.', 'error')
+                return redirect(url_for('auth'))
+
+            access_id = request.form.get('access_id')
+            if not access_id:
+                flash('Invalid resend request.', 'error')
+                return redirect(url_for('settings'))
+
+            try:
+                access_id_int = int(access_id)
+            except Exception:
+                flash('Invalid resend request.', 'error')
+                return redirect(url_for('settings'))
+
+            access = auth_manager.session.query(StaffAccess).filter_by(
+                id=access_id_int,
+                owner_user_id=current_user.id,
+                is_active=True
+            ).first()
+
+            if not access:
+                flash('Staff access record not found.', 'error')
+                return redirect(url_for('settings'))
+
+            staff_user = auth_manager.session.query(User).filter_by(id=access.staff_user_id).first()
+            owner_gym = auth_manager.session.query(Gym).filter_by(id=access.gym_id).first()
+
+            if not staff_user or not staff_user.email:
+                flash('Staff user email not found.', 'error')
+                return redirect(url_for('settings'))
+
+            login_url = request.host_url.rstrip('/') + url_for('auth')
+            reset_url = request.host_url.rstrip('/') + url_for('forgot_password')
+            gym_name = owner_gym.name if owner_gym else 'your gym'
+
+            try:
+                email_sent = email_sender.send_email(
+                    staff_user.email,
+                    f"Staff Access Reminder - {gym_name}",
+                    f"""
+                    <h3>Staff Access Reminder</h3>
+                    <p>You have active staff access to <strong>{gym_name}</strong>.</p>
+                    <p>Login page: <a href=\"{login_url}\">{login_url}</a></p>
+                    <p>If you forgot your password, reset it here: <a href=\"{reset_url}\">{reset_url}</a></p>
+                    """
+                )
+                if email_sent:
+                    flash(f'Reminder sent to {staff_user.email}.', 'success')
+                else:
+                    flash(
+                        f'Could not send reminder to {staff_user.email}. Configure SMTP in environment settings.',
+                        'warning'
+                    )
+            except Exception:
+                flash(
+                    f'Failed to send reminder to {staff_user.email}. Configure SMTP credentials to enable notifications.',
+                    'warning'
+                )
+
+            return redirect(url_for('settings'))
+
         name = request.form.get('gym_name')
         currency = request.form.get('currency', '$')
         if currency == 'AUTO':
