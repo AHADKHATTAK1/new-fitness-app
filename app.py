@@ -2708,6 +2708,25 @@ def settings():
                 gym_id=owner_gym.id
             ).first()
 
+            tier_config = TierManager.get_tier_config(current_user.subscription_tier or 'starter')
+            staff_limit = int((tier_config.get('limits') or {}).get('staff', -1))
+            active_staff_count = auth_manager.session.query(StaffAccess).filter_by(
+                owner_user_id=current_user.id,
+                gym_id=owner_gym.id,
+                is_active=True
+            ).count()
+
+            projected_count = active_staff_count
+            if not existing_access or not existing_access.is_active:
+                projected_count += 1
+
+            if staff_limit != -1 and projected_count > staff_limit:
+                flash(
+                    f"Staff seat limit reached for your {tier_config.get('name', 'Starter')} plan ({active_staff_count}/{staff_limit}). Upgrade your plan to add more staff.",
+                    'warning'
+                )
+                return redirect(url_for('settings'))
+
             if existing_access:
                 existing_access.is_active = True
             else:
@@ -2995,6 +3014,12 @@ def settings():
         
     shared_staff = []
     staff_activity_logs = []
+    staff_limit_info = {
+        'used': 0,
+        'limit': 0,
+        'is_unlimited': False,
+        'plan_name': subscription.get('plan_name', 'Starter')
+    }
     if not auth_manager.legacy and current_user:
         owner_gym = auth_manager.session.query(Gym).filter_by(user_id=current_user.id).first()
         if owner_gym:
@@ -3013,6 +3038,14 @@ def settings():
                 'created_at': access.created_at.strftime('%Y-%m-%d') if access.created_at else ''
             } for access, user in accesses]
 
+            staff_limit_value = TierManager.get_limit(current_user, 'staff')
+            staff_limit_info = {
+                'used': len(shared_staff),
+                'limit': staff_limit_value,
+                'is_unlimited': staff_limit_value == -1,
+                'plan_name': TierManager.get_tier_config(current_user.subscription_tier or 'starter').get('name', 'Starter')
+            }
+
             try:
                 audit_logs = security_manager.get_audit_logs(user_id=current_user.id, limit=50)
                 staff_activity_logs = [
@@ -3028,7 +3061,8 @@ def settings():
         payments=payments,
         subscription=subscription,
         shared_staff=shared_staff,
-        staff_activity_logs=staff_activity_logs
+        staff_activity_logs=staff_activity_logs,
+        staff_limit_info=staff_limit_info
     )
 
 @app.route('/restore_backup', methods=['POST'])

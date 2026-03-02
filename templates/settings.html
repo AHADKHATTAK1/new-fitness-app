@@ -235,6 +235,12 @@
         width: 100%;
     }
 
+    .staff-seat-summary {
+        margin: 0.4rem 0 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
     .shared-staff-list {
         margin: 0;
         color: var(--text-muted);
@@ -622,6 +628,11 @@
 <div class="card settings-card">
     <h2 class="section-title">👥 Share Staff Access</h2>
     <p class="muted-text">Grant staff login access by email and send notification automatically.</p>
+    <p class="staff-seat-summary">
+        Plan: {{ staff_limit_info.plan_name }} •
+        Seats: {{ staff_limit_info.used }} / {% if staff_limit_info.is_unlimited %}Unlimited{% else %}{{
+        staff_limit_info.limit }}{% endif %}
+    </p>
 
     <form method="POST" class="form-group staff-share-form">
         <input type="hidden" name="action" value="share_staff_access">

@@ -139,6 +139,7 @@ This repository includes a pinned `requirements.txt` to keep local and deploymen
 	- Expanded plan and market handling (US/PK), including mini plan support.
 	- Added staff sharing controls in settings (share, revoke, resend invite) with email notifications.
 	- Added owner-visible recent staff access activity log in settings for operational audit visibility.
+	- Enforced per-plan staff seat limits in sharing flow and added seat usage visibility in settings.
 
 - Payment reliability updates:
 	- Improved payment initiation user/email resolution.
