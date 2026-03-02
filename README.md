@@ -107,6 +107,7 @@ ADMIN_EMAILS=admin@gym.com
 - `/bulk_import` → import workflow
 - `/reports` → analytics reports
 - `/webhooks` → webhook management
+- `/healthz` → health/uptime probe endpoint
 - `/create_billing_portal_session` → Stripe customer billing self-service portal
 - `/backup/download/json` → full JSON backup (restore-compatible)
 - `/backup/download/excel` → full Excel backup (old structure)
@@ -149,7 +150,7 @@ ADMIN_EMAILS=admin@gym.com
 	- `Procfile` included: `web: gunicorn --bind 0.0.0.0:$PORT app:app`
 	- `gunicorn` is included in `requirements.txt`
 - Verify core routes after deploy:
-	- `/auth`, `/dashboard`, `/settings`, `/subscription_plans`, `/webhooks`
+	- `/auth`, `/dashboard`, `/settings`, `/subscription_plans`, `/webhooks`, `/healthz`
 
 Note: local VS Code task output may show `exit code: 1` after stopping/restarting the task terminal; startup is healthy when you see `Running on http://127.0.0.1:5000`.
 

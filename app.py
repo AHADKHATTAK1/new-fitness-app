@@ -729,7 +729,7 @@ def check_subscription():
         'index', 'auth', 'google_login', 'logout', 'forgot_password', 'reset_password',
         'static', 'subscription', 'subscription_plans', 'upgrade_tier', 'upgrade_success',
         'activate_trial', 'create_checkout_session', 'payment_success', 'payment_cancel',
-        'stripe_webhook', 'initiate_payment', 'payment_callback', 'fix_database_schema',
+        'stripe_webhook', 'initiate_payment', 'payment_callback', 'fix_database_schema', 'healthz',
         'super_admin', 'approve_payment'
     }
 
@@ -1203,6 +1203,17 @@ def stripe_webhook():
                     auth_manager.session.commit()
 
     return jsonify({'status': 'ok'}), 200
+
+
+@app.route('/healthz')
+def healthz():
+    """Lightweight health endpoint for load balancers and uptime monitors."""
+    return jsonify({
+        'status': 'ok',
+        'service': 'gym-manager',
+        'mode': 'database' if not auth_manager.legacy else 'legacy',
+        'timestamp': datetime.utcnow().isoformat() + 'Z'
+    }), 200
 
 # Trial activation is now handled by tier_routes.py
 
