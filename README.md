@@ -58,7 +58,11 @@ pip install -r requirements.txt
 
 3) Configure environment variables
 
-Create a `.env` file in the project root (example below).
+Copy the template and fill values:
+
+```powershell
+Copy-Item .env.example .env
+```
 
 4) Run the app
 
@@ -72,7 +76,7 @@ App runs locally at:
 
 ## Environment variables
 
-Create `.env` with at least:
+Use `.env.example` as the full source of truth. Minimum required keys in `.env` are:
 
 ```env
 FLASK_SECRET_KEY=change-this-in-production
