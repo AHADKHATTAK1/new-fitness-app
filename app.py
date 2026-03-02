@@ -200,6 +200,18 @@ def get_gym():
     return GymManager(username)
 
 
+def _get_company_details():
+    """Company profile values for public landing page."""
+    return {
+        'name': os.getenv('COMPANY_NAME', 'Gym Manager Pro'),
+        'tagline': os.getenv('COMPANY_TAGLINE', 'Professional SaaS solutions for gyms and fitness studios'),
+        'phone': os.getenv('COMPANY_PHONE', '+92-300-0000000'),
+        'email': os.getenv('COMPANY_EMAIL', 'support@gymmanagerpro.com'),
+        'address': os.getenv('COMPANY_ADDRESS', 'Main Boulevard, Lahore, Pakistan'),
+        'website': os.getenv('COMPANY_WEBSITE', 'https://gymmanagerpro.com')
+    }
+
+
 def _get_month_floor(gym, default_year=1970):
     """Return the earliest selectable month start date for a gym (no fixed past limit)."""
     floor_date = datetime(default_year, 1, 1)
@@ -1383,7 +1395,7 @@ def index():
     """Root route - dashboard for logged-in users, marketing landing for visitors."""
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
-    return render_template('landing.html')
+    return render_template('landing.html', company_details=_get_company_details())
 
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():

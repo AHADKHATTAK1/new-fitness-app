@@ -130,6 +130,33 @@ endblock %}
         color: var(--text-muted);
         font-size: 0.9rem;
     }
+
+    .company-section {
+        margin-top: 1.25rem;
+    }
+
+    .company-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.8rem;
+        margin-top: 0.75rem;
+    }
+
+    .company-item {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+    .company-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .company-tagline {
+        color: var(--text-muted);
+        margin-bottom: 0.7rem;
+    }
 </style>
 
 <section class="card landing-hero">
@@ -214,6 +241,18 @@ endblock %}
         <a class="btn btn-secondary" href="{{ url_for('subscription_plans') }}">Compare Plans</a>
     </div>
     <p class="landing-cta-text">Secure sessions, subscription tiers, billing portal, and health monitoring included.</p>
+</section>
+
+<section class="card company-section">
+    <h2 class="landing-section-title">Our Company Details</h2>
+    <div class="company-name">{{ company_details.name }}</div>
+    <div class="company-tagline">{{ company_details.tagline }}</div>
+    <div class="company-grid">
+        <div class="company-item"><strong>Phone:</strong> {{ company_details.phone }}</div>
+        <div class="company-item"><strong>Email:</strong> {{ company_details.email }}</div>
+        <div class="company-item"><strong>Address:</strong> {{ company_details.address }}</div>
+        <div class="company-item"><strong>Website:</strong> {{ company_details.website }}</div>
+    </div>
 </section>
 
 <div class="landing-footer">
