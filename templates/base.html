@@ -12,6 +12,19 @@
     <meta name="apple-mobile-web-app-title" content="Gym Manager">
     <link rel="manifest" href="/static/manifest.webmanifest">
     <title>{% block title %}Gym Manager{% endblock %}</title>
+    <meta name="description"
+        content="{% block meta_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:title"
+        content="{% block og_title %}{% block meta_title %}Gym Manager{% endblock %}{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}{% block meta_og_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
+    <meta property="og:site_name" content="Gym Manager">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+        content="{% block twitter_title %}{% block meta_twitter_title %}Gym Manager{% endblock %}{% endblock %}">
+    <meta name="twitter:description"
+        content="{% block twitter_description %}{% block meta_twitter_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
