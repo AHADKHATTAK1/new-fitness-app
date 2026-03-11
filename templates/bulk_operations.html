@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Bulk Operations - Gym Manager{% endblock %}
+{% block title %}Bulk Operations - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -170,22 +170,27 @@
 
 <div class="page-wrapper">
     <div class="page-header-row">
-        <h1 class="page-title">⚡ Bulk Operations</h1>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back</a>
+        <h1 class="page-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Bulk Operations</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"
+                aria-hidden="true"></i> Back</a>
     </div>
 
     <div class="bulk-card">
-        <h2 class="section-title">🎯 Quick Select</h2>
+        <h2 class="section-title"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Quick Select</h2>
         <div class="quick-select-actions">
-            <button onclick="selectAll()" class="btn btn-select-all">✅ Select All</button>
-            <button onclick="selectNone()" class="btn btn-select-none">❌ Deselect All</button>
-            <button onclick="selectUnpaid()" class="btn btn-select-unpaid">💸 Unpaid Only</button>
-            <button onclick="selectPaid()" class="btn btn-select-paid">✅ Paid Only</button>
+            <button onclick="selectAll()" class="btn btn-select-all"><i class="fa-solid fa-check-double"
+                    aria-hidden="true"></i> Select All</button>
+            <button onclick="selectNone()" class="btn btn-select-none"><i class="fa-solid fa-xmark"
+                    aria-hidden="true"></i> Deselect All</button>
+            <button onclick="selectUnpaid()" class="btn btn-select-unpaid"><i class="fa-solid fa-circle-xmark"
+                    aria-hidden="true"></i> Unpaid Only</button>
+            <button onclick="selectPaid()" class="btn btn-select-paid"><i class="fa-solid fa-circle-check"
+                    aria-hidden="true"></i> Paid Only</button>
         </div>
     </div>
 
     <div class="bulk-card">
-        <h2 class="section-title">👥 Select Members</h2>
+        <h2 class="section-title"><i class="fa-solid fa-users" aria-hidden="true"></i> Select Members</h2>
         <div id="selectedCount" class="selected-count">
             0 members selected
         </div>
@@ -209,13 +214,14 @@
     </div>
 
     <div class="bulk-card">
-        <h2 class="section-title">🚀 Actions</h2>
+        <h2 class="section-title"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Actions</h2>
 
         <div class="actions-grid">
             <form method="POST" action="{{ url_for('bulk_payment') }}"
                 onsubmit="return submitBulkAction(event, 'payment')">
                 <div class="action-box action-box-payment">
-                    <h3 class="action-title-payment">💰 Bulk Payment</h3>
+                    <h3 class="action-title-payment"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Bulk
+                        Payment</h3>
                     <p class="action-description">Record payment for selected members</p>
 
                     <input type="hidden" name="member_ids" id="paymentMemberIds">
@@ -231,12 +237,14 @@
                     <input type="number" id="bulk_payment_amount" name="amount" required min="0" step="0.01"
                         placeholder="2000" title="Enter payment amount" class="field-control">
 
-                    <button type="submit" class="btn btn-success btn-full">💾 Record Payments</button>
+                    <button type="submit" class="btn btn-success btn-full"><i class="fa-solid fa-floppy-disk"
+                            aria-hidden="true"></i> Record Payments</button>
                 </div>
             </form>
 
             <div class="action-box action-box-message">
-                <h3 class="action-title-message">💬 Bulk Message</h3>
+                <h3 class="action-title-message"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Bulk Message
+                </h3>
                 <p class="action-description">Send WhatsApp to selected members</p>
 
                 <label for="messageTemplate" class="field-label">Message Template:</label>
@@ -251,7 +259,8 @@
                     class="field-control field-control-textarea"
                     title="Message text">Hi {name}, your gym fee for {{ current_month }} is pending. Please pay soon!</textarea>
 
-                <button onclick="sendBulkMessages()" class="btn btn-primary btn-full">📨 Send Messages</button>
+                <button onclick="sendBulkMessages()" class="btn btn-primary btn-full"><i class="fa-solid fa-paper-plane"
+                        aria-hidden="true"></i> Send Messages</button>
             </div>
 
         </div>
@@ -261,7 +270,7 @@
 <script>
     const templates = {
         reminder: "Hi {name}, your gym fee for {{ current_month }} is pending. Please pay soon!",
-        promo: "Hi {name}! 🎉 Special offer: Get 20% off on your next month's subscription!",
+        promo: "Hi {name}! Special offer: Get 20% off on your next month's subscription!",
         custom: ""
     };
 

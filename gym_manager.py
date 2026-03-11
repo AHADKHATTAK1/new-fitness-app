@@ -1,5 +1,5 @@
 """
-Database-backed Gym Manager
+Database-backed fitnessmanagement
 Uses PostgreSQL via SQLAlchemy instead of JSON files
 Build Tag: 20251218-2135
 """
@@ -41,7 +41,7 @@ class GymManager:
                 # Create default gym for user
                 self.gym = Gym(
                     user_id=user.id,
-                    name='Gym Manager',
+                    name='fitnessmanagement',
                     currency=default_currency
                 )
                 self.session.add(self.gym)
@@ -67,16 +67,16 @@ class GymManager:
             'fees': {},
             'expenses': [],
             'attendance': {},
-            'gym_details': {'name': 'Gym Manager', 'logo': None, 'currency': '$'}
+            'gym_details': {'name': 'fitnessmanagement', 'logo': None, 'currency': '$'}
         }
 
     def get_gym_details(self) -> Dict:
         """Get gym name, logo, and currency"""
         if self.legacy:
-            return self.data.get('gym_details', {'name': 'Gym Manager', 'logo': None, 'currency': '$'})
+            return self.data.get('gym_details', {'name': 'fitnessmanagement', 'logo': None, 'currency': '$'})
         
         if not self.gym:
-            return {'name': 'Gym Manager', 'logo': None, 'currency': '$'}
+            return {'name': 'fitnessmanagement', 'logo': None, 'currency': '$'}
         
         return {
             'name': self.gym.name,
@@ -551,6 +551,68 @@ class GymManager:
         import csv
         from openpyxl import load_workbook
         import re
+
+        def _normalize_key(key):
+            return re.sub(r'\s+', ' ', str(key or '').strip().lower().replace('_', ' ').replace('-', ' '))
+
+        alias_map = {
+            'Name': {
+                'name', 'member name', 'client name', 'customer name'
+            },
+            'Phone': {
+                'phone', 'mobile', 'contact', 'phone number', 'mobile number',
+                'contact number', 'client contact number', 'client contact', 'client phone'
+            },
+            'Email': {
+                'email', 'mail', 'email address', 'client email'
+            },
+            'Membership Type': {
+                'membership type', 'type', 'plan', 'plan type', 'package', 'membership'
+            },
+            'Joined Date': {
+                'joined date', 'join date', 'joined', 'joining date', 'admission date',
+                'gym admission date', 'date of admission'
+            },
+            'Status': {
+                'status', 'paid', 'payment status', 'fee status', 'payment state'
+            },
+            'Paid Month': {
+                'paid month', 'month', 'payment month', 'fee month'
+            },
+            'Amount': {
+                'amount', 'fee', 'payment amount', 'paid amount', 'amount paid', 'fees'
+            },
+            'Paid Months': {
+                'paid months', 'payment months', 'paid history', 'payment history', 'fee history'
+            },
+            'Amounts': {
+                'amounts', 'paid amounts', 'payment amounts', 'fee amounts'
+            },
+            'Paid Date': {
+                'paid date', 'payment date', 'fee paid date', 'transaction date', 'fee pending date'
+            }
+        }
+
+        normalized_to_canonical = {
+            normalized_alias: canonical
+            for canonical, aliases in alias_map.items()
+            for normalized_alias in aliases
+        }
+
+        def _normalize_row(row):
+            canonical_row = {}
+            for raw_key, raw_value in (row or {}).items():
+                if raw_key is None:
+                    continue
+                normalized_key = _normalize_key(raw_key)
+                canonical_key = normalized_to_canonical.get(normalized_key)
+                if not canonical_key:
+                    continue
+
+                existing_value = canonical_row.get(canonical_key)
+                if existing_value in (None, '') and raw_value not in (None, ''):
+                    canonical_row[canonical_key] = raw_value
+            return canonical_row
         
         try:
             # Read file based on extension
@@ -634,9 +696,20 @@ class GymManager:
 
                 single_month_raw = row.get('Paid Month') or row.get('Month')
                 single_amount_raw = row.get('Amount') or row.get('Fee') or 0.0
+                paid_date_raw = row.get('Paid Date')
 
                 multi_months_raw = row.get('Paid Months') or row.get('Payment Months') or row.get('Paid History')
                 multi_amounts_raw = row.get('Amounts') or row.get('Paid Amounts')
+
+                paid_date = joined_date
+                if paid_date_raw:
+                    try:
+                        if isinstance(paid_date_raw, str):
+                            paid_date = datetime.strptime(paid_date_raw.strip(), '%Y-%m-%d').date()
+                        elif hasattr(paid_date_raw, 'date'):
+                            paid_date = paid_date_raw.date() if callable(paid_date_raw.date) else paid_date_raw
+                    except Exception:
+                        paid_date = joined_date
 
                 months = []
                 multi_month_tokens = _split_tokens(multi_months_raw)
@@ -650,6 +723,12 @@ class GymManager:
                 if single_month:
                     months.append(single_month)
 
+                if not months and paid_date:
+                    try:
+                        months.append(paid_date.strftime('%Y-%m'))
+                    except Exception:
+                        pass
+
                 if not months and 'paid' in status_val:
                     months.append(joined_date.strftime('%Y-%m'))
 
@@ -662,9 +741,11 @@ class GymManager:
                     entries.append({
                         'month': month,
                         'amount': amount,
-                        'paid_date': joined_date
+                        'paid_date': paid_date
                     })
                 return entries
+
+            rows_data = [_normalize_row(row) for row in rows_data]
             
             # Legacy Mode: Fallback to single add
             if self.legacy:

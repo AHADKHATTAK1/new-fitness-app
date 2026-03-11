@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Reports - Gym Manager{% endblock %}
+{% block title %}Reports - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -63,26 +63,26 @@
 </style>
 
 <h1 class="reports-title">
-    📊 Analytics & Reports
+    <i class="fa-solid fa-chart-column" aria-hidden="true"></i> Analytics & Reports
 </h1>
 
 <!-- Summary Cards -->
 <div class="reports-summary-grid">
     <div class="card reports-summary-card">
-        <div class="reports-summary-icon">👥</div>
+        <div class="reports-summary-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
         <h3 class="reports-summary-label">Total Members</h3>
         <div class="reports-summary-value reports-summary-members">{{ total_members }}</div>
     </div>
 
     <div class="card reports-summary-card">
-        <div class="reports-summary-icon">💰</div>
+        <div class="reports-summary-icon"><i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i></div>
         <h3 class="reports-summary-label">This Month Revenue</h3>
         <div class="reports-summary-value reports-summary-revenue">{{ gym_details.currency or '$' }}{{
             monthly_revenue }}</div>
     </div>
 
     <div class="card reports-summary-card">
-        <div class="reports-summary-icon">📈</div>
+        <div class="reports-summary-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
         <h3 class="reports-summary-label">Total Check-Ins</h3>
         <div class="reports-summary-value reports-summary-checkins">{{ total_checkins }}</div>
     </div>

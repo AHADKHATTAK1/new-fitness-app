@@ -1,197 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Gym Manager{% endblock %}
+{% block title %}Login - fitnessmanagement{% endblock %}
 
 {% block content %}
-<style>
-    .auth-container {
-        max-width: 480px;
-        margin: 6vh auto;
-        perspective: 1000px;
-    }
-
-    .auth-card {
-        background: rgba(15, 23, 42, 0.6);
-        -webkit-backdrop-filter: blur(20px);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 3.5rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.15);
-        transform-style: preserve-3d;
-        animation: cardFloat 6s ease-in-out infinite;
-    }
-
-    @keyframes cardFloat {
-
-        0%,
-        100% {
-            transform: translateY(0);
-        }
-
-        50% {
-            transform: translateY(-10px);
-        }
-    }
-
-    .auth-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-
-    .auth-header h1 {
-        font-size: 2.8rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #fff 0%, var(--primary) 30%, var(--secondary) 60%, var(--accent-gold) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.4));
-        letter-spacing: -1px;
-    }
-
-    .auth-header p {
-        color: var(--accent-gold);
-        font-size: 1.1rem;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-weight: 600;
-        opacity: 0.9;
-    }
-
-    .auth-subtitle {
-        margin-bottom: 2rem;
-    }
-
-    .auth-toggle {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 2rem;
-        gap: 1rem;
-    }
-
-    .auth-toggle-btn {
-        flex: 1;
-    }
-
-    .auth-toggle-login {
-        background: var(--primary);
-    }
-
-    .auth-toggle-signup {
-        background: transparent;
-        border: 1px solid var(--border);
-    }
-
-    .auth-label {
-        color: var(--primary);
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .auth-input {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--glass-border);
-        border-radius: 12px;
-        padding: 1rem;
-        color: #fff;
-        font-size: 1rem;
-        transition: 0.3s;
-    }
-
-    .auth-submit {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        margin-top: 1rem;
-    }
-
-    .auth-link-wrap {
-        text-align: center;
-        margin-top: 1.5rem;
-    }
-
-    .auth-forgot-link {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: 0.3s;
-    }
-
-    .auth-forgot-link:hover {
-        color: #fff;
-        text-shadow: 0 0 10px #fff;
-    }
-
-    .signup-hidden {
-        display: none;
-    }
-
-    .auth-small-note {
-        color: var(--text-muted);
-        font-size: 0.8rem;
-    }
-
-    .auth-signup-btn {
-        width: 100%;
-    }
-
-    .auth-divider {
-        display: flex;
-        align-items: center;
-        margin: 2rem 0;
-        color: var(--text-muted);
-    }
-
-    .auth-divider-line {
-        flex: 1;
-        border-color: var(--border);
-        opacity: 0.3;
-    }
-
-    .auth-divider-text {
-        padding: 0 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    .auth-google-wrap {
-        text-align: center;
-    }
-
-    .auth-google-warning {
-        padding: 1rem;
-        background: hsla(0, 80%, 60%, 0.1);
-        border: 1px solid var(--error);
-        border-radius: 8px;
-        color: var(--error);
-    }
-
-    .auth-helper-text {
-        margin-top: 1rem;
-        font-size: 0.9rem;
-        color: var(--text-muted);
-    }
-
-    .auth-helper-action {
-        color: var(--primary);
-        cursor: pointer;
-        text-decoration: underline;
-    }
-
-    .auth-helper-strong {
-        color: var(--primary);
-        font-weight: bold;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h1>💪 Gym Manager</h1>
+            <h1><i class="fa-solid fa-dumbbell" aria-hidden="true"></i> fitnessmanagement</h1>
             <p class="auth-subtitle">Manage your gym with ease</p>
         </div>
 
@@ -216,7 +33,7 @@
                 <input type="password" id="login_password" name="password" required class="auth-input">
             </div>
             <button type="submit" class="btn auth-submit">
-                🚀 Enter Gym Manager
+                <i class="fa-solid fa-rocket" aria-hidden="true"></i> Enter fitnessmanagement
             </button>
             <div class="auth-link-wrap">
                 <a href="{{ url_for('forgot_password') }}" class="auth-forgot-link">
@@ -246,27 +63,6 @@
         </form>
     </div>
 
-    <script>
-        function showForm(type) {
-            const loginForm = document.getElementById('form-login');
-            const signupForm = document.getElementById('form-signup');
-            const btnLogin = document.getElementById('btn-login');
-            const btnSignup = document.getElementById('btn-signup');
-
-            if (type === 'login') {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-                btnLogin.style.background = 'var(--primary)';
-                btnSignup.style.background = 'transparent';
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
-                btnLogin.style.background = 'transparent';
-                btnSignup.style.background = 'var(--secondary)'; // Use secondary color or green for signup
-            }
-        }
-    </script>
-
     <div class="auth-divider">
         <hr class="auth-divider-line">
         <span class="auth-divider-text">OR</span>
@@ -284,7 +80,8 @@
         </div>
         {% else %}
         <div class="auth-google-warning">
-            ⚠️ Google Login not configured. Please set GOOGLE_CLIENT_ID in .env file.
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Google Login not configured. Please set
+            GOOGLE_CLIENT_ID in .env file.
         </div>
         {% endif %}
         <p id="login-helper-text" class="auth-helper-text">
@@ -294,70 +91,7 @@
     </div>
 </div>
 </div>
-
-<style>
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-5px);
-        }
-
-        50% {
-            transform: translateX(5px);
-        }
-
-        75% {
-            transform: translateX(-5px);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    .highlight-shake {
-        animation: shake 0.4s ease-in-out;
-        border: 2px solid var(--primary);
-        border-radius: 4px;
-    }
-</style>
-
-<script>
-    function handleGoogleLogin() {
-        if (typeof google === 'undefined' || !google.accounts) {
-            // Show a toast or small message instead of alert if possible, or just wait
-            return;
-        }
-        google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                // Visual feedback: Highlight the main button
-                const btnContainer = document.querySelector('.g_id_signin');
-                if (btnContainer) {
-                    btnContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    btnContainer.classList.add('highlight-shake');
-
-                    // Remove class after animation to allow re-triggering
-                    setTimeout(() => {
-                        btnContainer.classList.remove('highlight-shake');
-                    }, 1000);
-
-                    // Update helper text temporarily
-                    const helperText = document.getElementById('login-helper-text');
-                    if (helperText) {
-                        const originalText = helperText.innerHTML;
-                        helperText.innerHTML = '<span class="auth-helper-strong">Please tap the main Google button above ☝️</span>';
-                        setTimeout(() => {
-                            helperText.innerHTML = originalText;
-                        }, 3000);
-                    }
-                }
-            }
-        });
-    }
-</script>
+<script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
 
 
 {% endblock %}

@@ -46,7 +46,7 @@ class EmailSender:
             msg = MIMEMultipart('alternative')
             msg['From'] = self.email
             msg['To'] = to_email
-            msg['Subject'] = 'Password Reset Code - Gym Manager'
+            msg['Subject'] = 'Password Reset Code - fitnessmanagement'
             
             # HTML email body
             html = f"""
@@ -68,7 +68,7 @@ class EmailSender:
                     
                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                     <p style="font-size: 12px; color: #999; text-align: center;">
-                        Gym Manager - Secure Fitness Management<br>
+                        fitnessmanagement - Secure Fitness Management<br>
                         {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                     </p>
                 </div>
@@ -100,7 +100,7 @@ class EmailSender:
             msg = MIMEMultipart('alternative')
             msg['From'] = self.email
             msg['To'] = to_email
-            msg['Subject'] = 'Password Changed Successfully - Gym Manager'
+            msg['Subject'] = 'Password Changed Successfully - fitnessmanagement'
             
             html = f"""
             <html>
@@ -166,3 +166,42 @@ class EmailSender:
         except Exception as e:
             print(f"Error sending generic email: {str(e)}")
             return False
+
+    def send_auto_code_email(self, to_email, code, purpose='Verification', username=None, expires_minutes=10):
+        """
+        Send an automatic email containing a security code.
+
+        Args:
+            to_email: Recipient email
+            code: Security code (OTP/reset/verification)
+            purpose: Code purpose shown in subject/body
+            username: Optional display name
+            expires_minutes: Code validity time in minutes
+
+        Returns:
+            bool: True if sent successfully
+        """
+        safe_purpose = str(purpose or 'Verification').strip().title()
+        display_name = (username or to_email or 'User').strip()
+
+        subject = f"{safe_purpose} Code - fitnessmanagement"
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                <h2 style="margin: 0 0 14px; color: #4f46e5;">{safe_purpose} Code</h2>
+                <p style="margin: 0 0 10px;">Hello <strong>{display_name}</strong>,</p>
+                <p style="margin: 0 0 16px;">Use the code below to complete your {safe_purpose.lower()} request:</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="display: inline-block; background: #eef2ff; color: #1e1b4b; border: 1px solid #c7d2fe; font-size: 30px; font-weight: 700; letter-spacing: 6px; padding: 16px 24px; border-radius: 10px;">
+                        {code}
+                    </div>
+                </div>
+                <p style="color: #475569; margin: 0 0 8px;">This code expires in <strong>{int(expires_minutes)}</strong> minutes.</p>
+                <p style="color: #64748b; font-size: 13px; margin: 0;">If you did not request this, you can ignore this email.</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return self.send_email(to_email, subject, body)

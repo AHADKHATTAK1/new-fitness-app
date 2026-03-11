@@ -1,5 +1,5 @@
 """
-Database models for Gym Manager
+Database models for fitnessmanagement
 PostgreSQL schema using SQLAlchemy ORM
 """
 

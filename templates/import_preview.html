@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Import Preview - Gym Manager{% endblock %}
+{% block title %}Import Preview - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -268,12 +268,12 @@
 <div class="import-preview-wrap">
     <div class="import-preview-back-wrap">
         <a href="{{ url_for('bulk_import') }}" class="import-preview-back-link">
-            ← Back to Upload
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Upload
         </a>
     </div>
 
     <h1 class="import-preview-title">
-        📊 Import Preview
+        <i class="fa-solid fa-chart-column" aria-hidden="true"></i> Import Preview
     </h1>
     <p class="import-preview-subtitle">Review data before importing: {{ filename }}</p>
 
@@ -281,28 +281,28 @@
     <div class="import-summary-grid">
         <!-- Total -->
         <div class="card import-summary-card import-summary-total">
-            <div class="import-summary-icon">📋</div>
+            <div class="import-summary-icon"><i class="fa-solid fa-table-list" aria-hidden="true"></i></div>
             <div class="import-summary-value import-summary-value-total">{{ validation.total }}</div>
             <div class="import-summary-label">Total Rows</div>
         </div>
 
         <!-- Valid -->
         <div class="card import-summary-card import-summary-valid">
-            <div class="import-summary-icon">✅</div>
+            <div class="import-summary-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <div class="import-summary-value import-summary-value-valid">{{ validation.valid }}</div>
             <div class="import-summary-label">Valid</div>
         </div>
 
         <!-- Warnings -->
         <div class="card import-summary-card import-summary-warn">
-            <div class="import-summary-icon">⚠️</div>
+            <div class="import-summary-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
             <div class="import-summary-value import-summary-value-warn">{{ validation.warnings }}</div>
             <div class="import-summary-label">Warnings</div>
         </div>
 
         <!-- Errors -->
         <div class="card import-summary-card import-summary-error">
-            <div class="import-summary-icon">❌</div>
+            <div class="import-summary-icon"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></div>
             <div class="import-summary-value import-summary-value-error">{{ validation.errors }}</div>
             <div class="import-summary-label">Errors</div>
         </div>
@@ -311,7 +311,8 @@
     <!-- Duplicate Handling (if duplicates found) -->
     {% if duplicate_count > 0 %}
     <div class="card import-duplicate-card">
-        <h2 class="import-duplicate-title">⚠️ Duplicates Found: {{ duplicate_count }}</h2>
+        <h2 class="import-duplicate-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            Duplicates Found: {{ duplicate_count }}</h2>
         <p class="import-duplicate-subtitle">
             These members already exist in your database. Choose how to handle them:
         </p>
@@ -350,7 +351,8 @@
 
     <!-- Preview Table -->
     <div class="card import-table-card">
-        <h2 class="import-table-title">📋 Preview (First 20 Rows)</h2>
+        <h2 class="import-table-title"><i class="fa-solid fa-table-list" aria-hidden="true"></i> Preview (First 20 Rows)
+        </h2>
 
         <table class="import-preview-table">
             <thead>
@@ -372,11 +374,14 @@
                     <td class="import-preview-td">{{ row.row_num }}</td>
                     <td class="import-preview-td">
                         {% if row.status == 'valid' %}
-                        <span class="import-status-icon import-status-valid">✅</span>
+                        <span class="import-status-icon import-status-valid"><i class="fa-solid fa-circle-check"
+                                aria-hidden="true"></i></span>
                         {% elif row.status == 'warning' %}
-                        <span class="import-status-icon import-status-warning">⚠️</span>
+                        <span class="import-status-icon import-status-warning"><i
+                                class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
                         {% else %}
-                        <span class="import-status-icon import-status-error">❌</span>
+                        <span class="import-status-icon import-status-error"><i class="fa-solid fa-circle-xmark"
+                                aria-hidden="true"></i></span>
                         {% endif %}
                     </td>
                     <td class="import-preview-td import-name-cell">{{ row.data.name or '-' }}</td>
@@ -417,16 +422,18 @@
     <!-- Action Buttons -->
     <div class="import-actions">
         <a href="{{ url_for('bulk_import') }}" class="btn import-btn-cancel">
-            ❌ Cancel
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancel
         </a>
 
         {% if validation.errors > 0 %}
         <button disabled class="btn import-btn-disabled" title="Fix errors before importing">
-            ⚠️ Cannot Import ({{ validation.errors }} errors)
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Cannot Import ({{ validation.errors }}
+            errors)
         </button>
         {% else %}
         <button type="submit" form="importForm" class="btn btn-success import-btn-confirm">
-            ✅ Proceed with Import ({{ validation.valid + validation.warnings }} rows)
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Proceed with Import ({{ validation.valid +
+            validation.warnings }} rows)
         </button>
         {% endif %}
     </div>

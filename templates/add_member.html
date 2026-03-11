@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Add Member - Gym Manager{% endblock %}
+{% block title %}Add Member - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -154,7 +154,7 @@
     }
 </style>
 
-<h1 class="add-member-title">✨ Add New Member</h1>
+<h1 class="add-member-title"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add New Member</h1>
 
 <div class="card add-member-card">
     <form method="POST" enctype="multipart/form-data" id="member-form">
@@ -191,7 +191,7 @@
         <div class="form-group trial-box">
             <div class="trial-row">
                 <label for="start_trial" class="trial-label">
-                    ⏳ Start 3-Day Free Trial?
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i> Start 3-Day Free Trial?
                     <div class="trial-note">
                         Member can use gym free for 3 days before paying.
                     </div>
@@ -202,7 +202,7 @@
 
         <div class="card initial-payment-card">
             <h3 class="initial-payment-title">
-                <span>💰</span> Initial Payment (Optional)
+                <span><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i></span> Initial Payment (Optional)
             </h3>
             <div class="initial-payment-row">
                 <div class="initial-payment-col">
@@ -226,10 +226,10 @@
             <label>Member Photo</label>
             <div class="photo-actions">
                 <label for="photo" class="btn btn-secondary upload-photo-label">
-                    📁 Upload Photo
+                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Upload Photo
                 </label>
                 <button type="button" id="open-camera-btn" class="btn btn-secondary">
-                    📷 Use Camera
+                    <i class="fa-solid fa-camera" aria-hidden="true"></i> Use Camera
                 </button>
             </div>
             <input type="file" id="photo" name="photo" accept="image/*" class="hidden-input">
@@ -242,17 +242,20 @@
             <img id="captured-image" alt="Captured photo">
 
             <div class="camera-controls camera-controls-hidden" id="camera-controls">
-                <button type="button" id="capture-btn" class="btn btn-success">📸 Capture</button>
-                <button type="button" id="retake-btn" class="btn btn-secondary retake-hidden">🔄
+                <button type="button" id="capture-btn" class="btn btn-success"><i class="fa-solid fa-camera"
+                        aria-hidden="true"></i> Capture</button>
+                <button type="button" id="retake-btn" class="btn btn-secondary retake-hidden"><i
+                        class="fa-solid fa-rotate-right" aria-hidden="true"></i>
                     Retake</button>
-                <button type="button" id="close-camera-btn" class="btn btn-danger">❌ Close</button>
+                <button type="button" id="close-camera-btn" class="btn btn-danger"><i class="fa-solid fa-xmark"
+                        aria-hidden="true"></i> Close</button>
             </div>
 
             <img id="preview-image" class="preview-image preview-hidden" alt="Preview">
         </div>
 
         <button type="submit" class="btn btn-success submit-member-btn">
-            ✅ Add Member
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Add Member
         </button>
     </form>
 </div>

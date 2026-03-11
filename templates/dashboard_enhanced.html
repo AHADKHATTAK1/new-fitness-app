@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Gym Manager{% endblock %}
+{% block title %}Dashboard - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -599,7 +599,8 @@
         <div class="carousel-slides carousel-slides-enhanced">
             <div class="carousel-slide carousel-slide-enhanced">
                 <h2 class="welcome-title">
-                    🎉 Welcome to {{ gym_details.name }}!</h2>
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Welcome to {{ gym_details.name }}!
+                </h2>
                 <p class="welcome-subtitle">Manage your gym with
                     ultimate ease</p>
             </div>
@@ -614,7 +615,8 @@
             </div>
             <div class="stat-content">
                 <div class="stat-icon stat-icon-purple">
-                    👥</div>
+                    <i class="fa-solid fa-users" aria-hidden="true"></i>
+                </div>
                 <h3 class="stat-heading stat-heading-purple">
                     Total Members</h3>
                 <div class="stat-value stat-value-purple">
@@ -628,7 +630,8 @@
             </div>
             <div class="stat-content">
                 <div class="stat-icon stat-icon-cyan">
-                    💰</div>
+                    <i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i>
+                </div>
                 <h3 class="stat-heading stat-heading-cyan">
                     This Month Revenue</h3>
                 <div class="stat-value stat-value-cyan stat-value-revenue">
@@ -642,7 +645,8 @@
             </div>
             <div class="stat-content">
                 <div class="stat-icon stat-icon-green">
-                    ✅</div>
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                </div>
                 <h3 class="stat-heading stat-heading-green">
                     Active (Paid)</h3>
                 <div class="stat-value stat-value-green">
@@ -658,7 +662,8 @@
             </div>
             <div class="stat-content">
                 <div class="stat-icon stat-icon-red">
-                    ⏰</div>
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                </div>
                 <h3 class="stat-heading stat-heading-red">
                     Expiring Soon</h3>
                 <div class="stat-value stat-value-red">
@@ -673,7 +678,7 @@
 
     <!-- Revenue Chart Section -->
     <div class="card member-card-3d revenue-section">
-        <h2 class="revenue-title">📊 Revenue Trend</h2>
+        <h2 class="revenue-title"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Revenue Trend</h2>
         <video autoplay loop muted class="revenue-video">
             <source src="https://assets.mixkit.co/videos/preview/mixkit-man-working-out-at-the-gym-228-large.mp4"
                 type="video/mp4">
@@ -771,22 +776,24 @@
         <h1 class="members-title">
             Members</h1>
         <div class="action-row">
-            <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="🔍 Search members..."
+            <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="Search members..."
                 class="member-search">
             {% if feature_access.advanced_reports %}
             <a href="{{ url_for('download_excel') }}" class="btn member-card-3d btn-export">
-                📥 Export Excel
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Export Excel
             </a>
             {% endif %}
             {% if feature_access.member_management %}
-            <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d">✨ Add Member</a>
+            <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d"><i
+                    class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member</a>
             {% endif %}
         </div>
     </div>
 
     <!-- Paid Members Table -->
     <div class="card member-card-3d" id="paid-members">
-        <h2 class="section-title-paid">✅ Paid Members ({{ current_month
+        <h2 class="section-title-paid"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Paid Members ({{
+            current_month
             }})</h2>
         {% if paid %}
         <div class="table-wrap">
@@ -815,7 +822,8 @@
                         <td><a href="{{ url_for('member_details', member_id=member.id) }}"
                                 class="member-link member-link-paid">{{ member.name }}</a></td>
                         <td>{{ member.phone }}</td>
-                        <td><span class="badge-enhanced badge-paid">✅ Paid</span></td>
+                        <td><span class="badge-enhanced badge-paid"><i class="fa-solid fa-circle-check"
+                                    aria-hidden="true"></i> Paid</span></td>
                         <td>
                             <a href="{{ url_for('member_details', member_id=member.id) }}"
                                 class="btn btn-sm icon-action" aria-label="View {{ member.name }} details"
@@ -841,7 +849,8 @@
 
     <!-- Unpaid Members -->
     <div class="card member-card-3d unpaid-section" id="unpaid-members">
-        <h2 class="section-title-unpaid">❌ Unpaid Members ({{ current_month }})
+        <h2 class="section-title-unpaid"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Unpaid Members ({{
+            current_month }})
         </h2>
         {% if unpaid %}
         <div class="table-wrap">
@@ -871,7 +880,8 @@
                                 class="member-link member-link-unpaid">{{
                                 member.name }}</a></td>
                         <td>{{ member.phone }}</td>
-                        <td><span class="badge-enhanced badge-unpaid">❌ Unpaid</span></td>
+                        <td><span class="badge-enhanced badge-unpaid"><i class="fa-solid fa-circle-xmark"
+                                    aria-hidden="true"></i> Unpaid</span></td>
                         <td>
                             <a href="{{ url_for('member_details', member_id=member.id) }}"
                                 class="btn btn-sm icon-action" aria-label="View {{ member.name }} details"
@@ -891,7 +901,7 @@
             </table>
         </div>
         {% else %}
-        <p class="empty-state">All members have paid! 🎉</p>
+        <p class="empty-state">All members have paid!</p>
         {% endif %}
     </div>
 </div>

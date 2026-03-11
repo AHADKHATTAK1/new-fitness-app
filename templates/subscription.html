@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Subscription Required - Gym Manager{% endblock %}
+{% block title %}Subscription Required - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -179,7 +179,7 @@
 <div class="subscription-wrap">
     <div class="card subscription-card">
         <div class="subscription-header">
-            <div class="lock-icon">🔒</div>
+            <div class="lock-icon"><i class="fa-solid fa-lock" aria-hidden="true"></i></div>
             <h1 class="subscription-title">
                 Subscription Required</h1>
             <p class="subscription-note">Your 3-day free trial has ended. Please choose a payment option to continue.
@@ -236,7 +236,7 @@
                 <input type="hidden" name="provider" value="stripe">
                 <input type="hidden" name="plan" value="monthly_us">
                 <button type="submit" class="btn btn-success pay-btn">
-                    <span>Pay Monthly ($60) 💳</span>
+                    <span>Pay Monthly ($60) <i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
                 </button>
             </form>
 
@@ -244,7 +244,7 @@
                 <input type="hidden" name="provider" value="stripe">
                 <input type="hidden" name="plan" value="mini_monthly_us">
                 <button type="submit" class="btn btn-primary pay-btn">
-                    <span>Mini Plan - 1 Month ($6) 💎</span>
+                    <span>Mini Plan - 1 Month ($6) <i class="fa-solid fa-gem" aria-hidden="true"></i></span>
                 </button>
             </form>
 

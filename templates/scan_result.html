@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Scan Result - Gym Manager{% endblock %}
+{% block title %}Scan Result - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -189,13 +189,13 @@
 
     {% if status == 'GRANTED' %}
     <div class="scan-status-box scan-status-granted">
-        <div class="scan-status-icon">✅</div>
+        <div class="scan-status-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
         <h1 class="scan-status-title">ACCESS GRANTED</h1>
         <p class="scan-status-subtitle">Paid for {{ month }}</p>
     </div>
     {% elif status == 'TRIAL' %}
     <div class="scan-status-box scan-status-trial">
-        <div class="scan-status-icon">⏳</div>
+        <div class="scan-status-icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></div>
         <h1 class="scan-status-title">TRIAL ACCESS</h1>
         <p class="scan-status-subtitle">Trial Active</p>
     </div>
@@ -230,9 +230,9 @@
                 <div class="scan-payment-label">{{ month }} Payment</div>
                 <div class="scan-payment-status">
                     {% if is_paid %}
-                    ✅ PAID
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i> PAID
                     {% else %}
-                    ❌ NOT PAID
+                    <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NOT PAID
                     {% endif %}
                 </div>
                 {% if last_payment %}
@@ -246,15 +246,15 @@
             <div class="scan-actions">
                 {% if status == 'DENIED' %}
                 <a href="{{ url_for('member_details', member_id=member.id) }}" class="btn btn-success scan-collect-btn">
-                    💰 Collect Payment
+                    <i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Collect Payment
                 </a>
                 {% endif %}
 
                 <a href="{{ url_for('scanner') }}" class="btn btn-secondary">
-                    📷 Scan Next
+                    <i class="fa-solid fa-camera" aria-hidden="true"></i> Scan Next
                 </a>
                 <a href="{{ url_for('dashboard') }}" class="btn">
-                    🏠 Dashboard
+                    <i class="fa-solid fa-house" aria-hidden="true"></i> Dashboard
                 </a>
             </div>
         </div>
@@ -262,7 +262,7 @@
         <!-- Attendance History -->
         {% if attendance_history %}
         <div class="card scan-history-card">
-            <h3 class="scan-history-title">📊 Recent Visits</h3>
+            <h3 class="scan-history-title"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Recent Visits</h3>
             <div class="scan-history-table-wrap">
                 <table>
                     <thead>

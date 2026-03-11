@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: fitnessmanagement
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: APP_VERBOSE_STARTUP
+        value: "0"
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: STRIPE_PUBLIC_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SMTP_SERVER
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_EMAIL
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: COMPANY_NAME
+        sync: false
+      - key: COMPANY_TAGLINE
+        sync: false
+      - key: COMPANY_PHONE
+        sync: false
+      - key: COMPANY_EMAIL
+        sync: false
+      - key: COMPANY_ADDRESS
+        sync: false
+      - key: COMPANY_WEBSITE
+        sync: false

@@ -9,25 +9,28 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Gym Manager">
+    <meta name="apple-mobile-web-app-title" content="fitnessmanagement">
     <link rel="manifest" href="/static/manifest.webmanifest">
-    <title>{% block title %}Gym Manager{% endblock %}</title>
+    <title>{% block title %}fitnessmanagement{% endblock %}</title>
     <meta name="description"
-        content="{% block meta_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}">
+        content="{% block meta_description %}fitnessmanagement SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}">
     <meta property="og:type" content="website">
     <meta property="og:title"
-        content="{% block og_title %}{% block meta_title %}Gym Manager{% endblock %}{% endblock %}">
+        content="{% block og_title %}{% block meta_title %}fitnessmanagement{% endblock %}{% endblock %}">
     <meta property="og:description"
-        content="{% block og_description %}{% block meta_og_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
-    <meta property="og:site_name" content="Gym Manager">
+        content="{% block og_description %}{% block meta_og_description %}fitnessmanagement SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
+    <meta property="og:site_name" content="fitnessmanagement">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title"
-        content="{% block twitter_title %}{% block meta_twitter_title %}Gym Manager{% endblock %}{% endblock %}">
+        content="{% block twitter_title %}{% block meta_twitter_title %}fitnessmanagement{% endblock %}{% endblock %}">
     <meta name="twitter:description"
-        content="{% block twitter_description %}{% block meta_twitter_description %}Gym Manager SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
+        content="{% block twitter_description %}{% block meta_twitter_description %}fitnessmanagement SaaS for member lifecycle, fee tracking, subscriptions, reports, and automation.{% endblock %}{% endblock %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWix+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8R4g8F6f4U7Wv8p4YfRvH+8abtTE1kg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/loading.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
@@ -486,53 +489,54 @@
                     <div id="moreDropdown" class="more-dropdown">
                         {% if subscription_active %}
                         <a href="{{ url_for('expenses') }}" class="more-dropdown-link">
-                            💸 Expenses
+                            <i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Expenses
                         </a>
                         <a href="{{ url_for('scanner') }}" class="more-dropdown-link border-top">
-                            📷 Scanner
+                            <i class="fa-solid fa-camera" aria-hidden="true"></i> Scanner
                         </a>
                         <a href="{{ url_for('bulk_import') }}" class="more-dropdown-link border-top">
-                            📥 Bulk Import
+                            <i class="fa-solid fa-file-import" aria-hidden="true"></i> Bulk Import
                         </a>
                         <a href="{{ url_for('schedule') }}" class="more-dropdown-link border-top">
-                            📅 Schedule
+                            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Schedule
                         </a>
                         <a href="{{ url_for('reports') }}" class="more-dropdown-link border-top">
-                            📊 Reports
+                            <i class="fa-solid fa-chart-line" aria-hidden="true"></i> Reports
                         </a>
                         {% endif %}
                         {% if feature_access.bulk_operations %}
                         <a href="{{ url_for('bulk_operations') }}" class="more-dropdown-link border-top">
-                            ⚡ Bulk Operations
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Bulk Operations
                         </a>
                         {% endif %}
                         {% if feature_access.advanced_analytics %}
                         <a href="{{ url_for('advanced_analytics') }}" class="more-dropdown-link border-top">
-                            🧠 AI Analytics
+                            <i class="fa-solid fa-brain" aria-hidden="true"></i> AI Analytics
                         </a>
                         {% endif %}
                         {% if feature_access.webhooks %}
                         <a href="{{ url_for('webhooks') }}" class="more-dropdown-link border-top">
-                            🔗 Webhooks
+                            <i class="fa-solid fa-link" aria-hidden="true"></i> Webhooks
                         </a>
                         {% endif %}
                         <a href="{{ url_for('subscription_plans') }}" class="more-dropdown-link border-top">
-                            💎 Subscription Plans
+                            <i class="fa-solid fa-gem" aria-hidden="true"></i> Subscription Plans
                         </a>
                         <a href="{{ url_for('settings') }}" class="more-dropdown-link border-top">
-                            ⚙️ Settings
+                            <i class="fa-solid fa-gear" aria-hidden="true"></i> Settings
                         </a>
                     </div>
                 </div>
 
                 <!-- Plan Badge -->
                 {% if subscription_active %}
-                <span class="badge plan-badge-premium">💎 {% if user_plan == 'vip' %}VIP Access{% else %}{{
+                <span class="badge plan-badge-premium"><i class="fa-solid fa-gem" aria-hidden="true"></i> {% if
+                    user_plan == 'vip' %}VIP Access{% else %}{{
                     user_plan|replace('_', ' ')|title }}{% endif %}</span>
                 {% else %}
                 <span class="badge plan-badge-unpaid"
                     onclick="window.location.href='{{ url_for('subscription_plans') }}'">
-                    ⚠️ Upgrade Required
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Upgrade Required
                 </span>
                 {% endif %}
 

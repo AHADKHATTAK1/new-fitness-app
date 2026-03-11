@@ -457,7 +457,7 @@ class AutomationManager:
             </div>
             
             <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px;">
-                This is an automated report from your Gym Manager system.
+                This is an automated report from your fitnessmanagement system.
             </p>
         </body>
         </html>

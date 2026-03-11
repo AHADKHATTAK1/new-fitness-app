@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}💎 Subscription Plans{% endblock %}
+{% block title %}Subscription Plans{% endblock %}
 
 {% block content %}
 <style>
@@ -49,7 +49,7 @@
     }
 
     .tier-card.featured::before {
-        content: "⭐ MOST POPULAR";
+        content: "MOST POPULAR";
         position: absolute;
         top: 20px;
         right: -35px;
@@ -312,7 +312,7 @@
     {% if current_user %}
     <div class="current-plan-card">
         <h1 class="current-plan-title">
-            <span>💎</span> My Current Subscription
+            <span><i class="fa-solid fa-gem" aria-hidden="true"></i></span> My Current Subscription
         </h1>
 
         <div class="current-plan-grid">
@@ -320,9 +320,9 @@
                 <div class="current-plan-label">Status</div>
                 <div class="current-plan-value current-plan-status">
                     {% if subscription_active %}
-                    <span>✅</span> Active
+                    <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span> Active
                     {% else %}
-                    <span>⚠️</span> Inactive
+                    <span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span> Inactive
                     {% endif %}
                 </div>
             </div>
@@ -351,7 +351,7 @@
     {% if payment_market != 'PK' %}
     <!-- All Available Plans -->
     <h2 class="plans-heading">
-        Choose Your Perfect Plan 🚀
+        Choose Your Perfect Plan
     </h2>
     <p class="plans-subheading">
         Flexible pricing for gyms of all sizes. Upgrade or downgrade anytime.
@@ -365,7 +365,7 @@
     <div class="tier-grid">
         <!-- MINI PLAN -->
         <div class="tier-card" data-tier="mini">
-            <span class="tier-icon">✨</span>
+            <span class="tier-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
             <div class="tier-name">Mini</div>
             <div class="tier-price">$6<span>/month</span></div>
             <div class="tier-period">Quick starter plan</div>
@@ -373,15 +373,15 @@
 
             <div class="tier-limits">
                 <div class="limit-item">
-                    <span class="limit-icon">⚡</span>
+                    <span class="limit-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
                     <span>Fast Activation</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">📅</span>
+                    <span class="limit-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
                     <span>Valid for 30 Days</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">💳</span>
+                    <span class="limit-icon"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
                     <span>Stripe Card Payment</span>
                 </div>
             </div>
@@ -404,7 +404,7 @@
 
         <!-- STARTER -->
         <div class="tier-card" data-tier="starter">
-            <span class="tier-icon">⚡</span>
+            <span class="tier-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
             <div class="tier-name">Starter</div>
             <div class="tier-price">$19<span>/month</span></div>
             <div class="tier-period">Billed monthly</div>
@@ -412,15 +412,15 @@
 
             <div class="tier-limits">
                 <div class="limit-item">
-                    <span class="limit-icon">🏢</span>
+                    <span class="limit-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
                     <span>1 Gym Location</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">👥</span>
+                    <span class="limit-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
                     <span>Up to 250 Members</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">👨‍💼</span>
+                    <span class="limit-icon"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></span>
                     <span>2 Staff Accounts</span>
                 </div>
             </div>
@@ -451,7 +451,7 @@
 
         <!-- PROFESSIONAL (FEATURED) -->
         <div class="tier-card featured" data-tier="professional">
-            <span class="tier-icon">💎</span>
+            <span class="tier-icon"><i class="fa-solid fa-gem" aria-hidden="true"></i></span>
             <div class="tier-name">Professional</div>
             <div class="tier-price">$49<span>/month</span></div>
             <div class="tier-period">Billed monthly</div>
@@ -459,15 +459,15 @@
 
             <div class="tier-limits">
                 <div class="limit-item">
-                    <span class="limit-icon">🏢</span>
+                    <span class="limit-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
                     <span>5 Gym Locations</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">👥</span>
+                    <span class="limit-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
                     <span>Up to 1,000 Members</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">👨‍💼</span>
+                    <span class="limit-icon"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></span>
                     <span>10 Staff Accounts</span>
                 </div>
             </div>
@@ -498,7 +498,7 @@
 
         <!-- ENTERPRISE -->
         <div class="tier-card" data-tier="enterprise">
-            <span class="tier-icon">🏆</span>
+            <span class="tier-icon"><i class="fa-solid fa-trophy" aria-hidden="true"></i></span>
             <div class="tier-name">Enterprise</div>
             <div class="tier-price">$129<span>/month</span></div>
             <div class="tier-period">Billed monthly</div>
@@ -545,7 +545,7 @@
 
         <!-- ENTERPRISE+ -->
         <div class="tier-card" data-tier="enterprise_plus">
-            <span class="tier-icon">👑</span>
+            <span class="tier-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
             <div class="tier-name">Enterprise+</div>
             <div class="tier-price">$299<span>/month</span></div>
             <div class="tier-period">Billed monthly</div>
@@ -553,15 +553,15 @@
 
             <div class="tier-limits">
                 <div class="limit-item">
-                    <span class="limit-icon">♾️</span>
+                    <span class="limit-icon"><i class="fa-solid fa-infinity" aria-hidden="true"></i></span>
                     <span>Everything Unlimited</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">🌐</span>
+                    <span class="limit-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
                     <span>Multi-Region Deploy</span>
                 </div>
                 <div class="limit-item">
-                    <span class="limit-icon">🔧</span>
+                    <span class="limit-icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></span>
                     <span>Custom Development</span>
                 </div>
             </div>
@@ -597,7 +597,7 @@
     <!-- Pakistan Plans -->
     <div class="pk-section">
         <h3 class="pk-title">
-            🇵🇰 Pakistan Special Pricing
+            <i class="fa-solid fa-location-dot" aria-hidden="true"></i> Pakistan Special Pricing
         </h3>
         <p class="pk-subtitle">
             Pay easily with JazzCash or EasyPaisa
@@ -606,18 +606,18 @@
         <div class="tier-grid pk-tier-grid">
             <!-- PAKISTAN STARTER -->
             <div class="tier-card">
-                <span class="tier-icon">📱</span>
+                <span class="tier-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
                 <div class="tier-name">Starter PK</div>
                 <div class="tier-price">Rs 2,500<span>/month</span></div>
                 <div class="tier-period">JazzCash / EasyPaisa</div>
 
                 <div class="tier-limits">
                     <div class="limit-item">
-                        <span class="limit-icon">👥</span>
+                        <span class="limit-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
                         <span>Up to 250 Members</span>
                     </div>
                     <div class="limit-item">
-                        <span class="limit-icon">✓</span>
+                        <span class="limit-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
                         <span>All Basic Features</span>
                     </div>
                 </div>
@@ -633,18 +633,18 @@
 
             <!-- PAKISTAN PROFESSIONAL -->
             <div class="tier-card">
-                <span class="tier-icon">💚</span>
+                <span class="tier-icon"><i class="fa-solid fa-gem" aria-hidden="true"></i></span>
                 <div class="tier-name">Professional PK</div>
                 <div class="tier-price">Rs 7,000<span>/month</span></div>
                 <div class="tier-period">JazzCash / EasyPaisa</div>
 
                 <div class="tier-limits">
                     <div class="limit-item">
-                        <span class="limit-icon">👥</span>
+                        <span class="limit-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
                         <span>Up to 1,000 Members</span>
                     </div>
                     <div class="limit-item">
-                        <span class="limit-icon">✓</span>
+                        <span class="limit-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
                         <span>All Pro Features</span>
                     </div>
                 </div>

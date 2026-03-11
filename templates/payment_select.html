@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Select Payment Method - Gym Manager{% endblock %}
+{% block title %}Select Payment Method - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -78,11 +78,11 @@
         <!-- Option A: Stripe (Auto) -->
         <div class="card payment-option payment-option-clickable"
             onclick="document.getElementById('stripe-form').submit()">
-            <div class="payment-icon">💳</div>
+            <div class="payment-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></div>
             <h2 class="payment-title-card primary">Credit / Debit Card</h2>
             <p class="payment-desc">
                 International Payment via Stripe.<br>
-                <strong>Instant Activation</strong> ✅
+                <strong>Instant Activation</strong> <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
             </p>
             <div class="payment-price">$60.00</div>
 
@@ -94,11 +94,11 @@
         <!-- Option B: Manual (Pakistan) -->
         <a href="{{ url_for('manual_payment') }}" class="manual-link">
             <div class="card payment-option payment-option-full">
-                <div class="payment-icon">🏦</div>
+                <div class="payment-icon"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></div>
                 <h2 class="payment-title-card success">JazzCash / Bank</h2>
                 <p class="payment-desc">
                     Local Transfer in Pakistan.<br>
-                    <strong>Manual Approval (1-24h)</strong> 🕒
+                    <strong>Manual Approval (1-24h)</strong> <i class="fa-regular fa-clock" aria-hidden="true"></i>
                 </p>
                 <div class="payment-price">Rs. 2000</div>
                 <!-- Django code mentioned 2000 PKR -->

@@ -40,7 +40,7 @@ except Exception as scheduler_import_error:
 load_dotenv()
 
 print("=" * 80)
-print("🚀 STARTING GYM MANAGER APPLICATION")
+print("🚀 STARTING FITNESSMANAGEMENT APPLICATION")
 print("=" * 80)
 
 # Initialize database tables on startup
@@ -203,13 +203,21 @@ def get_gym():
 def _get_company_details():
     """Company profile values for public landing page."""
     return {
-        'name': os.getenv('COMPANY_NAME', 'Gym Manager Pro'),
-        'tagline': os.getenv('COMPANY_TAGLINE', 'Professional SaaS solutions for gyms and fitness studios'),
+        'name': os.getenv('COMPANY_NAME', 'fitnessmanagement'),
+        'tagline': os.getenv('COMPANY_TAGLINE', 'Modern SaaS platform for gyms and fitness studios'),
         'phone': os.getenv('COMPANY_PHONE', '+92-300-0000000'),
-        'email': os.getenv('COMPANY_EMAIL', 'support@gymmanagerpro.com'),
+        'email': os.getenv('COMPANY_EMAIL', 'support@fitnessmanagement.com'),
         'address': os.getenv('COMPANY_ADDRESS', 'Main Boulevard, Lahore, Pakistan'),
-        'website': os.getenv('COMPANY_WEBSITE', 'https://gymmanagerpro.com')
+        'website': os.getenv('COMPANY_WEBSITE', 'https://fitnessmanagement.com')
     }
+
+
+def _get_public_base_url():
+    """Public app URL used for SEO links (override in production)."""
+    configured = (os.getenv('PUBLIC_BASE_URL') or '').strip()
+    if configured:
+        return configured.rstrip('/')
+    return 'http://localhost:5000'
 
 
 def _get_month_floor(gym, default_year=1970):
@@ -458,7 +466,7 @@ def _parse_excel_backup_to_legacy(file_obj):
             'description': _as_text(_first_non_empty(row, ['description', 'note', 'notes'], ''), '')
         })
 
-    gym_details = {'name': 'Gym Manager', 'logo': None, 'currency': '$'}
+    gym_details = {'name': 'fitnessmanagement', 'logo': None, 'currency': '$'}
     for row in info_rows:
         key = str(row.get('key') or '').strip().lower()
         value = row.get('value')
@@ -630,7 +638,7 @@ def inject_gym_details():
         if 'currency' not in details: details['currency'] = '$'
         context['gym_details'] = details
     else:
-        context['gym_details'] = {'name': 'Gym Manager', 'logo': None, 'currency': '$'}
+        context['gym_details'] = {'name': 'fitnessmanagement', 'logo': None, 'currency': '$'}
         
     # Initialize with no access for anonymous users
     context['user_plan'] = 'starter'
@@ -742,6 +750,7 @@ def check_subscription():
         'static', 'subscription', 'subscription_plans', 'upgrade_tier', 'upgrade_success',
         'activate_trial', 'create_checkout_session', 'payment_success', 'payment_cancel',
         'stripe_webhook', 'initiate_payment', 'payment_callback', 'fix_database_schema', 'healthz',
+        'robots_txt', 'sitemap_xml',
         'super_admin', 'approve_payment'
     }
 
@@ -1078,7 +1087,7 @@ def create_checkout_session():
                 'price_data': {
                     'currency': 'usd',
                     'product_data': {
-                        'name': 'Gym Manager Pro Subscription',
+                        'name': 'fitnessmanagement Subscription',
                         'images': ['https://i.imgur.com/EHyR2nP.png'],
                     },
                     'unit_amount': 6000, # $60.00
@@ -1397,6 +1406,49 @@ def index():
         return redirect(url_for('dashboard'))
     return render_template('landing.html', company_details=_get_company_details())
 
+
+@app.route('/robots.txt')
+def robots_txt():
+    """Allow indexing for public pages and block private app pages."""
+    base_url = _get_public_base_url()
+    robots_content = "\n".join([
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /dashboard',
+        'Disallow: /settings',
+        'Disallow: /reports',
+        'Disallow: /fees',
+        'Disallow: /member',
+        f'Sitemap: {base_url}/sitemap.xml'
+    ])
+    return app.response_class(robots_content, mimetype='text/plain')
+
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    """Basic sitemap for public marketing and auth pages."""
+    base_url = _get_public_base_url()
+    today = datetime.utcnow().date().isoformat()
+    urls = [
+        (f'{base_url}/', 'daily', '1.0'),
+        (f'{base_url}/auth', 'weekly', '0.8'),
+        (f'{base_url}/subscription_plans', 'weekly', '0.7'),
+    ]
+
+    url_nodes = []
+    for loc, changefreq, priority in urls:
+        url_nodes.append(
+            f'<url><loc>{loc}</loc><lastmod>{today}</lastmod><changefreq>{changefreq}</changefreq><priority>{priority}</priority></url>'
+        )
+
+    sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + ''.join(url_nodes) +
+        '</urlset>'
+    )
+    return app.response_class(sitemap, mimetype='application/xml')
+
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():
     if request.method == 'POST':
@@ -1550,7 +1602,13 @@ def forgot_password():
             email_sender = EmailSender()
             
             if email_sender.is_configured():
-                email_sender.send_reset_code(email, reset_code, email)
+                email_sender.send_auto_code_email(
+                    to_email=email,
+                    code=reset_code,
+                    purpose='Password Reset',
+                    username=email,
+                    expires_minutes=15
+                )
                 flash(f'Reset code sent to {email}! Check your email.', 'success')
             else:
                 # Email not configured - show code on screen (dev mode)
@@ -1594,7 +1652,7 @@ def reset_password():
         # Verify code
         if auth_manager.verify_reset_code(email, code):
             # Reset password
-            if auth_manager.reset_password(email, new_password):
+            if auth_manager.update_password(email, new_password):
                 # Send confirmation email
                 from email_utils import EmailSender
                 email_sender = EmailSender()
@@ -3175,7 +3233,7 @@ def download_backup_excel():
 
     gym_details = payload.get('gym_details') or {}
     if gym_details:
-        ws_info.append(['gym_name', str(gym_details.get('name', 'Gym Manager'))])
+        ws_info.append(['gym_name', str(gym_details.get('name', 'fitnessmanagement'))])
         ws_info.append(['currency', str(gym_details.get('currency', '$'))])
 
     ws_members = wb.create_sheet('members')
@@ -3257,7 +3315,7 @@ def download_backup_template_excel():
     ws_info = wb.active
     ws_info.title = 'backup_info'
     ws_info.append(['key', 'value'])
-    ws_info.append(['gym_name', gym.get_gym_details().get('name', 'Gym Manager')])
+    ws_info.append(['gym_name', gym.get_gym_details().get('name', 'fitnessmanagement')])
     ws_info.append(['currency', gym.get_gym_details().get('currency', '$')])
     ws_info.append(['generated_at', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')])
 
@@ -3557,10 +3615,10 @@ def download_template():
     ws = wb.active
     ws.title = "Members"
     
-    # Headers
+    # Headers (client-friendly aliases are supported by importer)
     headers = [
-        'Name', 'Phone', 'Email', 'Membership Type', 'Joined Date',
-        'Status', 'Paid Month', 'Amount', 'Paid Months', 'Amounts'
+        'Client Name', 'Client Contact Number', 'Client Email', 'Membership Type', 'Gym Admission Date',
+        'Fee Status', 'Payment Amount', 'Fee Pending Date', 'Paid Months', 'Payment Amounts', 'Remarks'
     ]
     
     # Style for headers
@@ -3576,11 +3634,10 @@ def download_template():
         cell.alignment = center_align
     
     # Sample Data (with Payment Example)
-    current_month = datetime.now().strftime('%Y-%m')
     sample_data = [
-        ['John Doe', '03001234567', 'john@example.com', 'Gym', '2025-01-01', 'Paid', current_month, 2500, '', ''],
-        ['Jane Smith', '03117654321', 'jane@example.com', 'Gym + Cardio', '2025-01-05', 'Unpaid', '', '', '', ''],
-        ['Ahmed Ali', '03009876543', 'ahmed@example.com', 'Gym', '2025-01-10', 'Paid', '', '', '2024-11,2024-12,2025-01', '2500,2500,3000']
+        ['John Doe', '03001234567', 'john@example.com', 'Gym', '2025-01-01', 'Paid', 2500, '2025-01-01', '', '', 'Paid on joining'],
+        ['Jane Smith', '03117654321', 'jane@example.com', 'Gym + Cardio', '2025-01-05', 'Unpaid', '', '2025-02-05', '', '', 'Pending first fee'],
+        ['Ahmed Ali', '03009876543', 'ahmed@example.com', 'Gym', '2025-01-10', 'Paid', '', '', '2024-11,2024-12,2025-01', '2500,2500,3000', 'Historical payments']
     ]
     
     for row_num, row_data in enumerate(sample_data, 2):
@@ -3588,7 +3645,7 @@ def download_template():
             ws.cell(row=row_num, column=col_num).value = cell_value
     
     # Adjust column widths
-    column_widths = [20, 15, 25, 20, 15, 12, 12, 10, 24, 18]
+    column_widths = [20, 22, 25, 20, 18, 12, 14, 16, 24, 20, 22]
     for i, width in enumerate(column_widths, 1):
         ws.column_dimensions[chr(64 + i)].width = width
     
@@ -3806,13 +3863,13 @@ def chatbot_api():
         
         # Get gym details for personalized responses
         username = session.get('username')
-        gym_name = "Gym Manager"
+        gym_name = "fitnessmanagement"
         
         if username:
             try:
                 gym_manager = GymManager(username)
                 gym_details = gym_manager.get_gym_details()
-                gym_name = gym_details.get('name', 'Gym Manager')
+                gym_name = gym_details.get('name', 'fitnessmanagement')
             except:
                 pass
         

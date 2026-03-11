@@ -1,4 +1,4 @@
-# Fitness Management (Gym Manager)
+# fitnessmanagement
 
 A Flask-based gym management system with member management, fee tracking, imports/exports, analytics, subscriptions, payments, webhooks, and automation workflows.
 
@@ -152,6 +152,46 @@ ADMIN_EMAILS=admin@gym.com
 - Verify core routes after deploy:
 	- `/auth`, `/dashboard`, `/settings`, `/subscription_plans`, `/webhooks`, `/healthz`
 
+## Deploy on Render (recommended)
+
+If you are using Netlify, keep Netlify for static frontend only. This Flask app backend should run on Render.
+
+1) Push latest code to GitHub (including `Procfile` and `render.yaml`).
+
+2) In Render dashboard:
+
+- New + → **Blueprint**
+- Select your GitHub repo
+- Render detects `render.yaml` and creates web service
+
+3) Set required Environment Variables in Render:
+
+- `FLASK_SECRET_KEY`
+- `DATABASE_URL` (Render Postgres or your external Postgres)
+- `PUBLIC_BASE_URL` (your final public domain)
+- `STRIPE_PUBLIC_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `SMTP_SERVER`, `SMTP_PORT`, `SMTP_EMAIL`, `SMTP_PASSWORD`
+- `COMPANY_NAME`, `COMPANY_TAGLINE`, `COMPANY_PHONE`, `COMPANY_EMAIL`, `COMPANY_ADDRESS`, `COMPANY_WEBSITE`
+
+4) Keep these production settings:
+
+- `SESSION_COOKIE_SECURE=1`
+- `APP_VERBOSE_STARTUP=0`
+
+5) After deploy, verify:
+
+- `/healthz` returns `200`
+- `/robots.txt` opens publicly
+- `/sitemap.xml` opens publicly
+
+6) Stripe webhook setup:
+
+- In Stripe Dashboard → Webhooks → Add endpoint
+- Endpoint URL: `https://your-domain.com/stripe/webhook`
+- Copy signing secret (`whsec_...`) into `STRIPE_WEBHOOK_SECRET`
+
 ## Uptime monitor commands
 
 Use your deployed base URL in place of `https://your-domain.com`.
@@ -169,6 +209,38 @@ curl -sS https://your-domain.com/healthz
 ```
 
 Note: local VS Code task output may show `exit code: 1` after stopping/restarting the task terminal; startup is healthy when you see `Running on http://127.0.0.1:5000`.
+
+## Google indexing checklist (after live deploy)
+
+Search engines only index your public deployed domain, not localhost.
+
+1) Set your real domain in `.env`:
+
+```env
+PUBLIC_BASE_URL=https://your-domain.com
+```
+
+2) Verify these URLs are publicly accessible:
+
+- `https://your-domain.com/`
+- `https://your-domain.com/robots.txt`
+- `https://your-domain.com/sitemap.xml`
+
+3) Open Google Search Console:
+
+- Add property for your domain
+- Verify ownership (DNS recommended)
+- Submit sitemap URL: `https://your-domain.com/sitemap.xml`
+
+4) Request indexing for key pages:
+
+- `/`
+- `/auth`
+- `/subscription_plans`
+
+5) Keep private app pages protected (already enforced):
+
+- Dashboard/settings/reports are login-protected and not intended as public landing pages.
 
 ## Reproducible setup
 

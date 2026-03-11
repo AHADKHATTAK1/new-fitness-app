@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Expense Tracking - Gym Manager{% endblock %}
+{% block title %}Expense Tracking - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -134,26 +134,27 @@
 
 <div class="expenses-header">
     <h1 class="expenses-title">
-        💼 Expense Tracking & P&L
+        <i class="fa-solid fa-briefcase" aria-hidden="true"></i> Expense Tracking & P&L
     </h1>
     <p class="expenses-subtitle">Track expenses and calculate profit</p>
 </div>
 
 <!-- P&L Overview Card -->
 <div class="card pl-card">
-    <h2 class="section-title">📊 Monthly P&L - {{ current_month }}</h2>
+    <h2 class="section-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Monthly P&L - {{ current_month
+        }}</h2>
 
     <div class="pl-grid">
         <!-- Revenue -->
         <div class="pl-box pl-box-revenue">
-            <div class="pl-label">💰 Revenue</div>
+            <div class="pl-label"><i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i> Revenue</div>
             <div class="pl-value">{{ gym_details.currency or '$' }}{{ pl_data.revenue }}
             </div>
         </div>
 
         <!-- Expenses -->
         <div class="pl-box pl-box-expense">
-            <div class="pl-label">💸 Expenses</div>
+            <div class="pl-label"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Expenses</div>
             <div class="pl-value">{{ gym_details.currency or '$' }}{{ pl_data.expenses }}
             </div>
         </div>
@@ -161,7 +162,8 @@
         <!-- Net Profit -->
         <div class="pl-box {% if pl_data.net_profit >= 0 %}pl-box-profit{% else %}pl-box-loss{% endif %}">
             <div class="pl-label">
-                {% if pl_data.net_profit >= 0 %}📈 Net Profit{% else %}📉 Net Loss{% endif %}
+                {% if pl_data.net_profit >= 0 %}<i class="fa-solid fa-chart-line" aria-hidden="true"></i> Net Profit{%
+                else %}<i class="fa-solid fa-chart-line-down" aria-hidden="true"></i> Net Loss{% endif %}
             </div>
             <div class="pl-value">{{ gym_details.currency or '$' }}{{ pl_data.net_profit }}
             </div>
@@ -172,20 +174,20 @@
 
 <!-- Add Expense Form -->
 <div class="card expense-form-card">
-    <h2 class="section-title">➕ Add Expense</h2>
+    <h2 class="section-title"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Expense</h2>
     <form method="POST">
         <div class="expense-form-grid">
             <div class="form-group">
                 <label for="category">Category *</label>
                 <select id="category" name="category" required class="expense-input">
                     <option value="">-- Select Category --</option>
-                    <option value="Rent">🏢 Rent</option>
-                    <option value="Utilities">💡 Utilities (Electric, Water)</option>
-                    <option value="Equipment">🏋️ Equipment</option>
-                    <option value="Salaries">💼 Salaries</option>
-                    <option value="Maintenance">🔧 Maintenance</option>
-                    <option value="Marketing">📢 Marketing</option>
-                    <option value="Other">📝 Other</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Utilities">Utilities (Electric, Water)</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Salaries">Salaries</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
 
@@ -208,14 +210,15 @@
         </div>
 
         <button type="submit" class="btn btn-success expense-submit">
-            💾 Save Expense
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Expense
         </button>
     </form>
 </div>
 
 <!-- Expense History -->
 <div class="card">
-    <h2 class="section-title">📜 Expense History - {{ current_month }}</h2>
+    <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Expense History - {{
+        current_month }}</h2>
 
     {% if expenses %}
     <table>
@@ -242,7 +245,7 @@
                         class="expense-delete-form">
                         <button type="submit" class="btn btn-secondary expense-delete-btn"
                             onclick="return confirm('Delete this expense?')">
-                            🗑️ Delete
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete
                         </button>
                     </form>
                 </td>

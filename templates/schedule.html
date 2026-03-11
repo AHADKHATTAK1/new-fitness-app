@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Class Schedule - Gym Manager{% endblock %}
+{% block title %}Class Schedule - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -129,7 +129,7 @@
         Weekly Schedule
     </h1>
     <button onclick="document.getElementById('addClassModal').style.display='block'" class="btn">
-        + Add Class
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Class
     </button>
 </div>
 
@@ -143,9 +143,10 @@
 
         <h2 class="schedule-class-name">{{ cls.name }}</h2>
         <div class="schedule-class-meta">
-            <div>🕒 {{ cls.time }}</div>
-            <div>👤 {{ cls.instructor }}</div>
-            <div>👥 {{ cls.attendees|length }} / {{ cls.capacity }} filled</div>
+            <div><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ cls.time }}</div>
+            <div><i class="fa-solid fa-user" aria-hidden="true"></i> {{ cls.instructor }}</div>
+            <div><i class="fa-solid fa-users" aria-hidden="true"></i> {{ cls.attendees|length }} / {{ cls.capacity }}
+                filled</div>
         </div>
 
         <!-- Booking Form -->

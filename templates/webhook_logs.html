@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Webhook Logs - Gym Manager{% endblock %}
+{% block title %}Webhook Logs - fitnessmanagement{% endblock %}
 
 {% block content %}
 <div class="logs-container">
     <div class="logs-header">
-        <h1>📊 Webhook Delivery Logs</h1>
-        <a href="/webhooks" class="btn-secondary">← Back to Webhooks</a>
+        <h1><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Webhook Delivery Logs</h1>
+        <a href="/webhooks" class="btn-secondary"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to
+            Webhooks</a>
     </div>
 
     {% if logs %}
     <div class="logs-stats">
         <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <div class="stat-info">
                 <div class="stat-value">{{ logs|selectattr('success')|list|length }}</div>
                 <div class="stat-label">Successful</div>
@@ -20,7 +21,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">❌</div>
+            <div class="stat-icon"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></div>
             <div class="stat-info">
                 <div class="stat-value">{{ logs|rejectattr('success')|list|length }}</div>
                 <div class="stat-label">Failed</div>
@@ -28,7 +29,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">⏱️</div>
+            <div class="stat-icon"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>
             <div class="stat-info">
                 <div class="stat-value">
                     {% set avg_time = (logs|selectattr('response_time_ms')|map(attribute='response_time_ms')|sum /
@@ -116,7 +117,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-icon">📭</div>
+        <div class="empty-icon"><i class="fa-regular fa-envelope-open" aria-hidden="true"></i></div>
         <h3>No Delivery Logs Yet</h3>
         <p>Logs will appear here when this webhook is triggered</p>
     </div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Bulk Import - Gym Manager{% endblock %}
+{% block title %}Bulk Import - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -214,11 +214,15 @@
         border-radius: 6px;
         font-size: 0.85rem;
     }
+
+    .bulk-icon {
+        margin-right: 0.45rem;
+    }
 </style>
 
 <div class="bulk-import-header">
     <h1 class="bulk-import-title">
-        📊 Advanced Import Center
+        <i class="fa-solid fa-table-columns bulk-icon" aria-hidden="true"></i>Advanced Import Center
     </h1>
     <p class="bulk-import-subtitle">Upload Excel or CSV with validation, preview & smart
         duplicate handling</p>
@@ -226,18 +230,24 @@
 
 <!-- Instructions Card -->
 <div class="card bulk-card-instructions">
-    <h2 class="bulk-section-title">📋 How to Use</h2>
+    <h2 class="bulk-section-title"><i class="fa-solid fa-list-check bulk-icon" aria-hidden="true"></i>How to Use</h2>
 
     <ol class="bulk-instruction-list">
-        <li><strong>📥 Download Template</strong> - Get sample Excel with all required columns</li>
-        <li><strong>✍️ Fill Your Data</strong> - Add member details in the Excel file</li>
-        <li><strong>⬆️ Upload File</strong> - System validates data automatically</li>
-        <li><strong>👁️ Preview Results</strong> - Review validation, see duplicates, choose strategy</li>
-        <li><strong>✅ Confirm Import</strong> - Import only valid data with your chosen duplicate handling</li>
+        <li><strong><i class="fa-solid fa-download bulk-icon" aria-hidden="true"></i>Download Template</strong> - Get
+            sample Excel with all required columns</li>
+        <li><strong><i class="fa-solid fa-pen-to-square bulk-icon" aria-hidden="true"></i>Fill Your Data</strong> - Add
+            member details in the Excel file</li>
+        <li><strong><i class="fa-solid fa-upload bulk-icon" aria-hidden="true"></i>Upload File</strong> - System
+            validates data automatically</li>
+        <li><strong><i class="fa-solid fa-eye bulk-icon" aria-hidden="true"></i>Preview Results</strong> - Review
+            validation, see duplicates, choose strategy</li>
+        <li><strong><i class="fa-solid fa-circle-check bulk-icon" aria-hidden="true"></i>Confirm Import</strong> -
+            Import only valid data with your chosen duplicate handling</li>
     </ol>
 
     <div class="bulk-feature-box">
-        <strong class="bulk-feature-title">✨ New: Smart Import Features</strong>
+        <strong class="bulk-feature-title"><i class="fa-solid fa-wand-magic-sparkles bulk-icon"
+                aria-hidden="true"></i>New: Smart Import Features</strong>
         <ul class="bulk-feature-list">
             <li><strong>Auto-Validation:</strong> Required fields checked automatically</li>
             <li><strong>Duplicate Detection:</strong> Phone numbers matched against existing members</li>
@@ -249,32 +259,36 @@
     </div>
 
     <div class="bulk-required-box">
-        <strong class="bulk-required-title">📝 Required Fields:</strong>
+        <strong class="bulk-required-title"><i class="fa-solid fa-file-lines bulk-icon" aria-hidden="true"></i>Required
+            Fields:</strong>
         <ul class="bulk-required-list">
-            <li><strong>Name</strong> - Member's full name (minimum 2 characters)</li>
-            <li><strong>Phone</strong> - Unique phone number (10-15 digits)</li>
+            <li><strong>Name / Client Name</strong> - Member's full name (minimum 2 characters)</li>
+            <li><strong>Phone / Client Contact Number</strong> - Unique phone number (10-15 digits)</li>
         </ul>
         <div class="bulk-required-note">
-            <em>Email, Membership Type, and Dates are optional but recommended</em>
+            <em>Client-style headers are supported (Client Name, Client Contact Number, Gym Admission Date, Fee Status,
+                Payment Amount)</em>
         </div>
     </div>
 </div>
 
 <!-- Download Template Card -->
 <div class="card bulk-card-download">
-    <h2 class="bulk-download-title">📄 Step 1: Download Template</h2>
+    <h2 class="bulk-download-title"><i class="fa-solid fa-file-arrow-down bulk-icon" aria-hidden="true"></i>Step 1:
+        Download Template</h2>
     <p class="bulk-download-text">
         Download the sample Excel file with pre-filled headers and example data
     </p>
 
     <a href="{{ url_for('download_template') }}" class="btn btn-secondary bulk-download-btn">
-        📥 Download Excel Template
+        <i class="fa-solid fa-download bulk-icon" aria-hidden="true"></i>Download Excel Template
     </a>
 </div>
 
 <!-- Upload File Card -->
 <div class="card">
-    <h2 class="bulk-upload-title">📤 Step 2: Upload Your File</h2>
+    <h2 class="bulk-upload-title"><i class="fa-solid fa-file-import bulk-icon" aria-hidden="true"></i>Step 2: Upload
+        Your File</h2>
     <p class="bulk-upload-text">
         Select your completed Excel (.xlsx) or CSV (.csv) file
     </p>
@@ -295,35 +309,37 @@
 
         <div class="bulk-upload-actions">
             <button type="submit" class="btn btn-success bulk-action-btn">
-                ⬆️ Upload & Preview
+                <i class="fa-solid fa-upload bulk-icon" aria-hidden="true"></i>Upload & Preview
             </button>
             <a href="{{ url_for('dashboard') }}" class="btn bulk-action-btn">
-                ❌ Cancel
+                <i class="fa-solid fa-xmark bulk-icon" aria-hidden="true"></i>Cancel
             </a>
         </div>
 
         <div class="bulk-upload-note">
-            <em>✨ You'll see a preview before importing</em>
+            <em><i class="fa-solid fa-sparkles bulk-icon" aria-hidden="true"></i>You'll see a preview before
+                importing</em>
         </div>
     </form>
 </div>
 
 <!-- File Format Example -->
 <div class="card bulk-card-format">
-    <h3 class="bulk-format-title">📊 Expected File Format</h3>
+    <h3 class="bulk-format-title"><i class="fa-solid fa-table bulk-icon" aria-hidden="true"></i>Expected File Format
+    </h3>
 
     <div class="bulk-table-wrap">
         <table class="bulk-format-table">
             <thead>
                 <tr>
-                    <th>Name *</th>
-                    <th>Phone *</th>
-                    <th>Email</th>
+                    <th>Client Name *</th>
+                    <th>Client Contact Number *</th>
+                    <th>Client Email</th>
                     <th>Membership Type</th>
-                    <th>Joined Date</th>
-                    <th>Status</th>
-                    <th>Month</th>
-                    <th>Amount</th>
+                    <th>Gym Admission Date</th>
+                    <th>Fee Status</th>
+                    <th>Payment Amount</th>
+                    <th>Fee Pending Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -334,8 +350,8 @@
                     <td>Gym</td>
                     <td>2025-01-01</td>
                     <td><span class="bulk-status-paid">Paid</span></td>
-                    <td>2025-01</td>
                     <td>3000</td>
+                    <td>2025-01-01</td>
                 </tr>
                 <tr>
                     <td>Jane Smith</td>
@@ -344,18 +360,8 @@
                     <td>Gym + Cardio</td>
                     <td>2025-01-05</td>
                     <td><span class="bulk-status-unpaid">Unpaid</span></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>03009876543</td>
-                    <td>john@example.com</td>
-                    <td>Gym</td>
-                    <td>2025-01-10</td>
-                    <td><span class="bulk-status-paid">Paid</span></td>
-                    <td>2025-01</td>
-                    <td>2500</td>
+                    <td>2025-02-05</td>
+                    <td>2025-02-15</td>
                 </tr>
             </tbody>
         </table>
@@ -448,7 +454,7 @@
 
         const btn = this.querySelector('button[type="submit"]');
         btn.classList.add('is-loading');
-        btn.innerHTML = '⏳ Uploading & Validating...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin bulk-icon" aria-hidden="true"></i>Uploading & Validating...';
         btn.disabled = true;
     });
 </script>

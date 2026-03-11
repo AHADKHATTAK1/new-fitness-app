@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Analytics - Gym Manager{% endblock %}
+{% block title %}Analytics - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -269,22 +269,23 @@
 <div class="page-wrapper">
     <!-- Header -->
     <div class="analytics-header">
-        <h1 class="analytics-title">📊 Analytics Dashboard</h1>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+        <h1 class="analytics-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Analytics Dashboard</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"
+                aria-hidden="true"></i> Back to Dashboard</a>
     </div>
 
     <!-- Key Metrics Grid -->
     <div class="analytics-grid">
         <!-- Total Members -->
         <div class="card member-card-3d metric-card metric-card-primary">
-            <div class="metric-icon">👥</div>
+            <div class="metric-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
             <h3 class="metric-label metric-label-primary">Total Members</h3>
             <div class="metric-value metric-value-primary">{{ total_members }}</div>
         </div>
 
         <!-- Retention Rate -->
         <div class="card member-card-3d metric-card metric-card-secondary">
-            <div class="metric-icon">🔄</div>
+            <div class="metric-icon"><i class="fa-solid fa-rotate" aria-hidden="true"></i></div>
             <h3 class="metric-label metric-label-secondary">Retention Rate</h3>
             <div class="metric-value metric-value-secondary">{{ retention_rate }}%</div>
             <div class="metric-note">Members staying active</div>
@@ -292,7 +293,7 @@
 
         <!-- Total Check-ins -->
         <div class="card member-card-3d metric-card metric-card-success">
-            <div class="metric-icon">✅</div>
+            <div class="metric-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <h3 class="metric-label metric-label-success">Total Check-ins</h3>
             <div class="metric-value metric-value-success">{{ total_checkins }}</div>
             <div class="metric-note">This month</div>
@@ -301,7 +302,8 @@
 
     <!-- Member Growth Chart -->
     <div class="card member-card-3d analytics-section-card">
-        <h2 class="analytics-section-title">📈 Member Growth (Last 6 Months)
+        <h2 class="analytics-section-title"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Member Growth
+            (Last 6 Months)
         </h2>
         <div class="growth-chart">
             {% for data in member_growth %}
@@ -315,7 +317,7 @@
 
     <!-- Attendance Heatmap -->
     <div class="card member-card-3d analytics-section-card">
-        <h2 class="analytics-section-title">🔥 Attendance Heatmap</h2>
+        <h2 class="analytics-section-title"><i class="fa-solid fa-fire" aria-hidden="true"></i> Attendance Heatmap</h2>
         <p class="analytics-section-subtitle">Peak gym hours by day of week</p>
 
         <div class="heatmap-grid">
@@ -345,7 +347,8 @@
 
     <!-- Top Performers -->
     <div class="card member-card-3d">
-        <h2 class="analytics-section-title">🏆 Top Performers (Most Active)</h2>
+        <h2 class="analytics-section-title"><i class="fa-solid fa-trophy" aria-hidden="true"></i> Top Performers (Most
+            Active)</h2>
 
         {% if top_performers %}
         {% for performer in top_performers %}

@@ -1,0 +1,363 @@
+.landing-hero {
+    text-align: center;
+    padding: 2.75rem 1rem 1.5rem;
+}
+
+.landing-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
+}
+
+.landing-subtitle {
+    color: var(--text-muted);
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    font-size: 1.05rem;
+}
+
+.landing-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.25rem 0 1rem;
+}
+
+.landing-badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.landing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.landing-highlight {
+    background: linear-gradient(120deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.metric-chip {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem;
+    background: var(--bg-card);
+}
+
+.metric-chip strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.metric-chip span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.landing-card-title {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+}
+
+.landing-card-text {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.landing-pricing {
+    margin-top: 1.25rem;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+}
+
+.pricing-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.pricing-note {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.pricing-card-featured {
+    border: 1px solid var(--primary);
+    box-shadow: var(--neon-shadow);
+}
+
+.pricing-badge {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.landing-section-title {
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+.landing-trust {
+    margin-top: 1.25rem;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.trust-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.trust-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.landing-cta-strip {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.landing-cta-text {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.landing-checklist {
+    text-align: left;
+    margin-top: 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+.landing-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.company-section {
+    margin-top: 1.25rem;
+}
+
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+    margin-top: 0.75rem;
+}
+
+.company-item {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.company-item a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.company-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.company-tagline {
+    color: var(--text-muted);
+    margin-bottom: 0.7rem;
+}
+
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+    margin-top: 0.9rem;
+}
+
+.testimonial-quote {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 0.65rem;
+}
+
+.testimonial-author {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.install-section {
+    margin-top: 1.25rem;
+}
+
+.install-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+}
+
+.install-note {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.55rem;
+}
+
+.install-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.9rem;
+    margin-top: 0.95rem;
+}
+
+.install-step-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.install-step-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.install-btn-hidden {
+    display: none;
+}
+
+.install-btn-visible {
+    display: inline-flex;
+}
+
+@media (max-width: 768px) {
+    .landing-hero {
+        padding: 2rem 0.75rem 1.1rem;
+    }
+
+    .landing-title {
+        font-size: 1.9rem;
+    }
+
+    .landing-subtitle {
+        font-size: 0.98rem;
+        margin-bottom: 1rem;
+    }
+
+    .landing-actions {
+        gap: 0.55rem;
+        margin: 0.9rem 0 0.6rem;
+    }
+
+    .landing-actions .btn {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+        padding: 0.82rem 1rem;
+    }
+
+    .hero-metrics,
+    .landing-grid,
+    .pricing-grid,
+    .trust-grid,
+    .testimonial-grid,
+    .company-grid,
+    .install-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .landing-pricing,
+    .landing-trust,
+    .company-section,
+    .landing-cta-strip {
+        margin-top: 1rem;
+    }
+
+    .metric-chip,
+    .card {
+        padding: 0.95rem;
+    }
+
+    .landing-checklist {
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .landing-hero {
+        padding: 2.3rem 1rem 1.2rem;
+    }
+
+    .landing-title {
+        font-size: clamp(2.2rem, 4.2vw, 2.7rem);
+    }
+
+    .landing-subtitle {
+        max-width: 680px;
+        margin-bottom: 1.1rem;
+    }
+
+    .landing-actions .btn {
+        min-width: 180px;
+    }
+
+    .hero-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .landing-grid,
+    .pricing-grid,
+    .trust-grid,
+    .testimonial-grid,
+    .company-grid,
+    .install-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing-pricing,
+    .landing-trust,
+    .company-section,
+    .landing-cta-strip {
+        margin-top: 1.1rem;
+    }
+}

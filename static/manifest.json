@@ -1,6 +1,6 @@
 {
-    "name": "Gym Manager Pro",
-    "short_name": "GymPro",
+    "name": "fitnessmanagement",
+    "short_name": "fitness",
     "description": "Professional gym and fitness management system",
     "start_url": "/",
     "display": "standalone",

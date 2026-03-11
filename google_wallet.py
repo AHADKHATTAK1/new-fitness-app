@@ -1,5 +1,5 @@
 """
-Google Wallet Pass Generator for Gym Manager
+Google Wallet Pass Generator for fitnessmanagement
 Simplified implementation for creating digital membership cards
 """
 
@@ -75,7 +75,7 @@ class GymWalletPass:
             return None
     
     def create_pass_object(self, member_id, member_name, member_phone, 
-                          expiry_date=None, gym_name="Gym Manager"):
+                          expiry_date=None, gym_name="fitnessmanagement"):
         """Create a wallet pass object for a member"""
         if not self.is_configured():
             return None
@@ -133,7 +133,7 @@ class GymWalletPass:
             return None
     
     def create_jwt_save_url(self, member_id, member_name, member_phone, 
-                           gym_name="Gym Manager"):
+                           gym_name="fitnessmanagement"):
         """Create a JWT token for 'Add to Google Wallet' link"""
         if not self.is_configured():
             return None

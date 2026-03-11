@@ -38,7 +38,7 @@ class SecurityManager:
         # Generate provisioning URI for QR code
         provisioning_uri = totp.provisioning_uri(
             name=username,
-            issuer_name='Gym Manager Pro'
+            issuer_name='fitnessmanagement'
         )
         
         # Generate QR code
@@ -79,7 +79,7 @@ class SecurityManager:
         # In production:
         # from twilio.rest import Client
         # client = Client(account_sid, auth_token)
-        # client.messages.create(to=phone, from_=twilio_number, body=f"Your Gym Manager code: {code}")
+        # client.messages.create(to=phone, from_=twilio_number, body=f"Your fitnessmanagement code: {code}")
         return True
     
     # ==================== 2FA - Email ====================
@@ -89,7 +89,7 @@ class SecurityManager:
         from email_utils import EmailSender
         sender = EmailSender()
         
-        subject = "Gym Manager - Verification Code"
+        subject = "fitnessmanagement - Verification Code"
         body = f"""
         <html>
         <body style="font-family: Arial, sans-serif; padding: 20px;">

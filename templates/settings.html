@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - Gym Manager{% endblock %}
+{% block title %}Settings - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -307,21 +307,22 @@
 </style>
 
 <h1 class="settings-title">
-    ⚙️ Gym Settings</h1>
+    <i class="fa-solid fa-gear" aria-hidden="true"></i> Gym Settings
+</h1>
 
 <!-- NEW: Subscription Status Card -->
 <div class="card settings-card subscription-card">
     <div class="card-header-row">
         <h2 class="card-title-inline">
-            💎 My Subscription
+            <i class="fa-solid fa-gem" aria-hidden="true"></i> My Subscription
         </h2>
         {% if subscription.status == 'Active' %}
         <span class="badge badge-active">
-            ✅ Active
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Active
         </span>
         {% else %}
         <span class="badge badge-expired">
-            ❌ Expired
+            <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Expired
         </span>
         {% endif %}
     </div>
@@ -345,227 +346,290 @@
 
     {% if subscription.status != 'Active' or subscription.days_left < 5 %} <div class="renew-wrap">
         <a href="{{ url_for('subscription') }}" class="btn btn-primary full-width-btn btn-center">
-            🔄 Renew / Upgrade Plan
+            <i class="fa-solid fa-rotate" aria-hidden="true"></i> Renew / Upgrade Plan
         </a>
 </div>
 {% endif %}
 
 <div class="renew-wrap">
     <form method="POST" action="{{ url_for('create_billing_portal_session') }}">
-        <button type="submit" class="btn btn-secondary full-width-btn btn-center">💳 Manage Billing (SaaS
+        <button type="submit" class="btn btn-secondary full-width-btn btn-center"><i class="fa-regular fa-credit-card"
+                aria-hidden="true"></i> Manage Billing (SaaS
             Portal)</button>
     </form>
 </div>
 </div>
 
 <div class="card settings-card-spaced">
-    <h2 class="section-title">🚀 Plan Feature Access</h2>
+    <h2 class="section-title"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Plan Feature Access</h2>
     <p class="muted-text">
         Features are unlocked based on your paid subscription tier.
     </p>
 
     <div class="feature-grid">
         <div class="feature-pill {% if feature_access.member_management %}enabled{% else %}disabled{% endif %}">
-            <span>Member Management</span><span class="feature-status">{% if feature_access.member_management %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Member Management</span><span class="feature-status">{% if feature_access.member_management %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.payment_tracking %}enabled{% else %}disabled{% endif %}">
-            <span>Payment Tracking</span><span class="feature-status">{% if feature_access.payment_tracking %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Payment Tracking</span><span class="feature-status">{% if feature_access.payment_tracking %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.basic_reports %}enabled{% else %}disabled{% endif %}">
-            <span>Basic Reports</span><span class="feature-status">{% if feature_access.basic_reports %}✅{% else %}🔒{%
+            <span>Basic Reports</span><span class="feature-status">{% if feature_access.basic_reports %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.mobile_app %}enabled{% else %}disabled{% endif %}">
-            <span>Mobile App (PWA)</span><span class="feature-status">{% if feature_access.mobile_app %}✅{% else %}🔒{%
+            <span>Mobile App (PWA)</span><span class="feature-status">{% if feature_access.mobile_app %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.email_support %}enabled{% else %}disabled{% endif %}">
-            <span>Email Support</span><span class="feature-status">{% if feature_access.email_support %}✅{% else %}🔒{%
+            <span>Email Support</span><span class="feature-status">{% if feature_access.email_support %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.marketing_automation %}enabled{% else %}disabled{% endif %}">
             <span>Marketing Automation</span><span class="feature-status">{% if feature_access.marketing_automation
-                %}✅{% else %}🔒{% endif %}</span>
+                %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div
             class="feature-pill {% if feature_access.ai_churn_prediction or feature_access.advanced_analytics %}enabled{% else %}disabled{% endif %}">
             <span>AI Analytics</span><span class="feature-status">{% if feature_access.ai_churn_prediction or
-                feature_access.advanced_analytics %}✅{% else %}🔒{% endif %}</span>
+                feature_access.advanced_analytics %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.api_access %}enabled{% else %}disabled{% endif %}">
-            <span>API Access</span><span class="feature-status">{% if feature_access.api_access %}✅{% else %}🔒{% endif
+            <span>API Access</span><span class="feature-status">{% if feature_access.api_access %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{% endif
                 %}</span>
         </div>
         <div class="feature-pill {% if feature_access.multi_gym_management %}enabled{% else %}disabled{% endif %}">
             <span>Multi-Gym Management</span><span class="feature-status">{% if feature_access.multi_gym_management
-                %}✅{% else %}🔒{% endif %}</span>
+                %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.priority_support %}enabled{% else %}disabled{% endif %}">
-            <span>Priority Support</span><span class="feature-status">{% if feature_access.priority_support %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Priority Support</span><span class="feature-status">{% if feature_access.priority_support %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.custom_branding %}enabled{% else %}disabled{% endif %}">
-            <span>Custom Branding</span><span class="feature-status">{% if feature_access.custom_branding %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Custom Branding</span><span class="feature-status">{% if feature_access.custom_branding %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.bulk_operations %}enabled{% else %}disabled{% endif %}">
-            <span>Bulk Operations</span><span class="feature-status">{% if feature_access.bulk_operations %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Bulk Operations</span><span class="feature-status">{% if feature_access.bulk_operations %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.advanced_reports %}enabled{% else %}disabled{% endif %}">
-            <span>Advanced Reports</span><span class="feature-status">{% if feature_access.advanced_reports %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Advanced Reports</span><span class="feature-status">{% if feature_access.advanced_reports %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.webhooks %}enabled{% else %}disabled{% endif %}">
-            <span>Webhooks</span><span class="feature-status">{% if feature_access.webhooks %}✅{% else %}🔒{% endif
+            <span>Webhooks</span><span class="feature-status">{% if feature_access.webhooks %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{% endif
                 %}</span>
         </div>
         <div class="feature-pill {% if feature_access.white_label %}enabled{% else %}disabled{% endif %}">
-            <span>White-Label</span><span class="feature-status">{% if feature_access.white_label %}✅{% else %}🔒{%
+            <span>White-Label</span><span class="feature-status">{% if feature_access.white_label %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.custom_domain %}enabled{% else %}disabled{% endif %}">
-            <span>Custom Domain</span><span class="feature-status">{% if feature_access.custom_domain %}✅{% else %}🔒{%
+            <span>Custom Domain</span><span class="feature-status">{% if feature_access.custom_domain %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.dedicated_account_manager %}enabled{% else %}disabled{% endif %}">
             <span>Dedicated Account Manager</span><span class="feature-status">{% if
-                feature_access.dedicated_account_manager %}✅{% else %}🔒{% endif %}</span>
+                feature_access.dedicated_account_manager %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{%
+                else %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.sla_guarantee %}enabled{% else %}disabled{% endif %}">
-            <span>SLA Guarantee</span><span class="feature-status">{% if feature_access.sla_guarantee %}✅{% else %}🔒{%
+            <span>SLA Guarantee</span><span class="feature-status">{% if feature_access.sla_guarantee %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access['24_7_support'] %}enabled{% else %}disabled{% endif %}">
-            <span>24/7 Support</span><span class="feature-status">{% if feature_access['24_7_support'] %}✅{% else %}🔒{%
+            <span>24/7 Support</span><span class="feature-status">{% if feature_access['24_7_support'] %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.on_premise_deployment %}enabled{% else %}disabled{% endif %}">
             <span>On-Premise Deployment</span><span class="feature-status">{% if feature_access.on_premise_deployment
-                %}✅{% else %}🔒{% endif %}</span>
+                %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.custom_development %}enabled{% else %}disabled{% endif %}">
-            <span>Custom Development</span><span class="feature-status">{% if feature_access.custom_development %}✅{%
-                else %}🔒{% endif %}</span>
+            <span>Custom Development</span><span class="feature-status">{% if feature_access.custom_development %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{%
+                else %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.phone_support %}enabled{% else %}disabled{% endif %}">
-            <span>Phone Support</span><span class="feature-status">{% if feature_access.phone_support %}✅{% else %}🔒{%
+            <span>Phone Support</span><span class="feature-status">{% if feature_access.phone_support %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else %}<i class="fa-solid fa-lock"
+                    aria-hidden="true"></i>{%
                 endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.training_sessions %}enabled{% else %}disabled{% endif %}">
-            <span>Training Sessions</span><span class="feature-status">{% if feature_access.training_sessions %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Training Sessions</span><span class="feature-status">{% if feature_access.training_sessions %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.data_migration %}enabled{% else %}disabled{% endif %}">
-            <span>Data Migration</span><span class="feature-status">{% if feature_access.data_migration %}✅{% else
-                %}🔒{% endif %}</span>
+            <span>Data Migration</span><span class="feature-status">{% if feature_access.data_migration %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{% else
+                %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.compliance_support %}enabled{% else %}disabled{% endif %}">
-            <span>Compliance Support</span><span class="feature-status">{% if feature_access.compliance_support %}✅{%
-                else %}🔒{% endif %}</span>
+            <span>Compliance Support</span><span class="feature-status">{% if feature_access.compliance_support %}<i
+                    class="fa-solid fa-circle-check" aria-hidden="true"></i>{%
+                else %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
         <div class="feature-pill {% if feature_access.multi_region_deployment %}enabled{% else %}disabled{% endif %}">
             <span>Multi-Region Deployment</span><span class="feature-status">{% if
-                feature_access.multi_region_deployment %}✅{% else %}🔒{% endif %}</span>
+                feature_access.multi_region_deployment %}<i class="fa-solid fa-circle-check" aria-hidden="true"></i>{%
+                else %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}</span>
         </div>
     </div>
 
     <div class="quick-actions">
         {% if feature_access.member_management %}
-        <a href="{{ feature_paths.member_management }}" class="btn btn-secondary btn-center">👥 Member Management</a>
+        <a href="{{ feature_paths.member_management }}" class="btn btn-secondary btn-center"><i
+                class="fa-solid fa-users" aria-hidden="true"></i> Member Management</a>
         {% endif %}
         {% if feature_access.payment_tracking %}
-        <a href="{{ feature_paths.payment_tracking }}" class="btn btn-secondary btn-center">💳 Payment Tracking</a>
+        <a href="{{ feature_paths.payment_tracking }}" class="btn btn-secondary btn-center"><i
+                class="fa-regular fa-credit-card" aria-hidden="true"></i> Payment Tracking</a>
         {% endif %}
         {% if feature_access.basic_reports %}
-        <a href="{{ feature_paths.basic_reports }}" class="btn btn-secondary btn-center">📊 Basic Reports</a>
+        <a href="{{ feature_paths.basic_reports }}" class="btn btn-secondary btn-center"><i
+                class="fa-solid fa-chart-column" aria-hidden="true"></i> Basic Reports</a>
         {% endif %}
         {% if feature_access.mobile_app %}
-        <a href="{{ feature_paths.mobile_app }}" class="btn btn-secondary btn-center">📱 Mobile App / Scanner</a>
+        <a href="{{ feature_paths.mobile_app }}" class="btn btn-secondary btn-center"><i
+                class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Mobile App / Scanner</a>
         {% endif %}
         {% if feature_access.advanced_analytics %}
-        <a href="{{ feature_paths.advanced_analytics }}" class="btn btn-secondary btn-center">🧠 Open AI Analytics</a>
+        <a href="{{ feature_paths.advanced_analytics }}" class="btn btn-secondary btn-center"><i
+                class="fa-solid fa-brain" aria-hidden="true"></i> Open AI Analytics</a>
         {% endif %}
         {% if feature_access.bulk_operations %}
-        <a href="{{ feature_paths.bulk_operations }}" class="btn btn-secondary btn-center">⚡ Open Bulk Ops</a>
+        <a href="{{ feature_paths.bulk_operations }}" class="btn btn-secondary btn-center"><i class="fa-solid fa-bolt"
+                aria-hidden="true"></i> Open Bulk Ops</a>
         {% endif %}
         {% if feature_access.advanced_reports %}
-        <a href="{{ feature_paths.advanced_reports }}" class="btn btn-secondary btn-center">📤 Advanced Reports /
+        <a href="{{ feature_paths.advanced_reports }}" class="btn btn-secondary btn-center"><i
+                class="fa-solid fa-file-export" aria-hidden="true"></i> Advanced Reports /
             Export</a>
         {% endif %}
         {% if feature_access.webhooks %}
-        <a href="{{ feature_paths.webhooks }}" class="btn btn-secondary btn-center">🔗 Open Webhooks</a>
+        <a href="{{ feature_paths.webhooks }}" class="btn btn-secondary btn-center"><i class="fa-solid fa-link"
+                aria-hidden="true"></i> Open Webhooks</a>
         {% endif %}
         {% if feature_access.api_access %}
-        <a href="{{ feature_paths.api_access }}" class="btn btn-secondary btn-center api-pill">🧩 API Access Enabled</a>
+        <a href="{{ feature_paths.api_access }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> API Access Enabled</a>
         {% endif %}
         {% if feature_access.marketing_automation %}
-        <a href="{{ feature_paths.marketing_automation }}" class="btn btn-secondary btn-center api-pill">📣 Marketing
+        <a href="{{ feature_paths.marketing_automation }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-bullhorn" aria-hidden="true"></i> Marketing
             Automation Enabled</a>
         {% endif %}
         {% if feature_access.multi_gym_management %}
-        <a href="{{ feature_paths.multi_gym_management }}" class="btn btn-secondary btn-center api-pill">🏢 Multi-Gym
+        <a href="{{ feature_paths.multi_gym_management }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-building" aria-hidden="true"></i> Multi-Gym
             Management Enabled</a>
         {% endif %}
         {% if feature_access.priority_support %}
-        <a href="{{ feature_paths.priority_support }}" class="btn btn-secondary btn-center api-pill">⭐ Priority Support
+        <a href="{{ feature_paths.priority_support }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-star" aria-hidden="true"></i> Priority Support
             Enabled</a>
         {% endif %}
         {% if feature_access.custom_branding %}
-        <a href="{{ feature_paths.custom_branding }}" class="btn btn-secondary btn-center api-pill">🎨 Custom Branding
+        <a href="{{ feature_paths.custom_branding }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-palette" aria-hidden="true"></i> Custom Branding
             Enabled</a>
         {% endif %}
         {% if feature_access.white_label %}
-        <a href="{{ feature_paths.white_label }}" class="btn btn-secondary btn-center api-pill">🏷️ White-Label
+        <a href="{{ feature_paths.white_label }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-tag" aria-hidden="true"></i> White-Label
             Enabled</a>
         {% endif %}
         {% if feature_access.custom_domain %}
-        <a href="{{ feature_paths.custom_domain }}" class="btn btn-secondary btn-center api-pill">🌐 Custom Domain
+        <a href="{{ feature_paths.custom_domain }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-globe" aria-hidden="true"></i> Custom Domain
             Enabled</a>
         {% endif %}
         {% if feature_access.dedicated_account_manager %}
-        <a href="{{ feature_paths.dedicated_account_manager }}" class="btn btn-secondary btn-center api-pill">👤
+        <a href="{{ feature_paths.dedicated_account_manager }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-user-tie" aria-hidden="true"></i>
             Dedicated Account Manager Enabled</a>
         {% endif %}
         {% if feature_access.sla_guarantee %}
-        <a href="{{ feature_paths.sla_guarantee }}" class="btn btn-secondary btn-center api-pill">🛡️ SLA Guarantee
+        <a href="{{ feature_paths.sla_guarantee }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-shield-halved" aria-hidden="true"></i> SLA Guarantee
             Enabled</a>
         {% endif %}
         {% if feature_access['24_7_support'] %}
-        <a href="{{ feature_paths['24_7_support'] }}" class="btn btn-secondary btn-center api-pill">☎️ 24/7 Support
+        <a href="{{ feature_paths['24_7_support'] }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-headset" aria-hidden="true"></i> 24/7 Support
             Enabled</a>
         {% endif %}
         {% if feature_access.on_premise_deployment %}
-        <a href="{{ feature_paths.on_premise_deployment }}" class="btn btn-secondary btn-center api-pill">🏠 On-Premise
+        <a href="{{ feature_paths.on_premise_deployment }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-house" aria-hidden="true"></i> On-Premise
             Deployment Enabled</a>
         {% endif %}
         {% if feature_access.custom_development %}
-        <a href="{{ feature_paths.custom_development }}" class="btn btn-secondary btn-center api-pill">🧰 Custom
+        <a href="{{ feature_paths.custom_development }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-toolbox" aria-hidden="true"></i> Custom
             Development Enabled</a>
         {% endif %}
         {% if feature_access.phone_support %}
-        <a href="{{ feature_paths.phone_support }}" class="btn btn-secondary btn-center api-pill">📞 Phone Support
+        <a href="{{ feature_paths.phone_support }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-phone" aria-hidden="true"></i> Phone Support
             Enabled</a>
         {% endif %}
         {% if feature_access.training_sessions %}
-        <a href="{{ feature_paths.training_sessions }}" class="btn btn-secondary btn-center api-pill">🎓 Training
+        <a href="{{ feature_paths.training_sessions }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Training
             Sessions Enabled</a>
         {% endif %}
         {% if feature_access.data_migration %}
-        <a href="{{ feature_paths.data_migration }}" class="btn btn-secondary btn-center api-pill">🗃️ Data Migration
+        <a href="{{ feature_paths.data_migration }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-database" aria-hidden="true"></i> Data Migration
             Enabled</a>
         {% endif %}
         {% if feature_access.compliance_support %}
-        <a href="{{ feature_paths.compliance_support }}" class="btn btn-secondary btn-center api-pill">✅ Compliance
+        <a href="{{ feature_paths.compliance_support }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-circle-check" aria-hidden="true"></i> Compliance
             Support Enabled</a>
         {% endif %}
         {% if feature_access.multi_region_deployment %}
-        <a href="{{ feature_paths.multi_region_deployment }}" class="btn btn-secondary btn-center api-pill">🌍
+        <a href="{{ feature_paths.multi_region_deployment }}" class="btn btn-secondary btn-center api-pill"><i
+                class="fa-solid fa-earth-asia" aria-hidden="true"></i>
             Multi-Region Deployment Enabled</a>
         {% endif %}
-        <a href="{{ url_for('subscription_plans') }}" class="btn btn-primary btn-center">💎 Upgrade / Manage
+        <a href="{{ url_for('subscription_plans') }}" class="btn btn-primary btn-center"><i class="fa-solid fa-gem"
+                aria-hidden="true"></i> Upgrade / Manage
             Subscription</a>
     </div>
 </div>
@@ -626,7 +690,7 @@
 </script>
 
 <div class="card settings-card">
-    <h2 class="section-title">👥 Share Staff Access</h2>
+    <h2 class="section-title"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Share Staff Access</h2>
     <p class="muted-text">Grant staff login access by email and send notification automatically.</p>
     <p class="staff-seat-summary">
         Plan: {{ staff_limit_info.plan_name }} •
@@ -639,7 +703,8 @@
         <label for="staff_email">Staff Email</label>
         <input type="email" id="staff_email" name="staff_email" required placeholder="staff@example.com"
             class="currency-select">
-        <button type="submit" class="btn btn-secondary btn-center staff-share-button">📧 Share
+        <button type="submit" class="btn btn-secondary btn-center staff-share-button"><i class="fa-solid fa-envelope"
+                aria-hidden="true"></i> Share
             Access & Notify</button>
     </form>
 
@@ -721,7 +786,7 @@
             {% endif %}
 
             <label for="gym_logo" class="btn btn-secondary upload-label">
-                📁 Upload New Logo
+                <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Upload New Logo
             </label>
             <input type="file" id="gym_logo" name="gym_logo" accept="image/*" class="hidden-input"
                 onchange="document.getElementById('file-name').textContent = this.files[0].name">
@@ -729,22 +794,23 @@
         </div>
 
         <button type="submit" class="btn btn-success full-width-btn save-btn">
-            💾 Save Settings
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Settings
         </button>
     </form>
 </div>
 
 <div class="card settings-card-spaced card-warning">
-    <h2 class="section-title">🔄 Restore Data (Backup)</h2>
+    <h2 class="section-title"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restore Data (Backup)</h2>
     <p class="muted-text">
         Upload your gym data file (<code>.json</code>) to restore all members, fees, and history.
-        <br><strong>⚠️ Warning:</strong> This will replace all current data!
+        <br><strong><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Warning:</strong> This will
+        replace all current data!
     </p>
 
     <form action="{{ url_for('restore_backup') }}" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="backup_file" class="btn btn-secondary upload-label">
-                📂 Select Backup File
+                <i class="fa-solid fa-folder-tree" aria-hidden="true"></i> Select Backup File
             </label>
             <input type="file" id="backup_file" name="backup_file" accept=".json" required class="hidden-input"
                 onchange="document.getElementById('backup-name').textContent = this.files[0].name">
@@ -752,15 +818,15 @@
         </div>
 
         <button type="submit" class="btn btn-warning full-width-btn"
-            onclick="return confirm('⚠️ Are you sure? This will OVERWRITE all current data permanently!')">
-            🔄 Restore Data Now
+            onclick="return confirm('Warning: Are you sure? This will OVERWRITE all current data permanently!')">
+            <i class="fa-solid fa-rotate" aria-hidden="true"></i> Restore Data Now
         </button>
     </form>
 </div>
 
 
 <div class="card settings-card-spaced card-primary">
-    <h2 class="section-title">🧹 Data Cleanup</h2>
+    <h2 class="section-title"><i class="fa-solid fa-broom" aria-hidden="true"></i> Data Cleanup</h2>
     <p class="muted-text">
         Automatically find and merge duplicate members (same name & phone).
         <br>It keeps the oldest member and moves all fees/attendance to them.
@@ -768,29 +834,30 @@
 
     <form action="{{ url_for('merge_duplicates') }}" method="POST">
         <button type="submit" class="btn btn-primary full-width-btn"
-            onclick="return confirm('⚠️ confirm merge? This will combine duplicates and cannot be undone.')">
-            🔍 Scan & Merge Duplicates
+            onclick="return confirm('Warning: confirm merge? This will combine duplicates and cannot be undone.')">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Scan & Merge Duplicates
         </button>
     </form>
 </div>
 
 <div class="card settings-card-spaced card-danger">
-    <h2 class="section-title">🗑️ Reset All Data</h2>
+    <h2 class="section-title"><i class="fa-solid fa-trash" aria-hidden="true"></i> Reset All Data</h2>
     <p class="muted-text">
-        <strong>⚠️ DANGER ZONE:</strong> This will delete ALL members, fees, and attendance records permanently.
+        <strong><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> DANGER ZONE:</strong> This will
+        delete ALL members, fees, and attendance records permanently.
         <br>This cannot be undone!
     </p>
 
     <form action="{{ url_for('reset_admin') }}" method="GET">
         <button type="submit" class="btn btn-danger full-width-btn"
-            onclick="return confirm('⚠️⚠️⚠️ FINAL WARNING!\n\nThis will DELETE EVERYTHING:\n• All Members\n• All Fees\n• All Attendance Records\n\nAre you ABSOLUTELY SURE?')">
-            🗑️ Reset All Data
+            onclick="return confirm('FINAL WARNING!\n\nThis will DELETE EVERYTHING:\n- All Members\n- All Fees\n- All Attendance Records\n\nAre you ABSOLUTELY SURE?')">
+            <i class="fa-solid fa-trash" aria-hidden="true"></i> Reset All Data
         </button>
     </form>
 </div>
 
 <div class="card billing-card">
-    <h2 class="billing-title">🧾 Subscription / Billing History</h2>
+    <h2 class="billing-title"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Subscription / Billing History</h2>
     {% if payments %}
     <table>
         <thead>
@@ -811,7 +878,7 @@
                 <td><span class="badge paid">{{ p.status }}</span></td>
                 <td>
                     <button class="btn btn-secondary invoice-btn" onclick="alert('Invoice download simulated.')">
-                        📄 Download
+                        <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> Download
                     </button>
                 </td>
             </tr>

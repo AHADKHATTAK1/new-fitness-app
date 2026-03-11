@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Webhooks - Gym Manager{% endblock %}
+{% block title %}Webhooks - fitnessmanagement{% endblock %}
 
 {% block content %}
 <div class="webhooks-container">
     <div class="page-header">
-        <h1>🔗 Webhook Management</h1>
+        <h1><i class="fa-solid fa-link" aria-hidden="true"></i> Webhook Management</h1>
         <p>Integrate with external services via real-time event notifications</p>
     </div>
 
     <!-- Create New Webhook -->
     <div class="webhook-create-section">
         <button class="btn-primary" onclick="toggleCreateForm()">
-            <span>➕</span> Create New Webhook
+            <span><i class="fa-solid fa-plus" aria-hidden="true"></i></span> Create New Webhook
         </button>
     </div>
 
@@ -124,21 +124,25 @@
                 </div>
 
                 <div class="webhook-actions">
-                    <a href="/webhooks/{{ webhook.id }}/logs" class="btn-sm btn-info">📊 View Logs</a>
+                    <a href="/webhooks/{{ webhook.id }}/logs" class="btn-sm btn-info"><i
+                            class="fa-solid fa-chart-column" aria-hidden="true"></i> View Logs</a>
 
                     <form action="/webhooks/{{ webhook.id }}/toggle" method="POST" class="webhook-action-inline">
                         <button type="submit" class="btn-sm btn-warning">
-                            {% if webhook.is_active %}⏸️ Disable{% else %}▶️ Enable{% endif %}
+                            {% if webhook.is_active %}<i class="fa-solid fa-pause" aria-hidden="true"></i> Disable{%
+                            else %}<i class="fa-solid fa-play" aria-hidden="true"></i> Enable{% endif %}
                         </button>
                     </form>
 
                     <form action="/webhooks/{{ webhook.id }}/test" method="POST" class="webhook-action-inline">
-                        <button type="submit" class="btn-sm btn-secondary">🧪 Test</button>
+                        <button type="submit" class="btn-sm btn-secondary"><i class="fa-solid fa-vial"
+                                aria-hidden="true"></i> Test</button>
                     </form>
 
                     <form action="/webhooks/{{ webhook.id }}/delete" method="POST" class="webhook-action-inline"
                         onsubmit="return confirm('Delete this webhook?');">
-                        <button type="submit" class="btn-sm btn-danger">🗑️ Delete</button>
+                        <button type="submit" class="btn-sm btn-danger"><i class="fa-solid fa-trash"
+                                aria-hidden="true"></i> Delete</button>
                     </form>
                 </div>
             </div>
@@ -146,7 +150,7 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <div class="empty-icon">🔗</div>
+            <div class="empty-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></div>
             <h3>No Webhooks Yet</h3>
             <p>Create your first webhook to start receiving real-time event notifications</p>
             <button class="btn-primary" onclick="toggleCreateForm()">Create Webhook</button>

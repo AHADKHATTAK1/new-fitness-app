@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}💰 Payment Center - Premium{% endblock %}
+{% block title %}Payment Center - Premium{% endblock %}
 
 {% block content %}
 <style>
@@ -474,11 +474,12 @@
     <div class="payment-header">
         <div class="payment-header-row">
             <div>
-                <h1 class="payment-header-title">💰 Payment Center</h1>
+                <h1 class="payment-header-title"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i> Payment
+                    Center</h1>
                 <p class="payment-header-subtitle">Record payments & manage transaction history</p>
             </div>
             <a href="{{ url_for('subscription_plans') }}" class="btn payment-subscription-btn">
-                💎 Subscription Plans
+                <i class="fa-solid fa-gem" aria-hidden="true"></i> Subscription Plans
             </a>
         </div>
     </div>
@@ -486,22 +487,22 @@
     <!-- Enhanced Tabs with Paid/Unpaid -->
     <div class="payment-tabs">
         <div class="payment-tab active" onclick="showTab('record')">
-            <div class="payment-tab-icon">💳</div>
+            <div class="payment-tab-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></div>
             <div class="payment-tab-title">Record Payment</div>
             <div class="payment-tab-subtitle payment-tab-subtitle-muted">Add new transaction</div>
         </div>
         <div class="payment-tab" onclick="showTab('paid')">
-            <div class="payment-tab-icon">✅</div>
+            <div class="payment-tab-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <div class="payment-tab-title">Paid Members</div>
             <div class="payment-tab-subtitle payment-tab-subtitle-paid">{{ paid_members|length }} this month</div>
         </div>
         <div class="payment-tab" onclick="showTab('unpaid')">
-            <div class="payment-tab-icon">❌</div>
+            <div class="payment-tab-icon"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></div>
             <div class="payment-tab-title">Unpaid Members</div>
             <div class="payment-tab-subtitle payment-tab-subtitle-unpaid">{{ unpaid_members|length }} pending</div>
         </div>
         <div class="payment-tab" onclick="showTab('history')">
-            <div class="payment-tab-icon">📜</div>
+            <div class="payment-tab-icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></div>
             <div class="payment-tab-title">Payment History</div>
             <div class="payment-tab-subtitle payment-tab-subtitle-muted">{{ fees|length }} total</div>
         </div>
@@ -511,7 +512,7 @@
     <div id="record-tab" class="tab-content">
         <div class="payment-form-card">
             <h2 class="payment-section-title">
-                <span class="payment-section-icon">💳</span>
+                <span class="payment-section-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
                 Record New Payment
             </h2>
 
@@ -552,11 +553,11 @@
                 <div class="form-group">
                     <label for="payment_method">Payment Method</label>
                     <select name="payment_method" id="payment_method" class="form-input">
-                        <option value="cash">💵 Cash</option>
-                        <option value="online">💳 Online Transfer</option>
-                        <option value="jazzcash">📱 JazzCash</option>
-                        <option value="easypaisa">📱 EasyPaisa</option>
-                        <option value="card">💳 Debit/Credit Card</option>
+                        <option value="cash">Cash</option>
+                        <option value="online">Online Transfer</option>
+                        <option value="jazzcash">JazzCash</option>
+                        <option value="easypaisa">EasyPaisa</option>
+                        <option value="card">Debit/Credit Card</option>
                     </select>
                 </div>
 
@@ -578,7 +579,7 @@
     <div id="paid-tab" class="tab-content tab-content-hidden">
         <div class="payment-form-card">
             <h2 class="payment-section-title payment-section-title-green">
-                <span class="payment-section-icon">✅</span>
+                <span class="payment-section-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
                 Paid Members ({{ current_month }})
             </h2>
             {% if paid_members %}
@@ -587,7 +588,8 @@
                 <div class="member-row member-row-paid">
                     <div class="member-row-main">
                         <div class="member-row-name">{{ member.name }}</div>
-                        <div class="member-row-phone">📱 {{ member.phone }}</div>
+                        <div class="member-row-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{
+                            member.phone }}</div>
                     </div>
                     <div class="member-row-right">
                         <span class="member-badge member-badge-paid">✓ PAID</span>
@@ -597,7 +599,7 @@
             </div>
             {% else %}
             <div class="empty-state">
-                <div class="empty-state-icon">😔</div>
+                <div class="empty-state-icon"><i class="fa-regular fa-face-frown" aria-hidden="true"></i></div>
                 <h3 class="empty-title-muted">No Paid Members This Month</h3>
                 <p class="empty-text-muted">Record payments to see them here!</p>
             </div>
@@ -609,7 +611,7 @@
     <div id="unpaid-tab" class="tab-content tab-content-hidden">
         <div class="payment-form-card">
             <h2 class="payment-section-title payment-section-title-red">
-                <span class="payment-section-icon">❌</span>
+                <span class="payment-section-icon"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></span>
                 Unpaid Members ({{ current_month }})
             </h2>
             {% if unpaid_members %}
@@ -618,17 +620,19 @@
                 <div class="member-row member-row-unpaid">
                     <div class="member-row-main">
                         <div class="member-row-name">{{ member.name }}</div>
-                        <div class="member-row-phone">📱 {{ member.phone }}</div>
+                        <div class="member-row-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{
+                            member.phone }}</div>
                     </div>
                     <div class="member-row-right">
-                        <span class="member-badge member-badge-unpaid">❌ UNPAID</span>
+                        <span class="member-badge member-badge-unpaid"><i class="fa-solid fa-circle-xmark"
+                                aria-hidden="true"></i> UNPAID</span>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <div class="empty-state-icon">🎉</div>
+                <div class="empty-state-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
                 <h3 class="empty-title-success">All Members Paid!</h3>
                 <p class="empty-text-muted">Great job collecting this month's fees!</p>
             </div>
@@ -641,7 +645,8 @@
         <div class="payment-form-card">
             <div class="history-header">
                 <h2 class="history-title">
-                    <span class="payment-section-icon">📜</span>
+                    <span class="payment-section-icon"><i class="fa-solid fa-clock-rotate-left"
+                            aria-hidden="true"></i></span>
                     Payment History
                 </h2>
                 <div class="history-total">
@@ -657,7 +662,8 @@
                 <div class="history-row">
                     <div>
                         <div class="history-member-name">{{ fee.member.name if fee.member else 'Unknown Member' }}</div>
-                        <div class="history-member-phone">📱 {{ fee.member.phone if fee.member and fee.member.phone else
+                        <div class="history-member-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{
+                            fee.member.phone if fee.member and fee.member.phone else
                             'N/A' }}</div>
                     </div>
                     <div>
@@ -681,7 +687,7 @@
             </div>
             {% else %}
             <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-icon"><i class="fa-regular fa-envelope-open" aria-hidden="true"></i></div>
                 <h3 class="empty-title-muted">No Payment History</h3>
                 <p class="empty-text-muted">Record your first payment to see it here!</p>
             </div>
@@ -769,7 +775,7 @@
                 if (submitBtn) {
                     submitBtn.classList.add('is-loading');
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="payment-submit-icon">⏳</span>Saving Payment...';
+                    submitBtn.innerHTML = '<span class="payment-submit-icon"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i></span>Saving Payment...';
                 }
             });
         }

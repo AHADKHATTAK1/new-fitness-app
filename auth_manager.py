@@ -12,6 +12,7 @@ import json
 
 class AuthManager:
     def __init__(self):
+        self._reset_codes = {}
         self.session = get_session()
         if not self.session:
             print("⚠️ Running in LEGACY JSON MODE (DB connection failed)")
@@ -229,18 +230,39 @@ class AuthManager:
         """Generate a 6-digit reset code"""
         if self.legacy:
             if username not in self.users: return None
-            return str(secrets.randbelow(900000) + 100000)
+            code = str(secrets.randbelow(900000) + 100000)
+            self._reset_codes[username] = {
+                'code': code,
+                'expires_at': datetime.utcnow() + timedelta(minutes=15)
+            }
+            return code
 
         user = self.session.query(User).filter_by(email=username).first()
         if not user:
             return None
         
         code = str(secrets.randbelow(900000) + 100000)  # 6-digit code
+        self._reset_codes[username] = {
+            'code': code,
+            'expires_at': datetime.utcnow() + timedelta(minutes=15)
+        }
         return code
     
     def verify_reset_code(self, username, code):
-        """Verify reset code (simplified for now)"""
-        return True  # Simplified
+        """Verify reset code and expiry"""
+        record = self._reset_codes.get(username)
+        if not record:
+            return False
+
+        if datetime.utcnow() > record.get('expires_at', datetime.utcnow()):
+            self._reset_codes.pop(username, None)
+            return False
+
+        is_valid = str(record.get('code', '')).strip() == str(code or '').strip()
+        if is_valid:
+            self._reset_codes.pop(username, None)
+
+        return is_valid
     
     def update_password(self, username, new_password):
         """Update user password"""

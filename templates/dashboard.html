@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Gym Manager{% endblock %}
+{% block title %}Dashboard - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -751,7 +751,8 @@
     <div class="carousel-header">
         <div class="carousel-slides">
             <div class="carousel-slide">
-                <h2 class="carousel-title">🎉 Welcome to {{ gym_details.name }}!</h2>
+                <h2 class="carousel-title"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Welcome to {{
+                    gym_details.name }}!</h2>
                 <p class="carousel-subtitle">Manage your gym with ultimate ease</p>
             </div>
         </div>
@@ -763,7 +764,7 @@
         <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-purple">
             <div class="stat-glow stat-glow-purple"></div>
             <div class="stat-content">
-                <div class="stat-icon stat-icon-purple">👥</div>
+                <div class="stat-icon stat-icon-purple"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
                 <h3 class="stat-label stat-label-primary">Total Members</h3>
                 <div class="stat-value stat-value-primary">{{ total_members }}</div>
             </div>
@@ -773,7 +774,8 @@
         <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-cyan">
             <div class="stat-glow stat-glow-cyan"></div>
             <div class="stat-content">
-                <div class="stat-icon stat-icon-cyan">💰</div>
+                <div class="stat-icon stat-icon-cyan"><i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i>
+                </div>
                 <h3 class="stat-label stat-label-secondary">This Month Revenue</h3>
                 <div class="stat-value stat-value-secondary">{{ gym_details.currency or '$' }}{{ revenue }}</div>
             </div>
@@ -783,7 +785,7 @@
         <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-green">
             <div class="stat-glow stat-glow-green"></div>
             <div class="stat-content">
-                <div class="stat-icon stat-icon-green">✅</div>
+                <div class="stat-icon stat-icon-green"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
                 <h3 class="stat-label stat-label-success">Paid Members</h3>
                 <div class="stat-value stat-value-success">{{ paid|length }}</div>
                 <div class="stat-note">Current Month</div>
@@ -794,7 +796,7 @@
         <div class="card stat-card-enhanced member-card-3d stat-card-base stat-card-red">
             <div class="stat-glow stat-glow-red"></div>
             <div class="stat-content">
-                <div class="stat-icon stat-icon-red">❌</div>
+                <div class="stat-icon stat-icon-red"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></div>
                 <h3 class="stat-label stat-label-error">Unpaid Members</h3>
                 <div class="stat-value stat-value-error">{{ unpaid|length }}</div>
                 <div class="stat-note">Pending Fees</div>
@@ -806,7 +808,7 @@
     <div class="insights-grid">
         <!-- Expiring Soon Insight -->
         <div class="card stat-card-enhanced member-card-3d insight-card insight-card-yellow">
-            <div class="insight-icon insight-icon-yellow">⏰</div>
+            <div class="insight-icon insight-icon-yellow"><i class="fa-regular fa-clock" aria-hidden="true"></i></div>
             <div>
                 <h4 class="insight-title insight-title-yellow">Expiring Soon</h4>
                 <div class="insight-value">{{ expiring_count }} <span class="insight-value-unit">members</span></div>
@@ -816,7 +818,7 @@
         <!-- Inactive Alert Insight -->
         {% if inactive_members_alert %}
         <div class="card stat-card-enhanced member-card-3d insight-card insight-card-slate">
-            <div class="insight-icon insight-icon-slate">😴</div>
+            <div class="insight-icon insight-icon-slate"><i class="fa-solid fa-bed" aria-hidden="true"></i></div>
             <div>
                 <h4 class="insight-title insight-title-slate">Inactive</h4>
                 <div class="insight-value">{{ inactive_members_alert|length }} <span class="insight-value-unit">silent
@@ -831,7 +833,7 @@
 <!-- SMART ALERTS SECTION -->
 {% if unpaid_members_alert or expiring_trials_alert or birthdays_today_alert or inactive_members_alert %}
 <div class="smart-alerts-wrap">
-    <h2 class="smart-alerts-title">🔔 Smart Alerts</h2>
+    <h2 class="smart-alerts-title"><i class="fa-regular fa-bell" aria-hidden="true"></i> Smart Alerts</h2>
 
     <div class="smart-alerts-grid">
 
@@ -839,7 +841,7 @@
         {% if unpaid_members_alert %}
         <div class="card member-card-3d alert-card-unpaid">
             <div class="alert-head">
-                <div class="alert-emoji">💸</div>
+                <div class="alert-emoji"><i class="fa-solid fa-money-bills" aria-hidden="true"></i></div>
                 <div>
                     <h3 class="alert-title alert-title-unpaid">Payment Due</h3>
                     <p class="alert-subtitle">{{
@@ -851,7 +853,8 @@
                 <div class="alert-item">
                     <span class="alert-item-name">{{ member.name }}</span>
                     <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20your%20gym%20fee%20for%20{{ current_month }}%20is%20pending!"
-                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                        target="_blank" rel="noopener noreferrer" class="wa-link" title="Send WhatsApp reminder"
+                        aria-label="Send WhatsApp reminder"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
                 </div>
                 {% endfor %}
             </div>
@@ -862,7 +865,7 @@
         {% if expiring_trials_alert %}
         <div class="card member-card-3d alert-card-trials">
             <div class="alert-head">
-                <div class="alert-emoji">⏰</div>
+                <div class="alert-emoji"><i class="fa-regular fa-clock" aria-hidden="true"></i></div>
                 <div>
                     <h3 class="alert-title alert-title-trials">Trials Expiring</h3>
                     <p class="alert-subtitle">Next 3 days</p>
@@ -877,7 +880,8 @@
                         </div>
                     </div>
                     <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20your%20trial%20ends%20soon!%20Convert%20to%20full%20membership?"
-                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                        target="_blank" rel="noopener noreferrer" class="wa-link" title="Send WhatsApp reminder"
+                        aria-label="Send WhatsApp reminder"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
                 </div>
                 {% endfor %}
             </div>
@@ -888,7 +892,7 @@
         {% if birthdays_today_alert %}
         <div class="card member-card-3d alert-card-birthday">
             <div class="alert-head">
-                <div class="alert-emoji">🎂</div>
+                <div class="alert-emoji"><i class="fa-solid fa-cake-candles" aria-hidden="true"></i></div>
                 <div>
                     <h3 class="alert-title alert-title-birthday">Birthdays Today</h3>
                     <p class="alert-subtitle">Celebrate!</p>
@@ -898,8 +902,10 @@
                 {% for member in birthdays_today_alert %}
                 <div class="alert-item">
                     <span class="alert-item-name">{{ member.name }}</span>
-                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Happy%20Birthday%20{{ member.name }}!%20🎉%20Wishing%20you%20health%20and%20happiness!"
-                        target="_blank" rel="noopener noreferrer" class="wa-link">🎉</a>
+                    <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Happy%20Birthday%20{{ member.name }}!%20Wishing%20you%20health%20and%20happiness!"
+                        target="_blank" rel="noopener noreferrer" class="wa-link" title="Send birthday message"
+                        aria-label="Send birthday message"><i class="fa-solid fa-cake-candles"
+                            aria-hidden="true"></i></a>
                 </div>
                 {% endfor %}
             </div>
@@ -910,7 +916,7 @@
         {% if inactive_members_alert %}
         <div class="card member-card-3d alert-card-inactive">
             <div class="alert-head">
-                <div class="alert-emoji">😴</div>
+                <div class="alert-emoji"><i class="fa-solid fa-bed" aria-hidden="true"></i></div>
                 <div>
                     <h3 class="alert-title alert-title-inactive">Inactive Members</h3>
                     <p class="alert-subtitle">No check-in 14+
@@ -926,7 +932,8 @@
                         </div>
                     </div>
                     <a href="https://wa.me/{{ member.phone.replace(' ', '') }}?text=Hi%20{{ member.name }},%20we%20miss%20you!%20Everything%20okay?"
-                        target="_blank" rel="noopener noreferrer" class="wa-link">💬</a>
+                        target="_blank" rel="noopener noreferrer" class="wa-link" title="Send WhatsApp reminder"
+                        aria-label="Send WhatsApp reminder"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
                 </div>
                 {% endfor %}
             </div>
@@ -940,9 +947,10 @@
 <!-- Revenue Chart Section -->
 <div class="card member-card-3d revenue-card">
     <div class="revenue-card-head">
-        <h2 class="revenue-card-title">📊 Revenue Trend</h2>
-        <button onclick="toggleChart()" class="revenue-toggle">
-            👁️
+        <h2 class="revenue-card-title"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Revenue Trend</h2>
+        <button onclick="toggleChart()" class="revenue-toggle" title="Toggle revenue chart"
+            aria-label="Toggle revenue chart">
+            <i class="fa-regular fa-eye" aria-hidden="true"></i>
         </button>
     </div>
     <div class="container mt-4">
@@ -953,7 +961,7 @@
                 <!-- Quick Actions -->
                 <div class="quick-actions-bar mb-4">
                     <a href="/subscription_plans" class="action-btn action-btn-premium">
-                        <span class="action-icon">💎</span>
+                        <span class="action-icon"><i class="fa-solid fa-gem" aria-hidden="true"></i></span>
                         <div class="action-text">
                             <div class="action-title">Subscription Plans</div>
                             <div class="action-subtitle">Upgrade your tier</div>
@@ -961,7 +969,7 @@
                     </a>
 
                     <a href="/webhooks" class="action-btn action-btn-integrations">
-                        <span class="action-icon">🔗</span>
+                        <span class="action-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
                         <div class="action-text">
                             <div class="action-title">Webhooks</div>
                             <div class="action-subtitle">Manage integrations</div>
@@ -970,7 +978,7 @@
 
                     <a href="/add_member?gym_id={{ selected_gym.id if selected_gym else '' }}"
                         class="action-btn action-btn-primary">
-                        <span class="action-icon">➕</span>
+                        <span class="action-icon"><i class="fa-solid fa-user-plus" aria-hidden="true"></i></span>
                         <div class="action-text">
                             <div class="action-title">Add Member</div>
                             <div class="action-subtitle">Quick add</div>
@@ -979,7 +987,7 @@
 
                     <a href="/fees?gym_id={{ selected_gym.id if selected_gym else '' }}"
                         class="action-btn action-btn-success">
-                        <span class="action-icon">💰</span>
+                        <span class="action-icon"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i></span>
                         <div class="action-text">
                             <div class="action-title">Record Payment</div>
                             <div class="action-subtitle">Collect fees</div>
@@ -1124,22 +1132,24 @@
                     Members</h1>
                 <div class="members-actions">
                     <a href="{{ url_for('analytics') }}" class="btn btn-gradient-primary">
-                        📊 Analytics
+                        <i class="fa-solid fa-chart-column" aria-hidden="true"></i> Analytics
                     </a>
                     {% if feature_access.bulk_operations %}
                     <a href="{{ url_for('bulk_operations') }}" class="btn btn-gradient-secondary">
-                        ⚡ Bulk Operations
+                        <i class="fa-solid fa-bolt" aria-hidden="true"></i> Bulk Operations
                     </a>
                     {% endif %}
-                    <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="🔍 Search members..."
+                    <input type="text" id="memberSearch" onkeyup="filterMembers()" placeholder="Search members..."
                         class="member-search">
-                    <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d">✨ Add Member</a>
+                    <a href="{{ url_for('add_member') }}" class="btn btn-success member-card-3d"><i
+                            class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member</a>
                 </div>
             </div>
 
             <!-- Paid Members Table -->
             <div class="card member-card-3d" id="paid-members">
-                <h2 class="members-section-title members-section-title-paid">✅ Paid Members ({{
+                <h2 class="members-section-title members-section-title-paid"><i class="fa-solid fa-circle-check"
+                        aria-hidden="true"></i> Paid Members ({{
                     current_month
                     }})</h2>
                 {% if paid %}
@@ -1169,7 +1179,8 @@
                                 <td><a href="{{ url_for('member_details', member_id=member.id) }}"
                                         class="member-link-paid">{{ member.name }}</a></td>
                                 <td>{{ member.phone }}</td>
-                                <td><span class="badge-enhanced badge-paid">✅ Paid</span></td>
+                                <td><span class="badge-enhanced badge-paid"><i class="fa-solid fa-circle-check"
+                                            aria-hidden="true"></i> Paid</span></td>
                                 <td>
                                     <a href="{{ url_for('member_details', member_id=member.id) }}"
                                         class="btn btn-sm view-btn-paid">View</a>
@@ -1187,7 +1198,8 @@
 
             <!-- Unpaid Members -->
             <div class="card member-card-3d mt-2" id="unpaid-members">
-                <h2 class="members-section-title members-section-title-unpaid">❌ Unpaid Members ({{
+                <h2 class="members-section-title members-section-title-unpaid"><i class="fa-solid fa-circle-xmark"
+                        aria-hidden="true"></i> Unpaid Members ({{
                     current_month }})
                 </h2>
                 {% if unpaid %}
@@ -1218,7 +1230,8 @@
                                         class="member-link-unpaid">{{
                                         member.name }}</a></td>
                                 <td>{{ member.phone }}</td>
-                                <td><span class="badge-enhanced badge-unpaid">❌ Unpaid</span></td>
+                                <td><span class="badge-enhanced badge-unpaid"><i class="fa-solid fa-circle-xmark"
+                                            aria-hidden="true"></i> Unpaid</span></td>
                                 <td>
                                     <a href="{{ url_for('member_details', member_id=member.id) }}"
                                         class="btn btn-sm view-btn-unpaid">View</a>
@@ -1229,7 +1242,7 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="empty-state">All members have paid! 🎉
+                <p class="empty-state">All members have paid!
                 </p>
                 {% endif %}
             </div>

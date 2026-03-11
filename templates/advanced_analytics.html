@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Advanced Analytics - Gym Manager{% endblock %}
+{% block title %}Advanced Analytics - fitnessmanagement{% endblock %}
 
 {% block content %}
 <div class="analytics-container">
-    <h1 class="page-title">📊 Advanced Business Analytics</h1>
+    <h1 class="page-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Advanced Business Analytics</h1>
 
     <!-- Key Metrics Overview -->
     <div class="metrics-grid">
         <div class="metric-card highlight">
-            <div class="metric-icon">💰</div>
+            <div class="metric-icon"><i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i></div>
             <div class="metric-value">₨{{ total_revenue|default(0)|round(2) }}</div>
             <div class="metric-label">Total Revenue (This Month)</div>
             <div class="metric-trend {% if revenue_growth >= 0 %}positive{% else %}negative{% endif %}">
@@ -18,7 +18,7 @@
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon">👥</div>
+            <div class="metric-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
             <div class="metric-value">{{ total_members|default(0) }}</div>
             <div class="metric-label">Total Members</div>
             <div class="metric-trend {% if member_growth >= 0 %}positive{% else %}negative{% endif %}">
@@ -27,14 +27,14 @@
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon">📈</div>
+            <div class="metric-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
             <div class="metric-value">{{ retention_rate|default(0) }}%</div>
             <div class="metric-label">Retention Rate</div>
             <div class="metric-trend">Last 3 Months</div>
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon">⚡</div>
+            <div class="metric-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
             <div class="metric-value">{{ avg_attendance|default(0) }}</div>
             <div class="metric-label">Avg Daily Attendance</div>
             <div class="metric-trend">Peak Hour: {{ peak_hour|default('N/A') }}</div>
@@ -45,38 +45,38 @@
     <div class="charts-section">
         <!-- Revenue Forecast Chart -->
         <div class="chart-card">
-            <h3>📊 Revenue Forecast (Next 6 Months)</h3>
+            <h3><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Revenue Forecast (Next 6 Months)</h3>
             <canvas id="revenueForecastChart"></canvas>
         </div>
 
         <!-- Member Growth Chart -->
         <div class="chart-card">
-            <h3>👥 Member Growth Trend</h3>
+            <h3><i class="fa-solid fa-users" aria-hidden="true"></i> Member Growth Trend</h3>
             <canvas id="memberGrowthChart"></canvas>
         </div>
 
         <!-- Attendance Heatmap -->
         <div class="chart-card full-width">
-            <h3>🔥 Attendance Heatmap (Peak Hours)</h3>
+            <h3><i class="fa-solid fa-fire" aria-hidden="true"></i> Attendance Heatmap (Peak Hours)</h3>
             <canvas id="attendanceHeatmap"></canvas>
         </div>
 
         <!-- Revenue by Membership Type -->
         <div class="chart-card">
-            <h3>💳 Revenue by Membership Type</h3>
+            <h3><i class="fa-regular fa-credit-card" aria-hidden="true"></i> Revenue by Membership Type</h3>
             <canvas id="revenueByTypeChart"></canvas>
         </div>
 
         <!-- Payment Collection Rate -->
         <div class="chart-card">
-            <h3>💵 Payment Collection Rate</h3>
+            <h3><i class="fa-solid fa-money-check-dollar" aria-hidden="true"></i> Payment Collection Rate</h3>
             <canvas id="collectionRateChart"></canvas>
         </div>
     </div>
 
     <!-- Business Insights -->
     <div class="insights-section">
-        <h2>🧠 Smart Business Insights</h2>
+        <h2><i class="fa-solid fa-brain" aria-hidden="true"></i> Smart Business Insights</h2>
         <div class="insights-grid">
             {% for insight in insights %}
             <div class="insight-card {{ insight.type }}">
@@ -92,25 +92,25 @@
 
     <!-- Member Segments -->
     <div class="segments-section">
-        <h2>👥 Member Segments</h2>
+        <h2><i class="fa-solid fa-users" aria-hidden="true"></i> Member Segments</h2>
         <div class="segments-grid">
             <div class="segment-card vip">
-                <h3>⭐ VIP Members</h3>
+                <h3><i class="fa-solid fa-star" aria-hidden="true"></i> VIP Members</h3>
                 <div class="segment-value">{{ vip_count|default(0) }}</div>
                 <p>Premium members</p>
             </div>
             <div class="segment-card active">
-                <h3>✅ Active Members</h3>
+                <h3><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Active Members</h3>
                 <div class="segment-value">{{ active_count|default(0) }}</div>
                 <p>Regular attendance</p>
             </div>
             <div class="segment-card risk">
-                <h3>⚠️ At Risk</h3>
+                <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> At Risk</h3>
                 <div class="segment-value">{{ at_risk_count|default(0) }}</div>
                 <p>Low engagement</p>
             </div>
             <div class="segment-card churned">
-                <h3>❌ Churned</h3>
+                <h3><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Churned</h3>
                 <div class="segment-value">{{ churned_count|default(0) }}</div>
                 <p>Inactive 30+ days</p>
             </div>

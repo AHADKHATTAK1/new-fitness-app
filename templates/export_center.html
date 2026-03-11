@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Export Center - Gym Manager{% endblock %}
+{% block title %}Export Center - fitnessmanagement{% endblock %}
 
 {% block content %}
 <style>
@@ -111,7 +111,7 @@
 
 <div class="export-center-wrap">
     <h1 class="export-center-title">
-        📊 Export Center
+        <i class="fa-solid fa-file-export" aria-hidden="true"></i> Export Center
     </h1>
 
     <p class="export-center-subtitle">
@@ -122,85 +122,89 @@
 
         <!-- Complete Members Database -->
         <div class="card export-card">
-            <div class="export-card-icon">👥</div>
+            <div class="export-card-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Complete Members</h2>
             <p class="export-card-desc">
                 Full member database with personal info, payment history, and membership details
             </p>
             <a href="{{ url_for('export_members_complete') }}" class="btn btn-primary export-card-btn">
-                📥 Download Excel
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Download Excel
             </a>
         </div>
 
         <!-- Revenue Report -->
         <div class="card export-card">
-            <div class="export-card-icon">💰</div>
+            <div class="export-card-icon"><i class="fa-solid fa-money-bill-trend-up" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Revenue Report</h2>
             <p class="export-card-desc">
                 Detailed revenue breakdown by month, member type, and payment method
             </p>
             <a href="{{ url_for('export_revenue_report') }}" class="btn btn-success export-card-btn">
-                📥 Download Excel
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Download Excel
             </a>
         </div>
 
         <!-- Unpaid Members -->
         <div class="card export-card">
-            <div class="export-card-icon">⚠️</div>
+            <div class="export-card-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Unpaid Members</h2>
             <p class="export-card-desc">
                 List of members with pending payments and overdue amounts
             </p>
             <a href="{{ url_for('export_unpaid_members') }}" class="btn export-card-btn export-card-btn-warning">
-                📥 Download Excel
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Download Excel
             </a>
         </div>
 
         <!-- Attendance Analysis (Coming Soon) -->
         <div class="card export-card dimmed">
-            <div class="export-card-icon">📈</div>
+            <div class="export-card-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Attendance Analysis</h2>
             <p class="export-card-desc">
                 Member check-in frequency and engagement statistics
             </p>
             <button class="btn export-card-btn export-card-btn-disabled" disabled>
-                🔜 Coming Soon
+                <i class="fa-solid fa-hourglass-start" aria-hidden="true"></i> Coming Soon
             </button>
         </div>
 
         <!-- Quick Dashboard Export -->
         <div class="card export-card">
-            <div class="export-card-icon">⚡</div>
+            <div class="export-card-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Quick Export</h2>
             <p class="export-card-desc">
                 Basic member list with current month payment status
             </p>
             <a href="{{ url_for('download_excel') }}" class="btn export-card-btn export-card-btn-secondary">
-                📥 Download Excel
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Download Excel
             </a>
         </div>
 
         <!-- Custom Report Builder (Coming Soon) -->
         <div class="card export-card dimmed">
-            <div class="export-card-icon">🎯</div>
+            <div class="export-card-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
             <h2 class="export-card-title">Custom Report</h2>
             <p class="export-card-desc">
                 Build custom reports with date ranges and filters
             </p>
             <button class="btn export-card-btn export-card-btn-disabled" disabled>
-                🔜 Coming Soon
+                <i class="fa-solid fa-hourglass-start" aria-hidden="true"></i> Coming Soon
             </button>
         </div>
 
     </div>
 
     <div class="card export-tips">
-        <h3 class="export-tips-title">💡 Pro Tips</h3>
+        <h3 class="export-tips-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Pro Tips</h3>
         <ul class="export-tips-list">
-            <li class="export-tips-item">✅ All exports are professionally formatted Excel files</li>
-            <li class="export-tips-item">✅ Column widths auto-adjusted for readability</li>
-            <li class="export-tips-item">✅ Headers are styled with your gym colors</li>
-            <li>✅ Files include timestamp in filename for easy organization</li>
+            <li class="export-tips-item"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> All exports are
+                professionally formatted Excel files</li>
+            <li class="export-tips-item"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Column widths
+                auto-adjusted for readability</li>
+            <li class="export-tips-item"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Headers are styled
+                with your gym colors</li>
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Files include timestamp in filename for easy
+                organization</li>
         </ul>
     </div>
 </div>

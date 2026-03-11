@@ -70,13 +70,30 @@ class ImportValidator:
             'existing_member': None
         }
         
-        # Extract and clean data
-        name = str(row.get('Name') or row.get('name') or '').strip()
-        phone = str(row.get('Phone') or row.get('phone') or row.get('Mobile') or '').strip()
-        email = str(row.get('Email') or row.get('email') or '').strip()
-        joined_date = row.get('Joined Date') or row.get('Join Date') or row.get('joined_date')
-        status = str(row.get('Status') or row.get('Paid') or '').strip().lower()
-        membership_type = str(row.get('Membership Type') or row.get('Type') or '').strip()
+        def _normalize_key(key: str) -> str:
+            return re.sub(r'\s+', ' ', str(key or '').strip().lower().replace('_', ' ').replace('-', ' '))
+
+        def _get_value(source_row: Dict, aliases: List[str], default=None):
+            if not source_row:
+                return default
+
+            normalized_lookup = {
+                _normalize_key(k): v for k, v in source_row.items() if k is not None
+            }
+
+            for alias in aliases:
+                value = normalized_lookup.get(_normalize_key(alias))
+                if value not in (None, ''):
+                    return value
+            return default
+
+        # Extract and clean data (supports common alternate headers)
+        name = str(_get_value(row, ['Name', 'name', 'Member Name', 'Client Name']) or '').strip()
+        phone = str(_get_value(row, ['Phone', 'phone', 'Mobile', 'Contact', 'Phone Number', 'Client Contact Number']) or '').strip()
+        email = str(_get_value(row, ['Email', 'email', 'Mail', 'Email Address', 'Client Email']) or '').strip()
+        joined_date = _get_value(row, ['Joined Date', 'Join Date', 'joined_date', 'Gym Admission Date', 'Admission Date', 'Joining Date'])
+        status = str(_get_value(row, ['Status', 'Paid', 'Fee Status', 'Payment Status']) or '').strip().lower()
+        membership_type = str(_get_value(row, ['Membership Type', 'Type', 'Plan', 'Package']) or '').strip()
         
         # Validate Name (Required)
         if not name or len(name) < 2:

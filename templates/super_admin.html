@@ -27,7 +27,8 @@
 </style>
 
 <div class="card super-admin-card">
-    <h1 class="super-admin-title">🛡️ Super Admin - Payment Approvals</h1>
+    <h1 class="super-admin-title"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Super Admin - Payment
+        Approvals</h1>
 
     {% if pending_users %}
     <table>
@@ -58,7 +59,7 @@
                 <td>
                     <a href="{{ url_for('approve_payment', target_username=u.username) }}" class="btn btn-success"
                         onclick="return confirm('Approve this user?')">
-                        ✅ Approve
+                        <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Approve
                     </a>
                 </td>
             </tr>

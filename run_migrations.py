@@ -6,9 +6,10 @@ Connects to Neon PostgreSQL and runs all required migrations
 
 import psycopg2
 from psycopg2 import sql
+import os
 
-# Database connection URL
-DATABASE_URL = "postgresql://neondb_owner:npg_UdX8K1pgAVnv@ep-wild-pine-adrlnus4-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
+# Database connection URL (read from environment for safety)
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 # Migration SQL statements
 MIGRATIONS = [
@@ -42,6 +43,10 @@ MIGRATIONS = [
 
 def run_migrations():
     """Connect to database and run all migrations"""
+    if not DATABASE_URL:
+        print("❌ DATABASE_URL is not set.")
+        print("Set it in your environment before running migrations.")
+        return False
     
     print("🔧 Starting Database Migration...")
     print(f"📡 Connecting to: {DATABASE_URL.split('@')[1].split('/')[0]}")
@@ -110,7 +115,7 @@ def run_migrations():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("   GYM MANAGER - DATABASE MIGRATION TOOL")
+    print("   FITNESSMANAGEMENT - DATABASE MIGRATION TOOL")
     print("=" * 60)
     print()
     
@@ -121,4 +126,5 @@ if __name__ == "__main__":
     else:
         print("\n❌ Migration failed. Check errors above.")
     
-    input("\nPress Enter to exit...")
+    if os.getenv("MIGRATIONS_NO_PAUSE", "0") != "1":
+        input("\nPress Enter to exit...")
