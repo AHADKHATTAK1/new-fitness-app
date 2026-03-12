@@ -1,9 +1,201 @@
-FROM python:3.11-slim
+<!DOCTYPE html>
+<html lang="en">
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ company_details.name }} | Gym Management Platform</title>
+    <style>
+        :root {
+            --bg: #f4f1ea;
+            --panel: #fffdf8;
+            --ink: #18211e;
+            --muted: #54605b;
+            --accent: #005f4a;
+            --accent-2: #ff8d3a;
+            --ring: rgba(0, 95, 74, 0.15);
+        }
 
-COPY . .
-ENV PYTHONUNBUFFERED=1
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 0% 0%, #e6f8f2 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, #ffe8d5 0%, transparent 45%),
+                var(--bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .shell {
+            width: 100%;
+            max-width: 980px;
+            background: var(--panel);
+            border-radius: 20px;
+            box-shadow: 0 22px 60px var(--ring);
+            overflow: hidden;
+            border: 1px solid #e8e4da;
+        }
+
+        .topbar {
+            background: linear-gradient(120deg, var(--accent) 0%, #009171 100%);
+            color: #ffffff;
+            padding: 28px 28px 32px;
+        }
+
+        .brand {
+            margin: 0;
+            font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+            letter-spacing: 0.3px;
+        }
+
+        .tagline {
+            margin: 10px 0 0;
+            color: #dff8f1;
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
+            line-height: 1.4;
+            max-width: 680px;
+        }
+
+        .body {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            padding: 26px;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #ece7dc;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .copy {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 135px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 10px;
+            color: var(--muted);
+        }
+
+        .contact-list strong {
+            color: var(--ink);
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .accent-note {
+            margin-top: 12px;
+            color: #7a441a;
+            background: #fff0e4;
+            border: 1px solid #ffd7bb;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 780px) {
+            .body {
+                grid-template-columns: 1fr;
+                padding: 18px;
+            }
+
+            .topbar {
+                padding: 22px 18px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+        <section class="topbar">
+            <h1 class="brand">{{ company_details.name }}</h1>
+            <p class="tagline">{{ company_details.tagline }}</p>
+        </section>
+
+        <section class="body">
+            <article class="panel">
+                <h2>Run Your Gym From One Dashboard</h2>
+                <p class="copy">
+                    Manage members, fees, attendance, reports, and renewals in one place.
+                    Built for gyms that want less admin friction and more time for coaching.
+                </p>
+                <div class="actions">
+                    <a class="btn btn-primary" href="{{ url_for('auth') }}">Sign In</a>
+                    <a class="btn btn-secondary" href="{{ url_for('subscription_plans') }}">View Plans</a>
+                </div>
+            </article>
+
+            <aside class="panel">
+                <h2>Contact</h2>
+                <ul class="contact-list">
+                    <li><strong>Phone:</strong> {{ company_details.phone }}</li>
+                    <li><strong>Email:</strong> {{ company_details.email }}</li>
+                    <li><strong>Address:</strong> {{ company_details.address }}</li>
+                    <li><strong>Website:</strong> {{ company_details.website }}</li>
+                </ul>
+                <p class="accent-note">Need setup help? Reach out and we will onboard your gym quickly.</p>
+            </aside>
+        </section>
+    </main>
+</body>
+
+</html>
