@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "sh -c \"gunicorn --bind 0.0.0.0:${PORT:-8080} app:app\""
+startCommand = "sh start.sh"
 healthcheckPath = "/healthz"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

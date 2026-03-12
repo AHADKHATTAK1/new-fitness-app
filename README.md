@@ -147,7 +147,8 @@ ADMIN_EMAILS=admin@gym.com
 	- `GOOGLE_CLIENT_ID`
 	- `ADMIN_EMAILS`
 - Use production server process:
-	- `Procfile` included: `web: gunicorn --bind 0.0.0.0:$PORT app:app`
+	- `Procfile` included: `web: sh start.sh`
+	- `start.sh` runs: `gunicorn --bind 0.0.0.0:${PORT:-8080} app:app`
 	- `gunicorn` is included in `requirements.txt`
 - Verify core routes after deploy:
 	- `/auth`, `/dashboard`, `/settings`, `/subscription_plans`, `/webhooks`, `/healthz`
